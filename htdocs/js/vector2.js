@@ -67,5 +67,15 @@ proto.magnitude = function horde_Vector2_proto_magnitude () {
 proto.normalize = function horde_Vector2_proto_normalize () {
 	return this.scale(1 / this.magnitude());
 };
+
+proto.toString = function horde_Vector2_proto_toString () {
+	return this.x + ", " + this.y;
+};
+
+proto.floor = function horde_Vector2_proto_floor () {
+	this.x = Math.floor(this.x);
+	this.y = Math.floor(this.y);
+	return this;
+};
 	
 }());

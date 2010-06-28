@@ -41,21 +41,41 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
  */
 proto.init = function horde_Engine_proto_init () {
 	
+	this.map = [
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+		[0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0],
+		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+	];
+	
+	this.tileSize = new horde.Size(32, 32);
+	
 	var hero = new horde.Object();
 	hero.team = 0;
 	hero.hitPoints = 10;
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
 	
-	var numEnemies = horde.randomRange(5, 8);
+	var numEnemies = horde.randomRange(1, 1);
 	for (var x = 0; x < numEnemies; x++) {
 		var e = new horde.Object();
 		e.team = 1;
-		e.hitPoints = 2;
+		e.hitPoints = 25;
 		e.color = "rgb(0, 255, 0)";
 		e.speed = 50;
-		e.position.x = horde.randomRange(0, this.view.width - e.size.width);
-		e.position.y = horde.randomRange(0, this.view.height - e.size.height);
+		e.position.x = 9 * this.tileSize.width;
+		e.position.y = 2 * this.tileSize.height;
 		
 		this.addObject(e);
 	}
@@ -99,7 +119,63 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		}
 
 		var px = ((o.speed / 1000) * elapsed);
-		o.position.add(o.direction.clone().scale(px));
+		
+		if (o.direction.x !== 0) {
+			// the object is moving along the "x" axis
+			o.position.x += (o.direction.x * px);
+			var b = o.boundingBox();
+			var size = new horde.Vector2(b.width, b.height);
+			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
+			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
+			for (var y = b.y; y <= e.y; y++) {
+				for (var x = b.x; x <= e.x; x++) {
+					if (this.map[y][x] === 0) {
+						// unwalkable
+						// hit a wall
+						if (o.ownerId === "o1") {
+							o.wounds = o.hitPoints;
+						}
+						if (o.direction.x > 0) {
+							// moving right
+							o.position.x = x * this.tileSize.width - o.size.width;
+						} else {
+							// moving left
+							o.position.x = x * this.tileSize.width + this.tileSize.width;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		if (o.direction.y !== 0) {
+			// the object is moving along the "y" axis
+			o.position.y += (o.direction.y * px);
+			var b = o.boundingBox();
+			var size = new horde.Vector2(b.width, b.height);
+			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
+			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
+			for (var y = b.y; y <= e.y; y++) {
+				for (var x = b.x; x <= e.x; x++) {
+					if (this.map[y][x] === 0) {
+						// unwalkable
+						if (o.ownerId === "o1") {
+							o.wounds = o.hitPoints;
+						}
+						if (o.direction.y > 0) {
+							// moving down
+							o.position.y = y * this.tileSize.height - o.size.height;
+						} else {
+							// moving up
+							o.position.y = y * this.tileSize.height + this.tileSize.height;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		//o.position.add(o.direction.clone().scale(px));
 		
 		for (var x in this.objects) {
 			
