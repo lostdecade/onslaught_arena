@@ -16,6 +16,8 @@ horde.Engine = function horde_Engine () {
 	
 	this.view = new horde.Size(640, 480);
 	
+	this.images = null;
+
 };
 
 var proto = horde.Engine.prototype;
@@ -59,6 +61,16 @@ proto.init = function horde_Engine_proto_init () {
 	}
 	
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
+	
+	this.images = new horde.ImageLoader();
+	this.images.load({
+		"background": "img/arena.png"
+	}, this.handleImagesLoaded, this);
+	
+};
+
+horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
+	this.imagesLoaded = true;
 };
 
 horde.Engine.prototype.update = function horde_Engine_proto_update () {
@@ -67,6 +79,10 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	var elapsed = now - this.lastUpdate;
 	this.lastUpdate = now;
 
+	if (this.imagesLoaded !== true) {
+		return;
+	}
+	
 	this.handleInput();
 	
 	for (var id in this.objects) {
@@ -88,6 +104,10 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		for (var x in this.objects) {
 			
 			var o2 = this.objects[x];
+			
+			if (o2.wounds >= o2.hitPoints) {
+				continue;
+			}
 			
 			if (o2.team === o.team) {
 				continue;
@@ -141,7 +161,7 @@ horde.Engine.prototype.handleInput = function () {
 		p.speed = 400;
 		p.size.width = 16;
 		p.size.height = 16;
-		p.color = "rgb(200, 200, 200)";
+		p.color = "rgb(200, 0, 0)";
 		p.centerOn(o.boundingBox().center());		
 		p.setDirection(o.facing);
 		this.addObject(p);
@@ -156,8 +176,12 @@ horde.Engine.prototype.render = function () {
 	var ctx = this.canvases["display"].getContext("2d");
 
 	// TODO: remove this once we have a map
-	ctx.fillStyle = "rgb(0,0,0)";
-	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	//ctx.fillStyle = "rgb(0,0,0)";
+	//ctx.fillRect(0, 0, this.view.width, this.view.height);
+	
+	ctx.drawImage(this.images.getImage("background"), 
+			0, 0, 640, 480, 
+			0, 0, this.view.width, this.view.height);
 	
 	var hpWidth = 300;
 	
