@@ -1,6 +1,7 @@
 (function define_horde_Object () {
 
 /**
+ * Horde Game Object
  * @constructor
  */
 horde.Object = function () {
@@ -16,20 +17,32 @@ horde.Object = function () {
 	this.hitPoints = 1;
 	this.wounds = 0;
 	this.damage = 1;
-	
 	this.spriteSheet = "";
 	this.spriteX = 0;
 	this.spriteY = 0;
-
 	this.animated = false;
 	this.animFrameIndex = 0;
 	this.animDelay = 200;
 	this.animElapsed = 0;
-	
+	this.state = "alive";
 };
 
-horde.Object.prototype.update = function (elapsed) {
-	
+var proto = horde.Object.prototype;
+
+/**
+ * Runs any initialization
+ * @return {void}
+ */
+proto.init = function horde_Object_proto_init () {
+	this.execute("onInit");
+};
+
+/**
+ * Update this object
+ * @param {number} elapsed Elapsed time in milliseconds since last update
+ * @return {void}
+ */
+proto.update = function horde_Object_proto_update (elapsed) {
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -40,13 +53,16 @@ horde.Object.prototype.update = function (elapsed) {
 			}
 		}
 	}
-	
-	
+	this.execute("onUpdate", [elapsed]);
 };
 
-horde.Object.prototype.getSpriteXY = function () {
+/**
+ * Returns the XY coordinates of this objects sprite
+ * @return {horde.Vector2} XY coordinates of sprite to draw
+ */
+proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 	if (this.animated) {
-		var offset = horde.directions.fromVector(this.facing);
+		var offset = horde.directions.fromVector(this.facing.clone());
 		return new horde.Vector2(
 			((offset * 2) + this.animFrameIndex) * this.size.width,
 			this.spriteY
@@ -56,50 +72,100 @@ horde.Object.prototype.getSpriteXY = function () {
 	}
 };
 
-horde.Object.prototype.boundingBox = function () {
+/**
+ * Returns the bounding box for this object
+ * @return {horde.Rect} Rectangle representing the bounding box
+ */
+proto.boundingBox = function horde_Object_proto_boundingBox () {
 	return new horde.Rect(
 			this.position.x, this.position.y,
 			this.size.width - 1, this.size.height - 1);
 };
 
-horde.Object.prototype.centerOn = function (v) {
+/**
+ * Centers this object on a point
+ * @param {horde.Vector2} v Vector to center on
+ * @return {void}
+ */
+proto.centerOn = function horde_Object_proto_centerOn (v) {
 	this.position = v.subtract(horde.Vector2.fromSize(this.size).scale(0.5));
 };
 
-horde.Object.prototype.setDirection = function (v) {
-	this.direction = v;
-	this.facing = this.direction.clone();
+/**
+ * Deal some damage (or wound) this object
+ * @param {number} damage The amount of damage to deal
+ * @return {void}
+ */
+proto.wound = function horde_Object_proto_wound (damage) {
+	this.wounds += damage;
+	if (this.wounds >= this.hitPoints) {
+		this.die();
+	}
 };
 
-horde.Object.prototype.stopMoving = function () {
+/**
+ * Causes this object to die. Do not pass go, do not collect $200.
+ * @return {void}
+ */
+proto.die = function horde_Object_proto_die () {
+	this.state = "dead";
+};
+
+/**
+ * Handles when this object collides with a wall
+ * @param {array} axis Array of axes where collision occurred (x, y)
+ * @return {void}
+ */
+proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
+	switch (this.role) {
+		case "projectile":
+			// Projectiles "die" when they hit walls
+			this.die();
+			break;
+		case "monster":
+			// reverse direction(s)
+			var d = this.direction.clone();
+			for (var i in axis) {
+				d[axis[i]] *= -1;
+			}
+			this.setDirection(d);
+			break;
+	}
+	this.execute("onWallCollide");
+};
+
+/**
+ * Sets the direction (and facing) for this object
+ * @param {horde.Vector2} v Vector representing the direction
+ * @return {void}
+ */
+proto.setDirection = function horde_Object_proto_setDirection (v) { 
+	if (v.x === 0 && v.y === 0) {
+		this.stopMoving();
+	} else {
+		this.direction = v;
+		this.facing = this.direction.clone();
+	}
+};
+
+/**
+ * Stops this object from moving (resets direction vector to zero)
+ * @return {void}
+ */
+proto.stopMoving = function horde_Object_proto_stopMoving () {
 	this.direction.zero();
 };
 
-horde.Object.prototype.think = function (objects) {
-
-	if (this.id === "o1" || this.ownerId === "o1") {
-		return;
+/**
+ * Executes a method that may or may not exist
+ * @param {string} method Method to call
+ * @param {array} args Array of arguments
+ * @return {void}
+ */ 
+proto.execute = function horde_Object_proto_execute (method, args) {
+	if (this[method]) {
+		this[method].apply(this, args);
 	}
-
-	// move towards the player
-	
-	// don't clump too much on other units
-
-	// chase object "o1" (aka the hero)
-	var target = objects["o1"];
-	var move = target.boundingBox().center().subtract(this.position).normalize();
-	this.setDirection(move);
-	return;
-	
-	/*
-	// Switch to a random direction 5% of the time
-	if (horde.randomRange(1, 100) === 1) {
-		var x = horde.randomRange(-1, 1);
-		var y = horde.randomRange(-1, 1);
-		this.setDirection(new horde.Vector2(x, y));
-	}
-	*/
-	
 };
 
 }());

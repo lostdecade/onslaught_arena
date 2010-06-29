@@ -70,6 +70,16 @@ horde.randomRange = function horde_randomRange (min, max) {
 	return (Math.round(Math.random() * (max - min)) + min);
 };
 
+horde.randomDirection = function () {
+	var d = horde.directions.toVector(horde.randomRange(0, 7));
+	if (horde.randomRange(1, 100) > 50) {
+		d.x *= Math.random();
+	} else {
+		d.y *= Math.random();
+	}
+	return d;
+};
+
 /**
  * Directions enumeration
  */
@@ -82,8 +92,35 @@ horde.directions = {
 	DOWN_LEFT: 5,
 	LEFT: 6,
 	UP_LEFT: 7,
+	toVector: function (d) {
+		switch (d) {
+			case horde.directions.UP:
+				return new horde.Vector2(0, -1);
+				break;
+			case horde.directions.UP_RIGHT:
+				return new horde.Vector2(1, -1);
+				break;
+			case horde.directions.RIGHT:
+				return new horde.Vector2(1, 0);
+				break;
+			case horde.directions.DOWN_RIGHT:
+				return new horde.Vector2(1, 1);
+				break;
+			case horde.directions.DOWN:
+				return new horde.Vector2(0, 1);
+				break;
+			case horde.directions.DOWN_LEFT:
+				return new horde.Vector2(-1, 1);
+				break;
+			case horde.directions.LEFT:
+				return new horde.Vector2(-1, 0);
+				break;
+			case horde.directions.UP_LEFT:
+				return new horde.Vector2(-1, -1);
+				break;				
+		}
+	},
 	fromVector: function (v) {
-		v.floor();
 		if (v.x === 0 && v.y < 0) {
 			return horde.directions.UP;
 		}

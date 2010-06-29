@@ -82,11 +82,12 @@ proto.init = function horde_Engine_proto_init () {
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
 	
-	var numEnemies = horde.randomRange(1, 1);
+	var numEnemies = horde.randomRange(20, 30);
 	for (var x = 0; x < numEnemies; x++) {
 		var e = this.makeObject("bat");
 		e.position.x = 9 * this.tileSize.width;
 		e.position.y = 2 * this.tileSize.height;
+		e.setDirection(horde.randomDirection());
 		this.addObject(e);
 	}
 	
@@ -117,23 +118,26 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	}
 	
 	this.handleInput();
+	this.updateObjects(elapsed);
+	this.render();
+};
+
+horde.Engine.prototype.updateObjects = function (elapsed) {
 	
 	for (var id in this.objects) {
 
 		var o = this.objects[id];
 		
-		if (o.wounds >= o.hitPoints) {
+		if (o.state === "dead") {
 			delete(this.objects[o.id]);
 			continue;
 		}
 		
 		o.update(elapsed);
-		
-		if (o.id !== this.activeObjectId) {
-			o.think(this.objects);
-		}
 
 		var px = ((o.speed / 1000) * elapsed);
+		
+		var axis = [];
 		
 		if (o.direction.x !== 0) {
 			// the object is moving along the "x" axis
@@ -142,14 +146,10 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			var size = new horde.Vector2(b.width, b.height);
 			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
 			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
+			check_x:
 			for (var y = b.y; y <= e.y; y++) {
 				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y][x] === 0) {
-						// unwalkable
-						// hit a wall
-						if (o.ownerId === "o1") {
-							o.wounds = o.hitPoints;
-						}
+					if (this.map[y] && this.map[y][x] === 0) {
 						if (o.direction.x > 0) {
 							// moving right
 							o.position.x = x * this.tileSize.width - o.size.width;
@@ -157,6 +157,8 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 							// moving left
 							o.position.x = x * this.tileSize.width + this.tileSize.width;
 						}
+						axis.push("x");
+						break check_x;
 					}
 				}
 			}
@@ -170,13 +172,10 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			var size = new horde.Vector2(b.width, b.height);
 			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
 			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
+			check_y:
 			for (var y = b.y; y <= e.y; y++) {
 				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y][x] === 0) {
-						// unwalkable
-						if (o.ownerId === "o1") {
-							o.wounds = o.hitPoints;
-						}
+					if (this.map[y] && this.map[y][x] === 0) {
 						if (o.direction.y > 0) {
 							// moving down
 							o.position.y = y * this.tileSize.height - o.size.height;
@@ -184,36 +183,30 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 							// moving up
 							o.position.y = y * this.tileSize.height + this.tileSize.height;
 						}
+						axis.push("y");
+						break check_y;
 					}
 				}
 			}
 		}
 		
-		
-		//o.position.add(o.direction.clone().scale(px));
-		
+		if (axis.length > 0) {
+			o.wallCollide(axis);
+		}
+	
 		for (var x in this.objects) {
-			
 			var o2 = this.objects[x];
-			
-			if (o2.wounds >= o2.hitPoints) {
+			if (o2.state !== "alive" || o2.team === o.team) {
 				continue;
 			}
-			
-			if (o2.team === o.team) {
-				continue;
-			}
-			
 			if (o.boundingBox().intersects(o2.boundingBox())) {
-				o.wounds += o2.damage;
-				o2.wounds += o.damage;
+				o.wound(o2.damage);
+				o2.wound(o.damage);
 			}
-			
 		}
 		
 	}
 	
-	this.render();
 };
 
 horde.Engine.prototype.handleInput = function () {
@@ -267,7 +260,7 @@ horde.Engine.prototype.render = function () {
 	
 	// Draw shadow layer
 	ctx.drawImage(this.images.getImage("shadow"),
-		0, 0, 576, 386,
+		0, 0, 576, 386, 
 		32, 0, 576, 386
 	);
 	
@@ -293,6 +286,8 @@ horde.Engine.prototype.drawUI = function (ctx) {
 	var o = this.objects["o1"];
 	
 	ctx.save();
+	ctx.fillStyle = "rgb(50, 0, 0)";
+	ctx.fillRect(10, 430, hpWidth, 30);
 	ctx.fillStyle = "rgb(255, 0, 0)";
 	ctx.strokeStyle = "rgb(255, 255, 255)";
 	ctx.lineWidth = 2;

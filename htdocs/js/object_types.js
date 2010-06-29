@@ -62,7 +62,24 @@ o.bat = {
 	spriteSheet: "characters",
 	spriteY: 96,
 	animated: true,
-	animDelay: 150
+	animDelay: 150,
+	moveChangeElapsed: 0,
+	moveChangeDelay: 500,
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+	},
+	onUpdate: function (elapsed) {
+		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeElapsed >= this.moveChangeDelay) {
+			this.moveChangeElapsed = 0;
+			var d = horde.randomDirection();
+			if (d.x === 0 && d.y === 0) { return; }
+			this.setDirection(d);
+		}
+	},
+	onWallCollide: function () {
+		this.moveChangeElapsed = 0;
+	}
 };
 
 o.goblin = {
