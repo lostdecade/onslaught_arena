@@ -83,6 +83,7 @@ horde.directions = {
 	LEFT: 6,
 	UP_LEFT: 7,
 	fromVector: function (v) {
+		v.floor();
 		if (v.x === 0 && v.y < 0) {
 			return horde.directions.UP;
 		}

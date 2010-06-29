@@ -18,6 +18,7 @@ horde.Object = function () {
 	this.damage = 1;
 	
 	this.spriteSheet = "";
+	this.spriteX = 0;
 	this.spriteY = 0;
 
 	this.animated = false;
@@ -45,13 +46,13 @@ horde.Object.prototype.update = function (elapsed) {
 
 horde.Object.prototype.getSpriteXY = function () {
 	if (this.animated) {
-		var dir = horde.directions.fromVector(this.facing);
+		var offset = horde.directions.fromVector(this.facing);
 		return new horde.Vector2(
-			(dir + this.animFrameIndex) * this.size.width,
+			((offset * 2) + this.animFrameIndex) * this.size.width,
 			this.spriteY
 		);
 	} else {
-		return new horde.Vector2();
+		return new horde.Vector2(this.spriteX, this.spriteY);
 	}
 };
 

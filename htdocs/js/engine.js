@@ -96,7 +96,8 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"background": "img/arena.png",
 		"shadow": "img/arena_shadow.png",
-		"characters": "img/char.png"
+		"characters": "img/sheet_characters.png",
+		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
 	
 };
@@ -252,21 +253,16 @@ horde.Engine.prototype.handleInput = function () {
 };
 
 horde.Engine.prototype.render = function () {
+	
 	var ctx = this.canvases["display"].getContext("2d");
 
-	// TODO: remove this once we have a map
-	//ctx.fillStyle = "rgb(0,0,0)";
-	//ctx.fillRect(0, 0, this.view.width, this.view.height);
-	
+	// Draw background
 	ctx.drawImage(this.images.getImage("background"), 
-			0, 0, 640, 480, 
-			0, 0, this.view.width, this.view.height);
+		0, 0, 640, 480, 
+		0, 0, this.view.width, this.view.height
+	);
 	
-	var hpWidth = 300;
-	
-	var o = this.objects["o1"];
-	
-	// draw objects
+	// Draw objects
 	this.drawObjects(ctx);
 	
 	// Draw shadow layer
@@ -275,6 +271,27 @@ horde.Engine.prototype.render = function () {
 		32, 0, 576, 386
 	);
 	
+	// Draw UI
+	this.drawUI(ctx);
+
+};
+
+horde.Engine.prototype.drawObjects = function (ctx) {
+	for (var id in this.objects) {
+		var o = this.objects[id];
+		var s = o.getSpriteXY();
+		ctx.drawImage(this.images.getImage(o.spriteSheet),
+			s.x, s.y, o.size.width, o.size.height,
+			o.position.x, o.position.y, o.size.width, o.size.height
+		);
+	}
+};
+
+horde.Engine.prototype.drawUI = function (ctx) {
+	
+	var hpWidth = 300;
+	var o = this.objects["o1"];
+	
 	ctx.save();
 	ctx.fillStyle = "rgb(255, 0, 0)";
 	ctx.strokeStyle = "rgb(255, 255, 255)";
@@ -282,23 +299,7 @@ horde.Engine.prototype.render = function () {
 	ctx.fillRect(10, 430, hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints), 30);
 	ctx.strokeRect(10, 430, hpWidth, 30);
 	ctx.restore();
-
-};
-
-horde.Engine.prototype.drawObjects = function (ctx) {
-	for (var id in this.objects) {
-		var o = this.objects[id];
-		if (o.role === "monster") {
-			var s = o.getSpriteXY();
-			ctx.drawImage(this.images.getImage(o.spriteSheet),
-				s.x, s.y, o.size.width, o.size.height,
-				o.position.x, o.position.y, o.size.width, o.size.height
-			);
-		} else {
-			ctx.fillStyle = o.color;
-			ctx.fillRect(parseInt(o.position.x), parseInt(o.position.y), o.size.width, o.size.height);
-		}
-	}
+	
 };
 
 horde.Engine.prototype.run = function () {

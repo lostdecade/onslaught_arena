@@ -10,6 +10,9 @@ o.hero = {
 	speed: 150,
 	hitPoints: 25,
 	damage: 1,
+	spriteSheet: "characters",
+	spriteY: 0,
+	animated: true,
 	weapons: [
 		{type: "h_rock", count: -1}
 	]
@@ -19,10 +22,12 @@ o.hero = {
 
 o.h_rock = {
 	role: "projectile",
-	size: new horde.Size(16, 16),
-	speed: 200,
+	speed: 250,
 	hitPoints: 1,
-	damage: 1
+	damage: 1,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 0
 };
 
 o.h_sword = {
@@ -55,7 +60,7 @@ o.bat = {
 	hitPoints: 1,
 	damage: 1,
 	spriteSheet: "characters",
-	spriteY: 0,
+	spriteY: 96,
 	animated: true,
 	animDelay: 150
 };
