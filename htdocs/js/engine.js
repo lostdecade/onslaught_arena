@@ -35,6 +35,23 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 	return id;
 };
 
+proto.makeObject = function horde_Engine_proto_makeObject (type) {
+	var obj = new horde.Object();
+	for (var x in horde.objectTypes[type]) {
+		obj[x] = horde.objectTypes[type][x];
+	}
+	return obj;
+};
+
+proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
+	var o = this.makeObject(type);
+	o.ownerId = parent.id;
+	o.team = parent.team;
+	o.centerOn(parent.boundingBox().center());
+	o.setDirection(parent.facing);
+	this.addObject(o);
+};
+
 /**
  * Initializes the engine
  * @return {void}
@@ -61,22 +78,15 @@ proto.init = function horde_Engine_proto_init () {
 	
 	this.tileSize = new horde.Size(32, 32);
 	
-	var hero = new horde.Object();
-	hero.team = 0;
-	hero.hitPoints = 10;
+	var hero = this.makeObject("hero");
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
 	
 	var numEnemies = horde.randomRange(1, 1);
 	for (var x = 0; x < numEnemies; x++) {
-		var e = new horde.Object();
-		e.team = 1;
-		e.hitPoints = 25;
-		e.color = "rgb(0, 255, 0)";
-		e.speed = 50;
+		var e = this.makeObject("bat");
 		e.position.x = 9 * this.tileSize.width;
 		e.position.y = 2 * this.tileSize.height;
-		
 		this.addObject(e);
 	}
 	
@@ -84,7 +94,8 @@ proto.init = function horde_Engine_proto_init () {
 	
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		"background": "img/arena.png"
+		"background": "img/arena.png",
+		"characters": "img/char.png"
 	}, this.handleImagesLoaded, this);
 	
 };
@@ -113,6 +124,8 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			delete(this.objects[o.id]);
 			continue;
 		}
+		
+		o.update(elapsed);
 		
 		if (o.id !== this.activeObjectId) {
 			o.think(this.objects);
@@ -223,25 +236,14 @@ horde.Engine.prototype.handleInput = function () {
 	
 	var o = this.objects["o1"];
 	
-	o.stop();
+	o.stopMoving();
 	
 	if (move.x !== 0 || move.y !== 0) {
 		o.setDirection(move);
 	}
 	
 	if (this.keyboard.isKeyPressed(32)) {
-		
-		var p = new horde.Object();
-		p.ownerId = o.id;
-		p.team = o.team;
-		p.speed = 400;
-		p.size.width = 16;
-		p.size.height = 16;
-		p.color = "rgb(200, 0, 0)";
-		p.centerOn(o.boundingBox().center());		
-		p.setDirection(o.facing);
-		this.addObject(p);
-		
+		this.spawnObject(o, "h_rock");
 	}
 	
 	this.keyboard.storeKeyStates();
@@ -267,7 +269,6 @@ horde.Engine.prototype.render = function () {
 	this.drawObjects(ctx);
 	
 	ctx.save();
-	//ctx.globalAlpha = 0.5;
 	ctx.fillStyle = "rgb(255, 0, 0)";
 	ctx.strokeStyle = "rgb(255, 255, 255)";
 	ctx.lineWidth = 2;
@@ -280,8 +281,16 @@ horde.Engine.prototype.render = function () {
 horde.Engine.prototype.drawObjects = function (ctx) {
 	for (var id in this.objects) {
 		var o = this.objects[id];
-		ctx.fillStyle = o.color;
-		ctx.fillRect(parseInt(o.position.x), parseInt(o.position.y), o.size.width, o.size.height);
+		if (o.role === "monster") {
+			var s = o.getSpriteXY();
+			ctx.drawImage(this.images.getImage(o.spriteSheet),
+				s.x, s.y, o.size.width, o.size.height,
+				o.position.x, o.position.y, o.size.width, o.size.height
+			);
+		} else {
+			ctx.fillStyle = o.color;
+			ctx.fillRect(parseInt(o.position.x), parseInt(o.position.y), o.size.width, o.size.height);
+		}
 	}
 };
 

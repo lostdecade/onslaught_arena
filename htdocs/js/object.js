@@ -10,13 +10,49 @@ horde.Object = function () {
 	this.direction = new horde.Vector2();
 	this.facing = new horde.Vector2(0, 1);
 	this.speed = 100;
-	this.color = "rgb(0, 0, 255)";
+	this.color = "rgb(50, 50, 50)";
 	this.ownerId = "";
 	this.team = null;
-
 	this.hitPoints = 1;
 	this.wounds = 0;
 	this.damage = 1;
+	
+	this.spriteSheet = "";
+	this.spriteY = 0;
+
+	this.animated = false;
+	this.animFrameIndex = 0;
+	this.animDelay = 200;
+	this.animElapsed = 0;
+	
+};
+
+horde.Object.prototype.update = function (elapsed) {
+	
+	if (this.animated) {
+		this.animElapsed += elapsed;
+		if (this.animElapsed >= this.animDelay) {
+			this.animElapsed = 0;
+			this.animFrameIndex++;
+			if (this.animFrameIndex > 1) {
+				this.animFrameIndex = 0;
+			}
+		}
+	}
+	
+	
+};
+
+horde.Object.prototype.getSpriteXY = function () {
+	if (this.animated) {
+		var dir = horde.directions.fromVector(this.facing);
+		return new horde.Vector2(
+			(dir + this.animFrameIndex) * this.size.width,
+			this.spriteY
+		);
+	} else {
+		return new horde.Vector2();
+	}
 };
 
 horde.Object.prototype.boundingBox = function () {
@@ -34,7 +70,7 @@ horde.Object.prototype.setDirection = function (v) {
 	this.facing = this.direction.clone();
 };
 
-horde.Object.prototype.stop = function () {
+horde.Object.prototype.stopMoving = function () {
 	this.direction.zero();
 };
 

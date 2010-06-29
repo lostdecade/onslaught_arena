@@ -69,3 +69,43 @@ horde.makeCanvas = function horde_makeCanvas (id, width, height, hidden) {
 horde.randomRange = function horde_randomRange (min, max) {
 	return (Math.round(Math.random() * (max - min)) + min);
 };
+
+/**
+ * Directions enumeration
+ */
+horde.directions = {
+	UP: 0,
+	UP_RIGHT: 1,
+	RIGHT: 2,
+	DOWN_RIGHT: 3,
+	DOWN: 4,
+	DOWN_LEFT: 5,
+	LEFT: 6,
+	UP_LEFT: 7,
+	fromVector: function (v) {
+		if (v.x === 0 && v.y < 0) {
+			return horde.directions.UP;
+		}
+		if (v.x > 0 && v.y < 0) {
+			return horde.directions.UP_RIGHT;
+		}
+		if (v.x > 0 && v.y === 0) {
+			return horde.directions.RIGHT;
+		}
+		if (v.x > 0 && v.y > 0) {
+			return horde.directions.DOWN_RIGHT;
+		}
+		if (v.x === 0 && v.y > 0) {
+			return horde.directions.DOWN;
+		}
+		if (v.x < 0 && v.y > 0) {
+			return horde.directions.DOWN_LEFT;
+		}
+		if (v.x < 0 && v.y === 0) {
+			return horde.directions.LEFT;
+		}
+		if (v.x < 0 && v.y < 0) {
+			return horde.directions.UP_LEFT;
+		}
+	}
+};
