@@ -92,9 +92,6 @@ o.bat = {
 			if (d.x === 0 && d.y === 0) { return; }
 			this.setDirection(d);
 		}
-	},
-	onWallCollide: function () {
-		//this.moveChangeElapsed = 0;
 	}
 };
 
@@ -106,7 +103,22 @@ o.goblin = {
 	damage: 1,
 	spriteSheet: "characters",
 	spriteY: 160,
-	animated: true
+	animated: true,
+	gibletSize: "medium",
+	moveChangeElapsed: 0,
+	moveChangeDelay: 500,
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+	},
+	onUpdate: function (elapsed) {
+		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeElapsed >= this.moveChangeDelay) {
+			this.moveChangeElapsed = 0;
+			var d = horde.randomDirection();
+			if (d.x === 0 && d.y === 0) { return; }
+			this.setDirection(d);
+		}
+	}
 };
 
 o.ogre = {
@@ -115,7 +127,8 @@ o.ogre = {
 	team: 1,
 	speed: 50,
 	hitPoints: 10,
-	damage: 5
+	damage: 5,
+	gibletSize: "large"
 };
 
 // ENEMY WEAPONS
@@ -131,28 +144,98 @@ o.e_arrow = {
 // OTHER SHIT
 
 o.chest = {
-	
+	role: "chest",
+	team: 1,
+	speed: 0,
+	spriteSheet: "characters",
+	spriteX: 0,
+	spriteY: 32,
+	damage: 0,
+	hitPoints: 25
 };
 
 o.gold_chest = {
 	
 };
 
+// GIBLETS
 
-o.giblet = {
+o.small_skull = {
 	role: "fluff",
 	speed: 25,
 	ttl: 1000,
 	spriteSheet: "objects",
-	spriteX: 128,
-	spriteY: 32,
+	spriteX: 64,
+	spriteY: 64,
+	rotate: true,
+	rotateSpeed: 50,
+};
+
+o.small_giblet = {
+	role: "fluff",
+	speed: 25,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 160,
 	rotate: true,
 	rotateSpeed: 50,
 	onInit: function () {
-		var offset = horde.randomRange(0, 9);
+		var offset = horde.randomRange(0, 6);
 		this.spriteX += (offset * this.size.width);
 	}
+};
 
+o.medium_skull = {
+	role: "fluff",
+	speed: 25,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 64,
+	rotate: true,
+	rotateSpeed: 50,
+};
+
+o.medium_giblet = {
+	role: "fluff",
+	speed: 25,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 128,
+	rotate: true,
+	rotateSpeed: 50,
+	onInit: function () {
+		var offset = horde.randomRange(0, 6);
+		this.spriteX += (offset * this.size.width);
+	}
+};
+
+o.large_skull = {
+	role: "fluff",
+	speed: 25,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 64,
+	rotate: true,
+	rotateSpeed: 50,
+};
+
+o.large_giblet = {
+	role: "fluff",
+	speed: 25,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 96,
+	rotate: true,
+	rotateSpeed: 50,
+	onInit: function () {
+		var offset = horde.randomRange(0, 6);
+		this.spriteX += (offset * this.size.width);
+	}
 };
 
 }());

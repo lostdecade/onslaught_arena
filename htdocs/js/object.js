@@ -34,6 +34,7 @@ horde.Object = function () {
 	this.ttlElapsed = 0;
 	this.alpha = 1;
 	this.alphaStep = 0;
+	this.gibletSize = "small";
 };
 
 var proto = horde.Object.prototype;
