@@ -82,15 +82,31 @@ proto.init = function horde_Engine_proto_init () {
 	
 	this.tileSize = new horde.Size(32, 32);
 	
+	this.spawnPoints = [
+		new horde.Rect(
+			3 * this.tileSize.width, -2 * this.tileSize.height, 
+			this.tileSize.width * 2, this.tileSize.height * 2
+		),
+		new horde.Rect(
+			9 * this.tileSize.width, -2 * this.tileSize.height,
+			this.tileSize.width * 2, this.tileSize.height * 2
+		),
+		new horde.Rect(
+			15 * this.tileSize.width, -2 * this.tileSize.height,
+			this.tileSize.width * 2, this.tileSize.height * 2
+		)
+	];
+	
 	var hero = this.makeObject("hero");
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
-	
+
 	var numEnemies = horde.randomRange(50, 100);
 	for (var x = 0; x < numEnemies; x++) {
+		var sp = this.spawnPoints[horde.randomRange(0, 2)];
 		var e = this.makeObject("bat");
-		e.position.x = (9 * this.tileSize.width) + horde.randomRange(0, 32);
-		e.position.y = -2 * this.tileSize.height;
+		e.position.x = horde.randomRange(sp.left, sp.left + sp.width - e.size.width);
+		e.position.y = horde.randomRange(sp.top, sp.top + sp.height - e.size.height);
 		e.setDirection(new horde.Vector2(0, 1));
 		this.addObject(e);
 	}
