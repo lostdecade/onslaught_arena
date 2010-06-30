@@ -27,7 +27,8 @@ o.h_rock = {
 	damage: 1,
 	spriteSheet: "objects",
 	spriteX: 0,
-	spriteY: 0
+	spriteY: 0,
+	spin: true
 };
 
 o.h_sword = {
@@ -67,6 +68,9 @@ o.bat = {
 	moveChangeDelay: 500,
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
+		if (horde.randomRange(0, 1) === 1) {
+			this.spriteY = 96;
+		}
 	},
 	onUpdate: function (elapsed) {
 		this.moveChangeElapsed += elapsed;
@@ -78,7 +82,7 @@ o.bat = {
 		}
 	},
 	onWallCollide: function () {
-		this.moveChangeElapsed = 0;
+		//this.moveChangeElapsed = 0;
 	}
 };
 

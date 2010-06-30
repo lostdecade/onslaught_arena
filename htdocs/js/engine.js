@@ -35,20 +35,24 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 	return id;
 };
 
-proto.makeObject = function horde_Engine_proto_makeObject (type) {
+proto.makeObject = function horde_Engine_proto_makeObject (type, supressInit) {
 	var obj = new horde.Object();
 	for (var x in horde.objectTypes[type]) {
 		obj[x] = horde.objectTypes[type][x];
+	}
+	if (supressInit !== true) {
+		obj.init();
 	}
 	return obj;
 };
 
 proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
-	var o = this.makeObject(type);
+	var o = this.makeObject(type, true);
 	o.ownerId = parent.id;
 	o.team = parent.team;
 	o.centerOn(parent.boundingBox().center());
 	o.setDirection(parent.facing);
+	o.init();
 	this.addObject(o);
 };
 
@@ -264,7 +268,7 @@ horde.Engine.prototype.render = function () {
 		32, 0, 576, 386
 	);
 	
-	// Draw UI
+	// Draw UI1
 	this.drawUI(ctx);
 
 };
@@ -273,10 +277,23 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 	for (var id in this.objects) {
 		var o = this.objects[id];
 		var s = o.getSpriteXY();
+		
+		ctx.save();
+		
+		ctx.translate(
+			o.position.x + o.size.width / 2, 
+			o.position.y + o.size.height / 2
+		);
+		
+		if (o.angle !== 0) {
+			ctx.rotate(o.angle * Math.PI / 180);
+		}
+		
 		ctx.drawImage(this.images.getImage(o.spriteSheet),
 			s.x, s.y, o.size.width, o.size.height,
-			o.position.x, o.position.y, o.size.width, o.size.height
+			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
+		ctx.restore();
 	}
 };
 
