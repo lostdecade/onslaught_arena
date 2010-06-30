@@ -5,30 +5,31 @@
  * @constructor
  */
 horde.Object = function () {
-	this.id = "";
-	this.position = new horde.Vector2();
-	this.size = new horde.Size(32, 32);
-	this.direction = new horde.Vector2();
-	this.facing = new horde.Vector2(0, 1);
-	this.speed = 100;
-	this.color = "rgb(50, 50, 50)";
-	this.ownerId = "";
-	this.team = null;
-	this.hitPoints = 1;
-	this.wounds = 0;
-	this.damage = 1;
-	this.spriteSheet = "";
-	this.spriteX = 0;
+	this.id = ""; // Object ID
+	this.ownerId = null; // Owner object ID
+	this.position = new horde.Vector2(); // Object's position on the map
+	this.size = new horde.Size(32, 32); // Size of the object
+	this.direction = new horde.Vector2(); // Direction the object is moving
+	this.facing = new horde.Vector2(0, 1); // Direction the object is facing
+	this.speed = 100; // The speed at which the object moves
+	this.team = null; // Which "team" the object is on
+	this.hitPoints = 1; // Hit points
+	this.wounds = 0; // Amount of damage object has sustained
+	this.damage = 1; // Amount of damage object deals when colliding with enemies
+	this.spriteSheet = ""; // Sprite sheet where this object's graphics are found
+	this.spriteX = 0; 
 	this.spriteY = 0;
 	this.spriteAlign = false; // Align sprite with facing
-	this.animated = false;
+	this.animated = false; // Animated or not
 	this.animFrameIndex = 0;
 	this.animDelay = 200;
 	this.animElapsed = 0;
-	this.state = "alive";
+	this.state = "alive"; // State of the object ("alive", "dead")
 	this.angle = 0;
 	this.rotateSpeed = 400;
 	this.rotate = false; // Rotate sprite
+	this.worth = 0; // Amount of gold this object is worth when killed
+	this.gold = 0; // Amount of gold this object has earned
 };
 
 var proto = horde.Object.prototype;
@@ -38,13 +39,16 @@ var proto = horde.Object.prototype;
  * @return {void}
  */
 proto.init = function horde_Object_proto_init () {
+	this.execute("onInit");
 	if (this.spriteAlign) {
 		this.angle = (horde.directions.fromVector(this.facing) * 45);
 	}
 	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);
 	}
-	this.execute("onInit");
+	if (this.animated) {
+		this.animElapsed = horde.randomRange(0, this.animDelay);
+	}
 };
 
 /**
@@ -107,13 +111,15 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
 /**
  * Deal some damage (or wound) this object
  * @param {number} damage The amount of damage to deal
- * @return {void}
+ * @return {boolean} True if the object has died; otherwise false
  */
 proto.wound = function horde_Object_proto_wound (damage) {
 	this.wounds += damage;
 	if (this.wounds >= this.hitPoints) {
 		this.die();
+		return true;
 	}
+	return false;
 };
 
 /**

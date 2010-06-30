@@ -103,7 +103,10 @@ o.goblin = {
 	team: 1,
 	speed: 75,
 	hitPoints: 3,
-	damage: 1
+	damage: 1,
+	spriteSheet: "characters",
+	spriteY: 160,
+	animated: true
 };
 
 o.ogre = {
