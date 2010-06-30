@@ -32,6 +32,8 @@ horde.Object = function () {
 	this.gold = 0; // Amount of gold this object has earned
 	this.ttl = 0;
 	this.ttlElapsed = 0;
+	this.alpha = 1;
+	this.alphaStep = 0;
 };
 
 var proto = horde.Object.prototype;
@@ -50,6 +52,9 @@ proto.init = function horde_Object_proto_init () {
 	}
 	if (this.animated) {
 		this.animElapsed = horde.randomRange(0, this.animDelay);
+	}
+	if (this.ttl > 0) {
+		this.alphaStep = -0.01;
 	}
 };
 
@@ -71,6 +76,9 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	}
 	if (this.rotate) {
 		this.angle += ((this.rotateSpeed / 1000) * elapsed);
+	}
+	if (this.alphaStep !== 0) {
+		this.alpha += this.alphaStep;
 	}
 	if (this.ttl > 0) {
 		this.ttlElapsed += elapsed;
