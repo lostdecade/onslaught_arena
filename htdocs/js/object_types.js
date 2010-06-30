@@ -137,5 +137,21 @@ o.chest = {
 o.gold_chest = {
 	
 };
-	
+
+
+o.giblet = {
+	role: "fluff",
+	speed: 50,
+	ttl: 1000,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 32,
+	rotate: true,
+	onInit: function () {
+		var offset = horde.randomRange(0, 9);
+		this.spriteX += (offset * this.size.width);
+	}
+
+};
+
 }());

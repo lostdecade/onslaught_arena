@@ -201,10 +201,14 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		if (axis.length > 0) {
 			o.wallCollide(axis);
 		}
-	
+		
+		if (o.role === "fluff") {
+			continue;
+		}
+		
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
-			if (o2.state !== "alive" || o2.team === o.team) {
+			if (o2.state !== "alive" || o2.team === o.team || o2.role === "fluff") {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
@@ -227,6 +231,15 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			var owner = this.objects[attacker.ownerId];
 			if (owner) {
 				owner.gold += defender.worth;
+			}
+		}
+		if (defender.role === "monster") {
+			var numGiblets = horde.randomRange(2, 5);
+			for (var g = 0; g < numGiblets; g++) {
+				var gib = this.makeObject("giblet");
+				gib.position = defender.position.clone();
+				gib.setDirection(horde.randomDirection());
+				this.addObject(gib);
 			}
 		}
 	}
