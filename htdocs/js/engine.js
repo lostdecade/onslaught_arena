@@ -234,7 +234,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			}
 		}
 		if (defender.role === "monster") {
-			var numGiblets = horde.randomRange(2, 5);
+			var numGiblets = horde.randomRange(2, 3);
 			for (var g = 0; g < numGiblets; g++) {
 				var gib = this.makeObject("giblet");
 				gib.position = defender.position.clone();
@@ -310,6 +310,10 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		var o = this.objects[id];
 		var s = o.getSpriteXY();
 		
+		if (o.alpha <= 0) {
+			continue;
+		}
+		
 		ctx.save();
 		
 		ctx.translate(
@@ -319,6 +323,10 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		
 		if (o.angle !== 0) {
 			ctx.rotate(o.angle * Math.PI / 180);
+		}
+		
+		if (o.alpha !== 1) {
+			ctx.globalAlpha = o.alpha;
 		}
 		
 		ctx.drawImage(this.images.getImage(o.spriteSheet),
