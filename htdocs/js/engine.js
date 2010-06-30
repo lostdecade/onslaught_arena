@@ -242,7 +242,7 @@ horde.Engine.prototype.handleInput = function () {
 	}
 	
 	if (this.keyboard.isKeyPressed(32)) {
-		this.spawnObject(o, "h_rock");
+		this.spawnObject(o, "h_fireball");
 	}
 	
 	this.keyboard.storeKeyStates();

@@ -32,24 +32,36 @@ o.h_rock = {
 };
 
 o.h_sword = {
-	role: "projetile",
+	role: "projectile",
 	speed: 250,
 	hitPoints: 1,
-	damage: 2
+	damage: 2,
+	spriteSheet: "objects",
+	spriteX: 64,
+	spriteY: 0,
+	spriteAlign: true
 };
 
 o.h_spear = {
 	role: "projectile",
 	speed: 300,
 	hitPoints: 5,
-	damage: 5
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 0,
+	spriteAlign: true
 };
 
 o.h_fireball = {
 	role: "projectile",
 	speed: 400,
 	hitPoints: 1,
-	damage: 1
+	damage: 1,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 0,
+	rotate: true
 };
 
 // ENEMIES
