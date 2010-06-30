@@ -28,7 +28,7 @@ o.h_rock = {
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 0,
-	spin: true
+	rotate: true
 };
 
 o.h_sword = {

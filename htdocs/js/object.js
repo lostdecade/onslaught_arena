@@ -20,6 +20,7 @@ horde.Object = function () {
 	this.spriteSheet = "";
 	this.spriteX = 0;
 	this.spriteY = 0;
+	this.spriteAlign = false; // Align sprite with facing
 	this.animated = false;
 	this.animFrameIndex = 0;
 	this.animDelay = 200;
@@ -27,8 +28,7 @@ horde.Object = function () {
 	this.state = "alive";
 	this.angle = 0;
 	this.rotateSpeed = 400;
-	this.rotate = false; // initially rotate the sprite based on direction/facing
-	this.spin = false; // continually rotate the sprite (rocks/axes)
+	this.rotate = false; // Rotate sprite
 };
 
 var proto = horde.Object.prototype;
@@ -38,10 +38,10 @@ var proto = horde.Object.prototype;
  * @return {void}
  */
 proto.init = function horde_Object_proto_init () {
-	if (this.rotate) {
+	if (this.spriteAlign) {
 		this.angle = (horde.directions.fromVector(this.facing) * 45);
 	}
-	if (this.spin) {
+	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);
 	}
 	this.execute("onInit");
@@ -63,7 +63,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-	if (this.spin) {
+	if (this.rotate) {
 		this.angle += ((this.rotateSpeed / 1000) * elapsed);
 	}
 	this.execute("onUpdate", [elapsed]);
