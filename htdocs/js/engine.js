@@ -63,7 +63,7 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
 proto.init = function horde_Engine_proto_init () {
 	
 	this.map = [
-		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+		[0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0],
 		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 		[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
@@ -86,12 +86,12 @@ proto.init = function horde_Engine_proto_init () {
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
 	
-	var numEnemies = horde.randomRange(20, 30);
+	var numEnemies = horde.randomRange(50, 100);
 	for (var x = 0; x < numEnemies; x++) {
 		var e = this.makeObject("bat");
-		e.position.x = 9 * this.tileSize.width;
-		e.position.y = 2 * this.tileSize.height;
-		e.setDirection(horde.randomDirection());
+		e.position.x = (9 * this.tileSize.width) + horde.randomRange(0, 32);
+		e.position.y = -2 * this.tileSize.height;
+		e.setDirection(new horde.Vector2(0, 1));
 		this.addObject(e);
 	}
 	
@@ -168,7 +168,6 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			}
 		}
 		
-		
 		if (o.direction.y !== 0) {
 			// the object is moving along the "y" axis
 			o.position.y += (o.direction.y * px);
@@ -194,6 +193,11 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			}
 		}
 		
+		if (o.direction.y < 0 && o.position.y < 0) {
+			o.position.y = 0;
+			axis.push("y");
+		}
+		
 		if (axis.length > 0) {
 			o.wallCollide(axis);
 		}
@@ -204,13 +208,28 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
-				o.wound(o2.damage);
-				o2.wound(o.damage);
+				this.dealDamage(o2, o);
+				this.dealDamage(o, o2);
 			}
 		}
 		
 	}
 	
+};
+
+// Deals damage from object "attacker" to "defender"
+horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	if (defender.wound(attacker.damage)) {
+		// defender has died; assign gold
+		if (attacker.ownerId === null) {
+			attacker.gold += defender.worth;
+		} else {
+			var owner = this.objects[attacker.ownerId];
+			if (owner) {
+				owner.gold += defender.worth;
+			}
+		}
+	}
 };
 
 horde.Engine.prototype.handleInput = function () {
@@ -242,7 +261,7 @@ horde.Engine.prototype.handleInput = function () {
 	}
 	
 	if (this.keyboard.isKeyPressed(32)) {
-		this.spawnObject(o, "h_fireball");
+		this.spawnObject(o, "h_rock");
 	}
 	
 	this.keyboard.storeKeyStates();
