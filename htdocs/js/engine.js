@@ -8,6 +8,8 @@ horde.Engine = function horde_Engine () {
 	this.lastUpdate = 0;
 	this.canvases = {};
 	
+	this.map = null;
+	this.spawnPoints = [];
 	this.objects = {};
 	this.objectIdSeed = 0;
 	this.activeObjectId = null;
@@ -35,19 +37,8 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 	return id;
 };
 
-proto.makeObject = function horde_Engine_proto_makeObject (type, supressInit) {
-	var obj = new horde.Object();
-	for (var x in horde.objectTypes[type]) {
-		obj[x] = horde.objectTypes[type][x];
-	}
-	if (supressInit !== true) {
-		obj.init();
-	}
-	return obj;
-};
-
 proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
-	var o = this.makeObject(type, true);
+	var o = horde.makeObject(type, true);
 	o.ownerId = parent.id;
 	o.team = parent.team;
 	o.centerOn(parent.boundingBox().center());
@@ -81,36 +72,20 @@ proto.init = function horde_Engine_proto_init () {
 	];
 	
 	this.tileSize = new horde.Size(32, 32);
+
+	this.initSpawnPoints();
 	
-	this.spawnPoints = [
-		new horde.Rect(
-			3 * this.tileSize.width, -2 * this.tileSize.height, 
-			this.tileSize.width * 2, this.tileSize.height * 2
-		),
-		new horde.Rect(
-			9 * this.tileSize.width, -2 * this.tileSize.height,
-			this.tileSize.width * 2, this.tileSize.height * 2
-		),
-		new horde.Rect(
-			15 * this.tileSize.width, -2 * this.tileSize.height,
-			this.tileSize.width * 2, this.tileSize.height * 2
-		)
-	];
-	
-	var hero = this.makeObject("hero");
+	this.spawnPoints[0].queueSpawn("bat", 20);
+	//this.spawnPoints[0].delay = 10;
+	this.spawnPoints[1].queueSpawn("goblin", 10);
+	this.spawnPoints[1].delay = 2000;
+	this.spawnPoints[2].queueSpawn("bat", 20);
+	//this.spawnPoints[2].delay = 10;
+
+	var hero = horde.makeObject("hero");
 	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.activeObjectId = this.addObject(hero);
 
-	var numEnemies = horde.randomRange(50, 100);
-	for (var x = 0; x < numEnemies; x++) {
-		var sp = this.spawnPoints[horde.randomRange(0, 2)];
-		var e = this.makeObject("bat");
-		e.position.x = horde.randomRange(sp.left, sp.left + sp.width - e.size.width);
-		e.position.y = horde.randomRange(sp.top, sp.top + sp.height - e.size.height);
-		e.setDirection(new horde.Vector2(0, 1));
-		this.addObject(e);
-	}
-	
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	
 	this.images = new horde.ImageLoader();
@@ -120,6 +95,31 @@ proto.init = function horde_Engine_proto_init () {
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
+	
+};
+
+/**
+ * Initialize the spawn points
+ * @return {void}
+ */
+proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
+	
+	this.spawnPoints = [];
+	
+	this.spawnPoints.push(new horde.SpawnPoint(
+		3 * this.tileSize.width, -2 * this.tileSize.height,
+		this.tileSize.width * 2, this.tileSize.height * 2
+	));
+	
+	this.spawnPoints.push(new horde.SpawnPoint(
+		9 * this.tileSize.width, -2 * this.tileSize.height,
+		this.tileSize.width * 2, this.tileSize.height * 2
+	));
+	
+	this.spawnPoints.push(new horde.SpawnPoint(
+		15 * this.tileSize.width, -2 * this.tileSize.height,
+		this.tileSize.width * 2, this.tileSize.height * 2
+	));
 	
 };
 
@@ -138,7 +138,19 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	}
 	
 	this.handleInput();
+	
+	for (var s in this.spawnPoints) {
+		var o = this.spawnPoints[s].update(elapsed);
+		if (o !== false) {
+			this.addObject(o);
+		}
+	}
+	
+	
 	this.updateObjects(elapsed);
+	
+	
+	
 	this.render();
 };
 
@@ -250,13 +262,13 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			}
 		}
 		if (defender.role === "monster") {
-			var skull = this.makeObject(defender.gibletSize + "_skull");
+			var skull = horde.makeObject(defender.gibletSize + "_skull");
 			skull.position = defender.position.clone();
 			skull.setDirection(horde.randomDirection());
 			this.addObject(skull);
 			var numGiblets = horde.randomRange(1, 2);
 			for (var g = 0; g < numGiblets; g++) {
-				var gib = this.makeObject(defender.gibletSize + "_giblet");
+				var gib = horde.makeObject(defender.gibletSize + "_giblet");
 				gib.position = defender.position.clone();
 				gib.setDirection(horde.randomDirection());
 				this.addObject(gib);
