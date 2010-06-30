@@ -60,7 +60,7 @@ o.bat = {
 	hitPoints: 1,
 	damage: 1,
 	spriteSheet: "characters",
-	spriteY: 96,
+	spriteY: 128,
 	animated: true,
 	animDelay: 150,
 	moveChangeElapsed: 0,
