@@ -30,6 +30,8 @@ horde.Object = function () {
 	this.rotate = false; // Rotate sprite
 	this.worth = 0; // Amount of gold this object is worth when killed
 	this.gold = 0; // Amount of gold this object has earned
+	this.ttl = 0;
+	this.ttlElapsed = 0;
 };
 
 var proto = horde.Object.prototype;
@@ -69,6 +71,12 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	}
 	if (this.rotate) {
 		this.angle += ((this.rotateSpeed / 1000) * elapsed);
+	}
+	if (this.ttl > 0) {
+		this.ttlElapsed += elapsed;
+		if (this.ttlElapsed >= this.ttl) {
+			this.die();
+		}
 	}
 	this.execute("onUpdate", [elapsed]);
 };
