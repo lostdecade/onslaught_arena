@@ -81,7 +81,7 @@ o.bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		if (horde.randomRange(0, 1) === 1) {
-			this.spriteY = 96;
+			this.spriteY = 160;
 		}
 	},
 	onUpdate: function (elapsed) {

@@ -90,7 +90,7 @@ proto.init = function horde_Engine_proto_init () {
 	for (var x = 0; x < numEnemies; x++) {
 		var e = this.makeObject("bat");
 		e.position.x = 9 * this.tileSize.width;
-		e.position.y = 2 * this.tileSize.height;
+		e.position.y = 3 * this.tileSize.height;
 		e.setDirection(horde.randomDirection());
 		this.addObject(e);
 	}
@@ -299,17 +299,22 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 
 horde.Engine.prototype.drawUI = function (ctx) {
 	
-	var hpWidth = 300;
+	var bar = {
+		width : 320,
+		height : 48,
+		x : 34,
+		y : 420
+	};
 	var o = this.objects["o1"];
 	
 	ctx.save();
-	ctx.fillStyle = "rgb(50, 0, 0)";
-	ctx.fillRect(10, 430, hpWidth, 30);
-	ctx.fillStyle = "rgb(255, 0, 0)";
-	ctx.strokeStyle = "rgb(255, 255, 255)";
-	ctx.lineWidth = 2;
-	ctx.fillRect(10, 430, hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints), 30);
-	ctx.strokeRect(10, 430, hpWidth, 30);
+	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
+	ctx.fillStyle = "rgb(190, 22, 29)";
+	ctx.fillRect(bar.x, bar.y, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height);
+	ctx.fillStyle = "rgb(238, 28, 36)";
+	ctx.fillRect(bar.x, bar.y + 10, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height - 20);
+	ctx.fillStyle = "rgb(243, 97, 102)";
+	ctx.fillRect(bar.x, bar.y + 20, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height - 40);
 	ctx.restore();
 	
 };
