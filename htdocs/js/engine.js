@@ -234,13 +234,25 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			}
 		}
 		if (defender.role === "monster") {
-			var numGiblets = horde.randomRange(2, 3);
+			var skull = this.makeObject(defender.gibletSize + "_skull");
+			skull.position = defender.position.clone();
+			skull.setDirection(horde.randomDirection());
+			this.addObject(skull);
+			var numGiblets = horde.randomRange(1, 2);
 			for (var g = 0; g < numGiblets; g++) {
-				var gib = this.makeObject("giblet");
+				var gib = this.makeObject(defender.gibletSize + "_giblet");
 				gib.position = defender.position.clone();
 				gib.setDirection(horde.randomDirection());
 				this.addObject(gib);
 			}
+			/*
+			// Random chance to drop treasure!
+			if (horde.randomRange(1, 10) === 10) {
+				var chest = this.makeObject("chest");
+				chest.position = defender.position.clone();
+				this.addObject(chest);
+			}
+			*/
 		}
 	}
 };
@@ -305,9 +317,27 @@ horde.Engine.prototype.render = function () {
 
 };
 
-horde.Engine.prototype.drawObjects = function (ctx) {
+horde.Engine.prototype.getObjectDrawOrder = function () {
+	var drawOrder = [];
 	for (var id in this.objects) {
-		var o = this.objects[id];
+		drawOrder.push({
+			id: this.objects[id].id,
+			y: this.objects[id].position.y
+		});
+	}
+	drawOrder.sort(function (a, b) {
+		return a.y - b.y;
+	});
+	return drawOrder;
+};
+
+horde.Engine.prototype.drawObjects = function (ctx) {
+
+	var drawOrder = this.getObjectDrawOrder();
+
+	for (var x in drawOrder) {
+	
+		var o = this.objects[drawOrder[x].id];
 		var s = o.getSpriteXY();
 		
 		if (o.alpha <= 0) {
