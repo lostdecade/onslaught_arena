@@ -12,7 +12,7 @@ horde.Engine = function horde_Engine () {
 	this.spawnPoints = [];
 	this.objects = {};
 	this.objectIdSeed = 0;
-	this.activeObjectId = null;
+	this.playerObjectId = null;
 	
 	this.keyboard = new horde.Keyboard();
 	
@@ -37,6 +37,12 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 	return id;
 };
 
+/**
+ * Spawns an object from a parent object
+ * @param {horde.Object} parent Parent object
+ * @param {string} type Type of object to spawn
+ * @return {void}
+ */
 proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
 	var o = horde.makeObject(type, true);
 	o.ownerId = parent.id;
@@ -48,11 +54,48 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
 };
 
 /**
+ * Returns the currently "active" object
+ * In our case this is the player avatar
+ * @return {horde.Object} Player object
+ */
+proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
+	return this.objects[this.playerObjectId];
+};
+
+/**
  * Initializes the engine
  * @return {void}
  */
 proto.init = function horde_Engine_proto_init () {
+
+	this.initMap();
+	this.initSpawnPoints();
 	
+	// HACK: Manual spawn info
+	this.spawnPoints[0].queueSpawn("bat", 5);
+	this.spawnPoints[1].queueSpawn("goblin", 3);
+	this.spawnPoints[2].queueSpawn("bat", 5);
+
+	this.initPlayer();
+
+	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
+	
+	this.images = new horde.ImageLoader();
+	this.images.load({
+		"background": "img/arena.png",
+		"shadow": "img/arena_shadow.png",
+		"characters": "img/sheet_characters.png",
+		"objects": "img/sheet_objects.png"
+	}, this.handleImagesLoaded, this);
+	
+};
+
+/**
+ * Initializes the map
+ * @return {void}
+ */
+proto.initMap = function horde_Engine_proto_initMap () {
+	this.tileSize = new horde.Size(32, 32);
 	this.map = [
 		[0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0],
 		[0,0,0,1,1,0,0,0,0,1,1,0,0,0,0,1,1,0,0,0],
@@ -70,32 +113,6 @@ proto.init = function horde_Engine_proto_init () {
 		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 		[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 	];
-	
-	this.tileSize = new horde.Size(32, 32);
-
-	this.initSpawnPoints();
-	
-	this.spawnPoints[0].queueSpawn("bat", 20);
-	//this.spawnPoints[0].delay = 10;
-	this.spawnPoints[1].queueSpawn("goblin", 10);
-	this.spawnPoints[1].delay = 2000;
-	this.spawnPoints[2].queueSpawn("bat", 20);
-	//this.spawnPoints[2].delay = 10;
-
-	var hero = horde.makeObject("hero");
-	hero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
-	this.activeObjectId = this.addObject(hero);
-
-	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
-	
-	this.images = new horde.ImageLoader();
-	this.images.load({
-		"background": "img/arena.png",
-		"shadow": "img/arena_shadow.png",
-		"characters": "img/sheet_characters.png",
-		"objects": "img/sheet_objects.png"
-	}, this.handleImagesLoaded, this);
-	
 };
 
 /**
@@ -106,21 +123,34 @@ proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
 	
 	this.spawnPoints = [];
 	
+	// Left gate (index 0)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		3 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
 	
+	// Center gate (index 1)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		9 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
 	
+	// Right gate (index 2)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		15 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
 	
+};
+
+/**
+ * Initializes the player
+ * @return {void}
+ */
+proto.initPlayer = function horde_Engine_proto_initPlayer () {
+	var player = horde.makeObject("hero");
+	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
+	this.playerObjectId = this.addObject(player);
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -138,20 +168,26 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	}
 	
 	this.handleInput();
-	
-	for (var s in this.spawnPoints) {
-		var o = this.spawnPoints[s].update(elapsed);
+	this.updateSpawnPoints(elapsed);
+	this.updateObjects(elapsed);
+	this.render();
+};
+
+/**
+ * Updates the spawn points
+ * @param {number} elapsed Elapsed time in milliseconds since last update
+ * @return {void}
+ */
+proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed) {
+	// Iterate over the spawn points and update them
+	for (var x in this.spawnPoints) {
+		// Spawn points can return an object to spawn
+		var o = this.spawnPoints[x].update(elapsed);
 		if (o !== false) {
+			// We need to spawn an object
 			this.addObject(o);
 		}
 	}
-	
-	
-	this.updateObjects(elapsed);
-	
-	
-	
-	this.render();
 };
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
@@ -285,38 +321,40 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	}
 };
 
-horde.Engine.prototype.handleInput = function () {
+/**
+ * Handles game input
+ * @return {void}
+ */
+proto.handleInput = function horde_Engine_proto_handleInput () {
+
+	var player = this.getPlayerObject();
 	
+	// Determine which way we should move the player
 	var move = new horde.Vector2();
-	
 	if (this.keyboard.isKeyDown(37)) {
 		move.x = -1;
 	}
-	
 	if (this.keyboard.isKeyDown(38)) {
 		move.y = -1;
 	}
-	
 	if (this.keyboard.isKeyDown(39)) {
 		move.x = 1;
 	}
-	
 	if (this.keyboard.isKeyDown(40)) {
 		move.y = 1;
 	}
 	
-	var o = this.objects["o1"];
-	
-	o.stopMoving();
-	
+	// Move the player
+	player.stopMoving();	
 	if (move.x !== 0 || move.y !== 0) {
-		o.setDirection(move);
+		player.setDirection(move);
 	}
 	
+	// Have the player fire
 	if (this.keyboard.isKeyPressed(32)) {
-		this.spawnObject(o, "h_rock");
+		this.spawnObject(player, "h_rock");
 	}
-	
+
 	this.keyboard.storeKeyStates();
 	
 };
