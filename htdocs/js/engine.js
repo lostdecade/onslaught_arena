@@ -7,22 +7,36 @@
 horde.Engine = function horde_Engine () {
 	this.lastUpdate = 0;
 	this.canvases = {};
-	
 	this.map = null;
 	this.spawnPoints = [];
 	this.objects = {};
 	this.objectIdSeed = 0;
 	this.playerObjectId = null;
-	
 	this.keyboard = new horde.Keyboard();
-	
 	this.view = new horde.Size(640, 480);
-	
 	this.images = null;
-
+	this.debug = false; // Debugging toggle
 };
 
 var proto = horde.Engine.prototype;
+
+/**
+ * Runs the engine
+ * @return {void}
+ */
+proto.run = function horde_Engine_proto_run () {
+	this.init();
+	this.lastUpdate = horde.now();
+	this.interval = horde.setInterval(0, this.update, this);
+};
+
+/**
+ * Stops the engine
+ * @return {void}
+ */
+proto.stop = function horde_Engine_proto_stop () {
+	window.clearInterval(this.interval);
+};
 
 /**
  * Adds an object to the engine's collection
@@ -67,6 +81,8 @@ proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
  * @return {void}
  */
 proto.init = function horde_Engine_proto_init () {
+
+	this.state = "title";
 
 	this.initMap();
 
@@ -140,6 +156,11 @@ proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
 	
 };
 
+/**
+ * Queues up a wave of spawns in the spawn points
+ * @param {horde.SpawnWave} Wave to spawn
+ * @param {void}
+ */
 proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 	for (var x in wave.points) {
 		var p = wave.points[x];
@@ -153,6 +174,10 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 	}
 };
 
+/**
+ * Initializes the waves of bad guys!
+ * @return {void}
+ */
 proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	this.waves = [];
@@ -226,26 +251,31 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	var elapsed = now - this.lastUpdate;
 	this.lastUpdate = now;
 
+	this.lastElapsed = elapsed;
+
 	if (this.imagesLoaded !== true) {
 		return;
 	}
-	
-	this.lastWaveElapsed += elapsed;
-	if (this.lastWaveElapsed >= this.waveDelay) {
-		this.lastWaveElapsed = 0;
-		this.currentWaveId++;
-		if (this.currentWaveId >= this.waves.length) {
-			// Waves have rolled over, increase the difficulty!!
-			this.currentWaveId = 0;
-			this.waveModifier += 0.5;
-		}
-		this.initSpawnWave(this.waves[this.currentWaveId]);
+
+	switch (this.state) {
+
+		// Title Screen
+		case "title":
+			this.handleInput();
+			this.render();
+			break;
+			
+		// The game!
+		case "running":
+			this.handleInput();
+			this.updateWaves(elapsed);
+			this.updateSpawnPoints(elapsed);
+			this.updateObjects(elapsed);
+			this.render();
+			break;
+			
 	}
-	
-	this.handleInput();
-	this.updateSpawnPoints(elapsed);
-	this.updateObjects(elapsed);
-	this.render();
+
 };
 
 /**
@@ -262,6 +292,25 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 			// We need to spawn an object
 			this.addObject(o);
 		}
+	}
+};
+
+/**
+ * Updates the waves
+ * @param {number} elapsed Elapsed time in milliseconds since last update
+ * @return {void}
+ */
+proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
+	this.lastWaveElapsed += elapsed;
+	if (this.lastWaveElapsed >= this.waveDelay) {
+		this.lastWaveElapsed = 0;
+		this.currentWaveId++;
+		if (this.currentWaveId >= this.waves.length) {
+			// Waves have rolled over, increase the difficulty!!
+			this.currentWaveId = 0;
+			this.waveModifier += 0.5;
+		}
+		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
 };
 
@@ -402,60 +451,89 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
-	var player = this.getPlayerObject();
-	
-	// Determine which way we should move the player
-	var move = new horde.Vector2();
-	if (this.keyboard.isKeyDown(37)) {
-		move.x = -1;
-	}
-	if (this.keyboard.isKeyDown(38)) {
-		move.y = -1;
-	}
-	if (this.keyboard.isKeyDown(39)) {
-		move.x = 1;
-	}
-	if (this.keyboard.isKeyDown(40)) {
-		move.y = 1;
-	}
-	
-	// Move the player
-	player.stopMoving();	
-	if (move.x !== 0 || move.y !== 0) {
-		player.setDirection(move);
-	}
-	
-	// Have the player fire
-	if (this.keyboard.isKeyPressed(32)) {
-		this.spawnObject(player, "h_rock");
+	if (this.state === "title") {
+		if (this.keyboard.isKeyPressed(32)) {
+			this.state = "running";
+		}
+		this.keyboard.storeKeyStates();
+		return;
 	}
 
-	this.keyboard.storeKeyStates();
-	
+	if (this.state === "running") {
+		var player = this.getPlayerObject();
+
+		// Determine which way we should move the player
+		var move = new horde.Vector2();
+		if (this.keyboard.isKeyDown(37)) {
+			move.x = -1;
+		}
+		if (this.keyboard.isKeyDown(38)) {
+			move.y = -1;
+		}
+		if (this.keyboard.isKeyDown(39)) {
+			move.x = 1;
+		}
+		if (this.keyboard.isKeyDown(40)) {
+			move.y = 1;
+		}
+
+		// Move the player
+		player.stopMoving();	
+		if (move.x !== 0 || move.y !== 0) {
+			player.setDirection(move);
+		}
+
+		// Have the player fire
+		if (this.keyboard.isKeyPressed(32)) {
+			this.spawnObject(player, "h_rock");
+		}
+
+		this.keyboard.storeKeyStates();
+	}
+
 };
 
 horde.Engine.prototype.render = function () {
 	
 	var ctx = this.canvases["display"].getContext("2d");
 
-	// Draw background
+	switch (this.state) {
+		
+		// Title Screen
+		case "title":
+			this.drawBackground(ctx);
+			this.drawShadow(ctx);
+			this.drawTitle(ctx);
+			break;
+
+		// The game!
+		case "running":
+			this.drawBackground(ctx);
+			this.drawObjects(ctx);
+			this.drawShadow(ctx);
+			this.drawUI(ctx);
+			break;
+		
+	}
+
+	if (this.debug === true) {
+		this.drawDebugInfo(ctx);
+	}
+	
+};
+
+proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
 	ctx.drawImage(this.images.getImage("background"), 
 		0, 0, 640, 480, 
 		0, 0, this.view.width, this.view.height
 	);
-	
-	// Draw objects
-	this.drawObjects(ctx);
-	
-	// Draw shadow layer
+};
+
+proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
 	ctx.drawImage(this.images.getImage("shadow"),
 		0, 0, 576, 386, 
 		32, 0, 576, 386
 	);
-	
-	// Draw UI1
-	this.drawUI(ctx);
-
 };
 
 horde.Engine.prototype.getObjectDrawOrder = function () {
@@ -508,8 +586,14 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 	}
 };
 
-horde.Engine.prototype.drawUI = function (ctx) {
+/**
+ * Draws the game UI
+ * @param {object} Canvas 2d context to draw on
+ * @return {void}
+ */
+proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
+<<<<<<< HEAD:htdocs/js/engine.js
 	var bar = {
 		width : 320,
 		height : 48,
@@ -517,7 +601,12 @@ horde.Engine.prototype.drawUI = function (ctx) {
 		y : 420
 	};
 	var o = this.objects["o1"];
+=======
+	var o = this.getPlayerObject();
+>>>>>>> fad76a87661754d1c99e9387a1bbeee477507431:htdocs/js/engine.js
 	
+	// Draw health bar
+	var hpWidth = 300;
 	ctx.save();
 	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
 	ctx.fillStyle = "rgb(190, 22, 29)";
@@ -528,16 +617,69 @@ horde.Engine.prototype.drawUI = function (ctx) {
 	ctx.fillRect(bar.x, bar.y + 20, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height - 40);
 	ctx.restore();
 	
+	// Draw gold coin
+	ctx.drawImage(this.images.getImage("objects"),
+		0, 32, 32, 32, 603, 443, 32, 32
+	);
+	
+	// Draw gold amount
+	ctx.save();
+	ctx.textAlign = "right";
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.font = "Bold 32px Monospace";
+	ctx.fillText(o.gold, 603, 469);
+	ctx.restore();
+
 };
 
-horde.Engine.prototype.run = function () {
-	this.init();
-	this.lastUpdate = horde.now();
-	this.interval = horde.setInterval(0, this.update, this);
+proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
+	
+	// TODO: DRAW GAME LOGO HERE
+	
+	if (!this.titleAlphaStep) {
+		this.titleAlphaStep = -0.025;
+		this.titleAlpha = 1;
+	} else {
+		this.titleAlpha += this.titleAlphaStep;
+		if (this.titleAlpha <= 0) {
+			this.titleAlpha = 0;
+			this.titleAlphaStep = 0.025;
+		}
+		if (this.titleAlpha >= 1) {
+			this.titleAlpha = 1;
+			this.titleAlphaStep = -0.025;
+		}
+	}
+	
+	ctx.save();
+	ctx.globalAlpha = this.titleAlpha;
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.font = "Bold 35px Monospace";
+	ctx.fillText("Press space to begin", 110, 280);
+	ctx.restore();
+		
 };
 
-horde.Engine.prototype.stop = function () {
-	window.clearInterval(this.interval);
+/**
+ * Draws debugging information to the screen
+ * @param {object} Canvas 2d context
+ * @return {void}
+ */
+proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
+	
+	// Semi-transparent bar so we can see the text
+	ctx.save();
+	ctx.fillStyle = "rgba(0,0,0,0.3)";
+	ctx.fillRect(0, 0, this.view.width, 30);
+	ctx.restore();
+	
+	// Debugging info
+	ctx.save();
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.font = "bold 20px Monospace";
+	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
+	ctx.restore();
+	
 };
 
 }());
