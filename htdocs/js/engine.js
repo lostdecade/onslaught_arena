@@ -516,11 +516,17 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 	}
 };
 
-horde.Engine.prototype.drawUI = function (ctx) {
+/**
+ * Draws the game UI
+ * @param {object} Canvas 2d context to draw on
+ * @return {void}
+ */
+proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
+	var o = this.getPlayerObject();
+	
+	// Draw health bar
 	var hpWidth = 300;
-	var o = this.objects["o1"];
-	
 	ctx.save();
 	ctx.fillStyle = "rgb(50, 0, 0)";
 	ctx.fillRect(10, 430, hpWidth, 30);
@@ -529,6 +535,19 @@ horde.Engine.prototype.drawUI = function (ctx) {
 	ctx.lineWidth = 2;
 	ctx.fillRect(10, 430, hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints), 30);
 	ctx.strokeRect(10, 430, hpWidth, 30);
+	ctx.restore();
+	
+	// Draw gold coin
+	ctx.drawImage(this.images.getImage("objects"),
+		0, 32, 32, 32, 603, 443, 32, 32
+	);
+	
+	// Draw gold amount
+	ctx.save();
+	ctx.textAlign = "right";
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.font = "Bold 32px Monospace";
+	ctx.fillText(o.gold, 603, 469);
 	ctx.restore();
 	
 };
