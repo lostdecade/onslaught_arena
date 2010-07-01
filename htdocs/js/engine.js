@@ -229,20 +229,9 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 	if (this.imagesLoaded !== true) {
 		return;
 	}
-	
-	this.lastWaveElapsed += elapsed;
-	if (this.lastWaveElapsed >= this.waveDelay) {
-		this.lastWaveElapsed = 0;
-		this.currentWaveId++;
-		if (this.currentWaveId >= this.waves.length) {
-			// Waves have rolled over, increase the difficulty!!
-			this.currentWaveId = 0;
-			this.waveModifier += 0.5;
-		}
-		this.initSpawnWave(this.waves[this.currentWaveId]);
-	}
-	
+
 	this.handleInput();
+	this.updateWaves(elapsed);
 	this.updateSpawnPoints(elapsed);
 	this.updateObjects(elapsed);
 	this.render();
@@ -262,6 +251,25 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 			// We need to spawn an object
 			this.addObject(o);
 		}
+	}
+};
+
+/**
+ * Updates the waves
+ * @param {number} elapsed Elapsed time in milliseconds since last update
+ * @return {void}
+ */
+proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
+	this.lastWaveElapsed += elapsed;
+	if (this.lastWaveElapsed >= this.waveDelay) {
+		this.lastWaveElapsed = 0;
+		this.currentWaveId++;
+		if (this.currentWaveId >= this.waves.length) {
+			// Waves have rolled over, increase the difficulty!!
+			this.currentWaveId = 0;
+			this.waveModifier += 0.5;
+		}
+		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
 };
 
