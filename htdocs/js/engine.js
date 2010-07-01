@@ -68,6 +68,8 @@ proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
  */
 proto.init = function horde_Engine_proto_init () {
 
+	this.state = "title";
+
 	this.initMap();
 
 	this.initSpawnPoints();
@@ -230,11 +232,20 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		return;
 	}
 
-	this.handleInput();
-	this.updateWaves(elapsed);
-	this.updateSpawnPoints(elapsed);
-	this.updateObjects(elapsed);
-	this.render();
+	switch (this.state) {
+		case "title":
+			this.handleInput();
+			this.render();
+			break;
+		case "running":
+			this.handleInput();
+			this.updateWaves(elapsed);
+			this.updateSpawnPoints(elapsed);
+			this.updateObjects(elapsed);
+			this.render();
+			break;
+	}
+
 };
 
 /**
@@ -410,35 +421,47 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
-	var player = this.getPlayerObject();
-	
-	// Determine which way we should move the player
-	var move = new horde.Vector2();
-	if (this.keyboard.isKeyDown(37)) {
-		move.x = -1;
-	}
-	if (this.keyboard.isKeyDown(38)) {
-		move.y = -1;
-	}
-	if (this.keyboard.isKeyDown(39)) {
-		move.x = 1;
-	}
-	if (this.keyboard.isKeyDown(40)) {
-		move.y = 1;
-	}
-	
-	// Move the player
-	player.stopMoving();	
-	if (move.x !== 0 || move.y !== 0) {
-		player.setDirection(move);
-	}
-	
-	// Have the player fire
-	if (this.keyboard.isKeyPressed(32)) {
-		this.spawnObject(player, "h_rock");
+	if (this.state === "title") {
+		if (this.keyboard.isKeyPressed(32)) {
+			this.state = "running";
+		}
+		this.keyboard.storeKeyStates();
+		return;
 	}
 
-	this.keyboard.storeKeyStates();
+	if (this.state === "running") {
+		var player = this.getPlayerObject();
+
+		// Determine which way we should move the player
+		var move = new horde.Vector2();
+		if (this.keyboard.isKeyDown(37)) {
+			move.x = -1;
+		}
+		if (this.keyboard.isKeyDown(38)) {
+			move.y = -1;
+		}
+		if (this.keyboard.isKeyDown(39)) {
+			move.x = 1;
+		}
+		if (this.keyboard.isKeyDown(40)) {
+			move.y = 1;
+		}
+
+		// Move the player
+		player.stopMoving();	
+		if (move.x !== 0 || move.y !== 0) {
+			player.setDirection(move);
+		}
+
+		// Have the player fire
+		if (this.keyboard.isKeyPressed(32)) {
+			this.spawnObject(player, "h_rock");
+		}
+
+		this.keyboard.storeKeyStates();
+	}
+
+	
 	
 };
 
@@ -452,8 +475,10 @@ horde.Engine.prototype.render = function () {
 		0, 0, this.view.width, this.view.height
 	);
 	
-	// Draw objects
-	this.drawObjects(ctx);
+	if (this.state === "running") {
+		// Draw objects
+		this.drawObjects(ctx);
+	}
 	
 	// Draw shadow layer
 	ctx.drawImage(this.images.getImage("shadow"),
@@ -461,8 +486,37 @@ horde.Engine.prototype.render = function () {
 		32, 0, 576, 386
 	);
 	
-	// Draw UI1
-	this.drawUI(ctx);
+	if (this.state === "running") {
+		// Draw UI1
+		this.drawUI(ctx);
+	}
+	
+	if (!this.titleAlphaStep) {
+		this.titleAlphaStep = -0.025;
+		this.titleAlpha = 1;
+	} else {
+		this.titleAlpha += this.titleAlphaStep;
+		if (this.titleAlpha <= 0) {
+			this.titleAlpha = 0;
+			this.titleAlphaStep = 0.025;
+		}
+		if (this.titleAlpha >= 1) {
+			this.titleAlpha = 1;
+			this.titleAlphaStep = -0.025;
+		}
+	}
+	
+	if (this.state === "title") {
+		ctx.save();
+		ctx.globalAlpha = this.titleAlpha;
+		//ctx.lineWidth = 2;
+		//ctx.strokeStyle = "rgb(200, 200, 200)";
+		ctx.fillStyle = "rgb(0,0,0)";
+		ctx.font = "Bold 35px Monospace";
+		ctx.fillText("Press space to begin", 110, 280);
+		//ctx.strokeText("Press space to begin", 120, 240);
+		ctx.restore();
+	}
 
 };
 
