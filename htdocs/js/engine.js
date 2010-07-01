@@ -69,13 +69,10 @@ proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
 proto.init = function horde_Engine_proto_init () {
 
 	this.initMap();
-	this.initSpawnPoints();
-	
-	// HACK: Manual spawn info
-	this.spawnPoints[0].queueSpawn("bat", 5);
-	this.spawnPoints[1].queueSpawn("goblin", 3);
-	this.spawnPoints[2].queueSpawn("bat", 5);
 
+	this.initSpawnPoints();
+	this.initWaves();
+	
 	this.initPlayer();
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
@@ -143,6 +140,58 @@ proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
 	
 };
 
+proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
+	for (var x in wave.points) {
+		var p = wave.points[x];
+		var sp = this.spawnPoints[p.spawnPointId];
+		sp.delay = p.delay;
+		sp.lastSpawnElapsed = sp.delay;
+		for (var z in p.objects) {
+			var o = p.objects[z];
+			sp.queueSpawn(o.type, o.count);
+		}
+	}
+};
+
+proto.initWaves = function horde_Engine_proto_initWaves () {
+	
+	this.waves = [];
+	this.waveDelay = 20000;
+	this.lastWaveElapsed = this.waveDelay;
+	this.currentWaveId = -1;
+	
+	// Wave #1
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "bat", 5);
+	w.addObjects(1, "bat", 5);
+	w.addObjects(2, "bat", 5);
+	this.waves.push(w);
+	
+	// Wave #2
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 2000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "bat", 10);
+	w.addObjects(1, "goblin", 5);
+	w.addObjects(2, "bat", 10);
+	this.waves.push(w);
+	
+	// Wave #3
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "goblin", 15);
+	w.addObjects(1, "goblin", 15);
+	w.addObjects(2, "goblin", 15);
+	this.waves.push(w);
+
+};
+
 /**
  * Initializes the player
  * @return {void}
@@ -165,6 +214,16 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 	if (this.imagesLoaded !== true) {
 		return;
+	}
+	
+	this.lastWaveElapsed += elapsed;
+	if (this.lastWaveElapsed >= this.waveDelay) {
+		this.lastWaveElapsed = 0;
+		this.currentWaveId++;
+		if (this.currentWaveId >= this.waves.length) {
+			this.currentWaveId = 0;
+		}
+		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
 	
 	this.handleInput();
