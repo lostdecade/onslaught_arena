@@ -593,17 +593,13 @@ horde.Engine.prototype.drawObjects = function (ctx) {
  */
 proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
-<<<<<<< HEAD:htdocs/js/engine.js
 	var bar = {
 		width : 320,
 		height : 48,
 		x : 34,
 		y : 420
 	};
-	var o = this.objects["o1"];
-=======
 	var o = this.getPlayerObject();
->>>>>>> fad76a87661754d1c99e9387a1bbeee477507431:htdocs/js/engine.js
 	
 	// Draw health bar
 	var hpWidth = 300;
