@@ -26,7 +26,7 @@ proto.addObjects = function horde_SpawnWave_proto_addObjects (id, objType, objCo
 	}
 	pt.objects.push({
 		type: objType,
-		count: objCount
+		count: Math.floor(objCount)
 	});
 };
 

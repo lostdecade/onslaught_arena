@@ -159,15 +159,16 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveDelay = 20000;
 	this.lastWaveElapsed = this.waveDelay;
 	this.currentWaveId = -1;
+	this.waveModifier = 1;
 	
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "bat", 5);
-	w.addObjects(2, "bat", 5);
+	w.addObjects(0, "bat", 5 * this.waveModifier);
+	w.addObjects(1, "bat", 5 * this.waveModifier);
+	w.addObjects(2, "bat", 5 * this.waveModifier);
 	this.waves.push(w);
 	
 	// Wave #2
@@ -175,9 +176,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "bat", 10);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "bat", 10);
+	w.addObjects(0, "bat", 10 * this.waveModifier);
+	w.addObjects(1, "goblin", 5 * this.waveModifier);
+	w.addObjects(2, "bat", 10 * this.waveModifier);
 	this.waves.push(w);
 	
 	// Wave #3
@@ -185,9 +186,22 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 15);
-	w.addObjects(1, "goblin", 15);
-	w.addObjects(2, "goblin", 15);
+	w.addObjects(0, "goblin", 15 * this.waveModifier);
+	w.addObjects(1, "goblin", 15 * this.waveModifier);
+	w.addObjects(2, "goblin", 15 * this.waveModifier);
+	this.waves.push(w);
+	
+	// Wave #4
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "goblin", 5 * this.waveModifier);
+	w.addObjects(0, "bat", 15 * this.waveModifier);
+	w.addObjects(1, "bat", 10 * this.waveModifier);
+	w.addObjects(1, "goblin", 20 * this.waveModifier);
+	w.addObjects(2, "goblin", 5 * this.waveModifier);
+	w.addObjects(2, "bat", 15 * this.waveModifier);
 	this.waves.push(w);
 
 };
@@ -221,7 +235,9 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		this.lastWaveElapsed = 0;
 		this.currentWaveId++;
 		if (this.currentWaveId >= this.waves.length) {
+			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
+			this.waveModifier += 0.5;
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
