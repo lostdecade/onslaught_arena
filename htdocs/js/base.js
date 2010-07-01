@@ -80,6 +80,17 @@ horde.randomDirection = function () {
 	return d;
 };
 
+horde.makeObject = function horde_makeObject (type, supressInit) {
+	var obj = new horde.Object();
+	for (var x in horde.objectTypes[type]) {
+		obj[x] = horde.objectTypes[type][x];
+	}
+	if (supressInit !== true) {
+		obj.init();
+	}
+	return obj;
+};
+
 /**
  * Directions enumeration
  */
