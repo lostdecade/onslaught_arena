@@ -22,6 +22,7 @@ o.hero = {
 
 o.h_rock = {
 	role: "projectile",
+	cooldown: 350,
 	speed: 250,
 	hitPoints: 1,
 	damage: 1,
@@ -33,6 +34,7 @@ o.h_rock = {
 
 o.h_knife = {
 	role: "projectile",
+	cooldown: 200,
 	speed: 350,
 	hitPoints: 1,
 	damage: 1,
@@ -44,6 +46,7 @@ o.h_knife = {
 
 o.h_sword = {
 	role: "projectile",
+	cooldown: 300,
 	speed: 250,
 	hitPoints: 1,
 	damage: 2,
@@ -55,6 +58,7 @@ o.h_sword = {
 
 o.h_spear = {
 	role: "projectile",
+	cooldown: 500,
 	speed: 300,
 	hitPoints: 5,
 	damage: 5,
@@ -66,6 +70,7 @@ o.h_spear = {
 
 o.h_fireball = {
 	role: "projectile",
+	cooldown: 750,
 	speed: 400,
 	hitPoints: 1,
 	damage: 1,
@@ -77,6 +82,7 @@ o.h_fireball = {
 
 o.h_trident = {
 	role: "projectile",
+	cooldown: 1000,
 	speed: 500,
 	hitPoints: 100,
 	damage: 50,
