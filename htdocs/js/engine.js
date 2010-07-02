@@ -16,6 +16,7 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(640, 480);
 	this.images = null;
 	this.debug = false; // Debugging toggle
+	this.konamiEntered = false;
 };
 
 var proto = horde.Engine.prototype;
@@ -240,6 +241,10 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
+	player.weapons.push({
+		type: "h_spear",
+		count: 10
+	})
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -453,7 +458,17 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "title") {
+		if (this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
+			this.konamiEntered = true;
+		}
 		if (this.keyboard.isKeyPressed(32)) {
+			if (this.konamiEntered) {
+				var p = this.getPlayerObject();
+				p.weapons.push({
+					type: "h_trident",
+					count: null 
+				});
+			}
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -487,7 +502,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Have the player fire
 		if (this.keyboard.isKeyPressed(32)) {
 			
-			var weapon_type = "h_sword";
+			var weapon_type = player.fireWeapon();
+			if (weapon_type === false) {
+				break;
+			}
 			
 			switch (weapon_type) {
 
