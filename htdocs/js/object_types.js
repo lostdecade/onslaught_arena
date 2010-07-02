@@ -14,7 +14,7 @@ o.hero = {
 	spriteY: 0,
 	animated: true,
 	weapons: [
-		{type: "h_rock", count: -1}
+		{type: "h_rock", count: null}
 	]
 };
 
@@ -29,6 +29,17 @@ o.h_rock = {
 	spriteX: 0,
 	spriteY: 0,
 	rotate: true
+};
+
+o.h_knife = {
+	role: "projectile",
+	speed: 350,
+	hitPoints: 1,
+	damage: 1,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 0,
+	spriteAlign: true
 };
 
 o.h_sword = {
@@ -62,6 +73,17 @@ o.h_fireball = {
 	spriteX: 192,
 	spriteY: 0,
 	rotate: true
+};
+
+o.h_trident = {
+	role: "projectile",
+	speed: 500,
+	hitPoints: 100,
+	damage: 50,
+	spriteSheet: "objects",
+	spriteX: 160,
+	spriteY: 0,
+	spriteAlign: true
 };
 
 // ENEMIES

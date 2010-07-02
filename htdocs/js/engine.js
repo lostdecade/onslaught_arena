@@ -16,6 +16,7 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(640, 480);
 	this.images = null;
 	this.debug = false; // Debugging toggle
+	this.konamiEntered = false;
 };
 
 var proto = horde.Engine.prototype;
@@ -57,12 +58,13 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
  * @param {string} type Type of object to spawn
  * @return {void}
  */
-proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
+proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facing) {
+	var f = facing || parent.facing;
 	var o = horde.makeObject(type, true);
 	o.ownerId = parent.id;
 	o.team = parent.team;
 	o.centerOn(parent.boundingBox().center());
-	o.setDirection(parent.facing);
+	o.setDirection(f);
 	o.init();
 	this.addObject(o);
 };
@@ -239,6 +241,10 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
+	player.weapons.push({
+		type: "h_spear",
+		count: 10
+	})
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -452,7 +458,17 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "title") {
+		if (this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
+			this.konamiEntered = true;
+		}
 		if (this.keyboard.isKeyPressed(32)) {
+			if (this.konamiEntered) {
+				var p = this.getPlayerObject();
+				p.weapons.push({
+					type: "h_trident",
+					count: null 
+				});
+			}
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -478,14 +494,41 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Move the player
-		player.stopMoving();	
+		player.stopMoving();
 		if (move.x !== 0 || move.y !== 0) {
 			player.setDirection(move);
 		}
 
 		// Have the player fire
 		if (this.keyboard.isKeyPressed(32)) {
-			this.spawnObject(player, "h_rock");
+			
+			var weapon_type = player.fireWeapon();
+			if (weapon_type === false) {
+				break;
+			}
+			
+			switch (weapon_type) {
+
+				case "h_fireball":
+					for (var d = 0; d < 8; d++) {
+						var dir = horde.directions.toVector(d);
+						this.spawnObject(player, weapon_type, dir);
+					}
+					break;
+
+				case "h_knife":
+					var f = horde.directions.fromVector(player.facing);
+					for (var o = -1; o < 2; o++) {
+						var dir = horde.directions.toVector(f + o);
+						this.spawnObject(player, weapon_type, dir);
+					}
+					break;
+
+				default:
+					this.spawnObject(player, weapon_type);
+					break;
+			}
+
 		}
 
 		this.keyboard.storeKeyStates();

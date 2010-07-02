@@ -204,4 +204,18 @@ proto.execute = function horde_Object_proto_execute (method, args) {
 	}
 };
 
+proto.fireWeapon = function horde_Object_proto_fireWeapon () {
+	if (this.weapons.length < 1) {
+		return false;
+	}
+	var currentWeapon = this.weapons[this.weapons.length - 1];
+	if (currentWeapon.count !== null) {
+		currentWeapon.count -= 1;
+		if (currentWeapon.count < 1) {
+			this.weapons.pop();
+		}
+	}
+	return currentWeapon.type;
+};
+
 }());
