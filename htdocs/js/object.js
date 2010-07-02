@@ -35,6 +35,9 @@ horde.Object = function () {
 	this.alpha = 1;
 	this.alphaStep = 0;
 	this.gibletSize = "small";
+	this.cooldown = false;
+	this.cooldownElapsed = 0;
+	this.autoFire = false;
 };
 
 var proto = horde.Object.prototype;
@@ -85,6 +88,15 @@ proto.update = function horde_Object_proto_update (elapsed) {
 		this.ttlElapsed += elapsed;
 		if (this.ttlElapsed >= this.ttl) {
 			this.die();
+		}
+	}
+	if (this.cooldown === true) {
+		this.cooldownElapsed += elapsed;
+		var wepInfo = this.getWeaponInfo();
+		var wep = horde.objectTypes[wepInfo.type];
+		if (this.cooldownElapsed >= wep.cooldown) {
+			this.cooldown = false;
+			this.cooldownElapsed = 0;
 		}
 	}
 	this.execute("onUpdate", [elapsed]);
@@ -220,7 +232,7 @@ proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
  * @return {string} Weapon type to spawn
  */
 proto.fireWeapon = function horde_Object_proto_fireWeapon () {
-	if (this.weapons.length < 1) {
+	if (this.cooldown === true || this.weapons.length < 1) {
 		return false;
 	}
 	var currentWeapon = this.weapons[this.weapons.length - 1];
@@ -230,6 +242,7 @@ proto.fireWeapon = function horde_Object_proto_fireWeapon () {
 			this.weapons.pop();
 		}
 	}
+	this.cooldown = true;
 	return currentWeapon.type;
 };
 

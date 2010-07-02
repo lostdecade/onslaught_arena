@@ -242,9 +242,25 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
 	player.weapons.push({
+		type: "h_fireball",
+		count: 10
+	});
+	player.weapons.push({
+		type: "h_sword",
+		count: 10
+	});
+	player.weapons.push({
+		type: "h_knife",
+		count: 10
+	});
+	player.weapons.push({
 		type: "h_spear",
 		count: 10
-	})
+	});
+	player.weapons.push({
+		type: "h_trident",
+		count: 10
+	});
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -500,12 +516,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Have the player fire
-		if (this.keyboard.isKeyPressed(32)) {
+		if (this.keyboard.isKeyDown(32) || player.autoFire === true) {
 			
 			var weapon_type = player.fireWeapon();
-			if (weapon_type === false) {
-				break;
-			}
 			
 			switch (weapon_type) {
 
@@ -522,6 +535,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						var dir = horde.directions.toVector(f + o);
 						this.spawnObject(player, weapon_type, dir);
 					}
+					break;
+				
+				case false:
+					// no weapon to fire or on cooldown
 					break;
 
 				default:
