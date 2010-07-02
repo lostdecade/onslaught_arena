@@ -643,6 +643,9 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		y : 420
 	};
 	var o = this.getPlayerObject();
+	var weaponInfo = o.getWeaponInfo();
+	var w = horde.objectTypes[weaponInfo.type];
+	var wCount = (weaponInfo.count === null) ? "-": weaponInfo.count;
 	
 	// Draw health bar
 	var hpWidth = 300;
@@ -661,12 +664,18 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		0, 32, 32, 32, 603, 443, 32, 32
 	);
 	
-	// Draw gold amount
+	// Draw Weapon Icon
+	ctx.drawImage(this.images.getImage("objects"),
+		w.spriteX, w.spriteY, 32, 32, 603, 412, 32, 32
+	);
+	
+	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "right";
 	ctx.fillStyle = "rgb(255,255,255)";
 	ctx.font = "Bold 32px Monospace";
 	ctx.fillText(o.gold, 603, 469);
+	ctx.fillText(wCount, 603, 439);
 	ctx.restore();
 
 };

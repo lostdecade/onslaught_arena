@@ -204,6 +204,21 @@ proto.execute = function horde_Object_proto_execute (method, args) {
 	}
 };
 
+/**
+ * Returns the weapon info for this object's current weapon
+ * @return {object} Weapon info (type & count)
+ */
+proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
+	if (this.weapons.length >= 1) {
+		return this.weapons[this.weapons.length - 1];
+	}
+	return false;
+};
+
+/**
+ * "Fires" the current weapon by reducing the weapon count and returning the type
+ * @return {string} Weapon type to spawn
+ */
 proto.fireWeapon = function horde_Object_proto_fireWeapon () {
 	if (this.weapons.length < 1) {
 		return false;
