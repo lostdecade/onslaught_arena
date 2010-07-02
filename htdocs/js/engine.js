@@ -57,12 +57,13 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
  * @param {string} type Type of object to spawn
  * @return {void}
  */
-proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type) {
+proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facing) {
+	var f = facing || parent.facing;
 	var o = horde.makeObject(type, true);
 	o.ownerId = parent.id;
 	o.team = parent.team;
 	o.centerOn(parent.boundingBox().center());
-	o.setDirection(parent.facing);
+	o.setDirection(f);
 	o.init();
 	this.addObject(o);
 };
@@ -478,14 +479,38 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Move the player
-		player.stopMoving();	
+		player.stopMoving();
 		if (move.x !== 0 || move.y !== 0) {
 			player.setDirection(move);
 		}
 
 		// Have the player fire
 		if (this.keyboard.isKeyPressed(32)) {
-			this.spawnObject(player, "h_rock");
+			
+			var weapon_type = "h_sword";
+			
+			switch (weapon_type) {
+
+				case "h_fireball":
+					for (var d = 0; d < 8; d++) {
+						var dir = horde.directions.toVector(d);
+						this.spawnObject(player, weapon_type, dir);
+					}
+					break;
+
+				case "h_knife":
+					var f = horde.directions.fromVector(player.facing);
+					for (var o = -1; o < 2; o++) {
+						var dir = horde.directions.toVector(f + o);
+						this.spawnObject(player, weapon_type, dir);
+					}
+					break;
+
+				default:
+					this.spawnObject(player, weapon_type);
+					break;
+			}
+
 		}
 
 		this.keyboard.storeKeyStates();

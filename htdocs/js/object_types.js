@@ -31,6 +31,17 @@ o.h_rock = {
 	rotate: true
 };
 
+o.h_knife = {
+	role: "projectile",
+	speed: 350,
+	hitPoints: 1,
+	damage: 1,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 0,
+	spriteAlign: true
+};
+
 o.h_sword = {
 	role: "projectile",
 	speed: 250,
