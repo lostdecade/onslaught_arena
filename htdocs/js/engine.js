@@ -665,13 +665,13 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	var wCount = (weaponInfo.count === null) ? "-": weaponInfo.count;
 	
 	// Draw health bar
-	var hpWidth = 300;
 	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
 	ctx.save();
 
 	// Outside border
 	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 4, bar.height + 4);
+	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
+	ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
 	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
 
@@ -685,7 +685,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 	// Heart icon
 	ctx.drawImage(this.images.getImage("objects"),
-		128, 32, 32, 32, 40, 430, 32, 32
+		64, 192, 42, 42, 18, 424, 42, 42
 	);
 
 	ctx.restore();
