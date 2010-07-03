@@ -655,9 +655,9 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
 	var bar = {
 		width : 320,
-		height : 48,
-		x : 34,
-		y : 420
+		height : 24,
+		x : 50,
+		y : 432
 	};
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
@@ -666,14 +666,28 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
 	// Draw health bar
 	var hpWidth = 300;
+	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
 	ctx.save();
+
+	// Outside border
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 4, bar.height + 4);
+	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
+
+	// The bar itself
 	ctx.fillStyle = "rgb(190, 22, 29)";
-	ctx.fillRect(bar.x, bar.y, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height);
+	ctx.fillRect(bar.x, bar.y, width, bar.height);
 	ctx.fillStyle = "rgb(238, 28, 36)";
-	ctx.fillRect(bar.x, bar.y + 10, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height - 20);
+	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
 	ctx.fillStyle = "rgb(243, 97, 102)";
-	ctx.fillRect(bar.x, bar.y + 20, (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints)), bar.height - 40);
+	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
+
+	// Heart icon
+	ctx.drawImage(this.images.getImage("objects"),
+		128, 32, 32, 32, 40, 430, 32, 32
+	);
+
 	ctx.restore();
 	
 	// Draw gold coin
