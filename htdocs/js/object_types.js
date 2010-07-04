@@ -161,6 +161,8 @@ o.cyclops = {
 	spriteSheet: "characters",
 	spriteY: 224,
 
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
 	// This might be a dumb hack ...
 	pastGate: false,
 
@@ -176,8 +178,46 @@ o.cyclops = {
 	onUpdate: function (elapsed, engine) {
 
 		if (this.pastGate) {
-			// Uh, move towards the hero here, haha. have fun geoff!
-			this.setDirection(horde.directions.toVector(horde.directions.DOWN_LEFT));
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+
+				var direction = horde.directions.DOWN;
+				var p = engine.getPlayerObject();
+				var hero = {
+					x : p.position.x,
+					y : p.position.y
+				};
+				var x = this.position.x;
+				var y = this.position.y;
+
+				if (x < hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_RIGHT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_RIGHT;
+					} else {
+						direction = horde.directions.RIGHT;
+					}
+				} else if (x > hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_LEFT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_LEFT;
+					} else {
+						direction = horde.directions.LEFT;
+					}
+				} else if (y < hero.y) {
+					direction = horde.directions.DOWN;
+				} else if (y > hero.y) {
+					direction = horde.directions.UP;
+				}
+				
+				this.setDirection(horde.directions.toVector(direction));
+
+			}
+
 		} else {
 			if (this.position.y >= 50) this.pastGate = true;
 		}

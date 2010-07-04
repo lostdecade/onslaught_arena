@@ -99,7 +99,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.cooldownElapsed = 0;
 		}
 	}
-	this.execute("onUpdate", [elapsed]);
+	this.execute("onUpdate", arguments);
 };
 
 /**

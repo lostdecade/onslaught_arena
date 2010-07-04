@@ -641,7 +641,8 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			ctx.globalAlpha = o.alpha;
 		}
 		
-		ctx.drawImage(this.images.getImage(o.spriteSheet),
+		ctx.drawImage(
+			this.images.getImage(o.spriteSheet),
 			s.x, s.y, o.size.width, o.size.height,
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
