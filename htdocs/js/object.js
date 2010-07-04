@@ -17,7 +17,7 @@ horde.Object = function () {
 	this.wounds = 0; // Amount of damage object has sustained
 	this.damage = 1; // Amount of damage object deals when colliding with enemies
 	this.spriteSheet = ""; // Sprite sheet where this object's graphics are found
-	this.spriteX = 0; 
+	this.spriteX = 0;
 	this.spriteY = 0;
 	this.spriteAlign = false; // Align sprite with facing
 	this.animated = false; // Animated or not
@@ -99,7 +99,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.cooldownElapsed = 0;
 		}
 	}
-	this.execute("onUpdate", [elapsed]);
+	return this.execute("onUpdate", [elapsed]);
 };
 
 /**
@@ -212,7 +212,7 @@ proto.stopMoving = function horde_Object_proto_stopMoving () {
  */ 
 proto.execute = function horde_Object_proto_execute (method, args) {
 	if (this[method]) {
-		this[method].apply(this, args);
+		return this[method].apply(this, args);
 	}
 };
 

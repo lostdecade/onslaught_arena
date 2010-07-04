@@ -22,10 +22,10 @@ o.hero = {
 
 o.h_rock = {
 	role: "projectile",
-	cooldown: 350,
+	cooldown: 300,
 	speed: 250,
 	hitPoints: 1,
-	damage: 1,
+	damage: 2,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 0,
@@ -37,7 +37,7 @@ o.h_knife = {
 	cooldown: 200,
 	speed: 350,
 	hitPoints: 1,
-	damage: 1,
+	damage: 2,
 	spriteSheet: "objects",
 	spriteX: 32,
 	spriteY: 0,
@@ -47,9 +47,9 @@ o.h_knife = {
 o.h_sword = {
 	role: "projectile",
 	cooldown: 300,
-	speed: 250,
+	speed: 200,
 	hitPoints: 1,
-	damage: 2,
+	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 64,
 	spriteY: 0,
@@ -60,8 +60,8 @@ o.h_spear = {
 	role: "projectile",
 	cooldown: 500,
 	speed: 300,
-	hitPoints: 5,
-	damage: 5,
+	hitPoints: 10,
+	damage: 3,
 	spriteSheet: "objects",
 	spriteX: 96,
 	spriteY: 0,
@@ -72,8 +72,8 @@ o.h_fireball = {
 	role: "projectile",
 	cooldown: 750,
 	speed: 400,
-	hitPoints: 1,
-	damage: 1,
+	hitPoints: 5,
+	damage: 2,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
@@ -98,7 +98,7 @@ o.bat = {
 	role: "monster",
 	team: 1,
 	speed: 100,
-	hitPoints: 1,
+	hitPoints: 2,
 	damage: 1,
 	worth: 10,
 	spriteSheet: "characters",
@@ -128,8 +128,8 @@ o.goblin = {
 	role: "monster",
 	team: 1,
 	speed: 75,
-	hitPoints: 3,
-	damage: 1,
+	hitPoints: 5,
+	damage: 2,
 	worth: 20,
 	spriteSheet: "characters",
 	spriteY: 160,
@@ -137,6 +137,9 @@ o.goblin = {
 	gibletSize: "medium",
 	moveChangeElapsed: 0,
 	moveChangeDelay: 500,
+	weapons: [
+		{type: "e_arrow", count: null}
+	],
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -147,6 +150,9 @@ o.goblin = {
 			var d = horde.randomDirection();
 			if (d.x === 0 && d.y === 0) { return; }
 			this.setDirection(d);
+		}
+		if (horde.randomRange(1, 200) === 1) {
+			return "shoot";
 		}
 	}
 };
@@ -168,9 +174,17 @@ o.e_rock = {
 };
 
 o.e_arrow = {
-	
+	role: "projectile",
+	cooldown: 300,
+	speed: 200,
+	hitPoints: 1,
+	damage: 1,
+	spriteSheet: "objects",
+	spriteX: 256,
+	spriteY: 0,
+	spriteAlign: true
 };
-	
+
 // OTHER SHIT
 
 o.chest = {
@@ -189,6 +203,15 @@ o.gold_chest = {
 };
 
 // GIBLETS
+
+o.gate = {
+	role: "fluff",
+	speed: 25,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 192,
+	size: new horde.Size(64, 64)
+};
 
 o.small_skull = {
 	role: "fluff",

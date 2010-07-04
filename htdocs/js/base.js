@@ -18,6 +18,13 @@ horde.setInterval = function horde_setInterval (when, fn, context) {
 	return window.setInterval(f, when);
 };
 
+horde.setTimeout = function horde_setTimeout (when, fn, context) {
+	var f = function horde_setTimeout_anon () {
+		fn.call(context);
+	};
+	return window.setTimeout(f, when);
+};
+
 /**
  * Context corrected .addEventListener() wrapper
  * @param {string} type Type of event

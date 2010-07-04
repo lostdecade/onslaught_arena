@@ -17,6 +17,7 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
+	this.gatesUp = false;
 };
 
 var proto = horde.Engine.prototype;
@@ -78,23 +79,30 @@ proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
 	return this.objects[this.playerObjectId];
 };
 
+proto.preloadComplete = function () {
+	this.state = "intro";
+	this.logoAlpha = 0;
+	this.logoFade = "in";
+	this.logoFadeSpeed = 0.3;
+};
+
 /**
  * Initializes the engine
  * @return {void}
  */
 proto.init = function horde_Engine_proto_init () {
 
-	this.state = "title";
-
-	this.initMap();
-
-	this.initSpawnPoints();
-	this.initWaves();
-	
-	this.initPlayer();
+	this.state = "loading";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
+
+	// Load just the logo
+	this.preloader = new horde.ImageLoader();
+	this.preloader.load({
+		"logo": "img/ldg.png"
+	}, this.preloadComplete, this);
 	
+	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
 		"background": "img/arena.png",
@@ -102,6 +110,39 @@ proto.init = function horde_Engine_proto_init () {
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
+
+	var a = new Audio();
+	a.src = "sound/3.mp3";
+	a.loop = true;
+	a.preload = true;
+
+	this.sounds = {};
+	this.sounds["music"] = a;
+	
+};
+
+proto.initGame = function () {
+	
+	this.sounds["music"].play();
+	
+	this.state = "title";
+	
+	this.initMap();
+
+	this.initSpawnPoints();
+	this.initWaves();
+	
+	this.initPlayer();
+
+	/*
+	// Create gates
+	for (var gateX = 0; gateX < 3; gateX++) {
+		var gate = horde.makeObject("gate");
+		gate.position.x = 96 + (gateX * 192);
+		gate.position.y = 0;
+		this.addObject(gate);
+	}
+	*/
 	
 };
 
@@ -203,9 +244,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "bat", 10 * this.waveModifier);
+	w.addObjects(0, "goblin", 5 * this.waveModifier);
 	w.addObjects(1, "goblin", 5 * this.waveModifier);
-	w.addObjects(2, "bat", 10 * this.waveModifier);
+	w.addObjects(2, "goblin", 5 * this.waveModifier);
 	this.waves.push(w);
 	
 	// Wave #3
@@ -213,22 +254,22 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 15 * this.waveModifier);
-	w.addObjects(1, "goblin", 15 * this.waveModifier);
-	w.addObjects(2, "goblin", 15 * this.waveModifier);
+	w.addObjects(0, "goblin", 5 * this.waveModifier);
+	w.addObjects(0, "bat", 15 * this.waveModifier);
+	w.addObjects(1, "bat", 10 * this.waveModifier);
+	w.addObjects(1, "goblin", 10 * this.waveModifier);
+	w.addObjects(2, "goblin", 5 * this.waveModifier);
+	w.addObjects(2, "bat", 15 * this.waveModifier);
 	this.waves.push(w);
 	
 	// Wave #4
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5 * this.waveModifier);
-	w.addObjects(0, "bat", 15 * this.waveModifier);
+	w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(2, 200);
+	w.addObjects(0, "bat", 10 * this.waveModifier);
 	w.addObjects(1, "bat", 10 * this.waveModifier);
-	w.addObjects(1, "goblin", 20 * this.waveModifier);
-	w.addObjects(2, "goblin", 5 * this.waveModifier);
-	w.addObjects(2, "bat", 15 * this.waveModifier);
+	w.addObjects(2, "bat", 10 * this.waveModifier);
 	this.waves.push(w);
 
 };
@@ -242,29 +283,51 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
 	player.weapons.push({
+		type: "h_trident",
+		count: 10
+	});
+	player.weapons.push({
 		type: "h_fireball",
-		count: 10
-	});
-	player.weapons.push({
-		type: "h_sword",
-		count: 10
-	});
-	player.weapons.push({
-		type: "h_knife",
-		count: 10
+		count: 20
 	});
 	player.weapons.push({
 		type: "h_spear",
-		count: 10
+		count: 20
 	});
 	player.weapons.push({
-		type: "h_trident",
-		count: 10
+		type: "h_knife",
+		count: 100
+	});
+	player.weapons.push({
+		type: "h_sword",
+		count: 30
 	});
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
 	this.imagesLoaded = true;
+};
+
+proto.logoFadeOut = function () {
+	this.logoFade = "out";
+};
+
+proto.updateLogo = function (elapsed) {
+	if (this.logoFade === "in") {
+		this.logoAlpha += ((this.logoFadeSpeed / 1000) * elapsed);
+		if (this.logoAlpha >= 1) {
+			this.logoAlpha = 1;
+			this.logoFade = "none";
+			horde.setTimeout(3000, this.logoFadeOut, this);
+		}
+	} else if (this.logoFade === "out") {
+		this.logoAlpha -= ((this.logoFadeSpeed / 1000) * elapsed);
+		if (this.logoAlpha <= 0) {
+			this.logoAlpha = 0;
+			this.logoFade = "none";
+			this.initGame();
+		}
+	}
 };
 
 horde.Engine.prototype.update = function horde_Engine_proto_update () {
@@ -281,6 +344,15 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 	switch (this.state) {
 
+		case "loading":
+			this.render();
+			break;
+		
+		case "intro":
+			this.updateLogo(elapsed);
+			this.render();
+			break;
+
 		// Title Screen
 		case "title":
 			this.handleInput();
@@ -295,7 +367,7 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			this.updateObjects(elapsed);
 			this.render();
 			break;
-			
+
 	}
 
 };
@@ -347,7 +419,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			continue;
 		}
 		
-		o.update(elapsed);
+		var action = o.update(elapsed);
+		switch (action) {
+			case "shoot":
+				this.objectAttack(o);
+				break;
+		}
+		
 
 		var px = ((o.speed / 1000) * elapsed);
 		
@@ -475,9 +553,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "title") {
 		if (this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
+			console.log("KONAMI!!");
 			this.konamiEntered = true;
 		}
 		if (this.keyboard.isKeyPressed(32)) {
+			this.keyboard.keyStates[32] = false;
 			if (this.konamiEntered) {
 				var p = this.getPlayerObject();
 				p.weapons.push({
@@ -517,35 +597,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Have the player fire
 		if (this.keyboard.isKeyDown(32) || player.autoFire === true) {
-			
-			var weapon_type = player.fireWeapon();
-			
-			switch (weapon_type) {
-
-				case "h_fireball":
-					for (var d = 0; d < 8; d++) {
-						var dir = horde.directions.toVector(d);
-						this.spawnObject(player, weapon_type, dir);
-					}
-					break;
-
-				case "h_knife":
-					var f = horde.directions.fromVector(player.facing);
-					for (var o = -1; o < 2; o++) {
-						var dir = horde.directions.toVector(f + o);
-						this.spawnObject(player, weapon_type, dir);
-					}
-					break;
-				
-				case false:
-					// no weapon to fire or on cooldown
-					break;
-
-				default:
-					this.spawnObject(player, weapon_type);
-					break;
-			}
-
+			this.objectAttack(player);
 		}
 
 		this.keyboard.storeKeyStates();
@@ -553,15 +605,58 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 };
 
+proto.objectAttack = function (object) {
+	var weapon_type = object.fireWeapon();
+	
+	switch (weapon_type) {
+
+		case "h_fireball":
+			for (var d = 0; d < 8; d++) {
+				var dir = horde.directions.toVector(d);
+				this.spawnObject(object, weapon_type, dir);
+			}
+			break;
+
+		case "h_knife":
+			var f = horde.directions.fromVector(object.facing);
+			for (var o = -1; o < 2; o++) {
+				var dir = horde.directions.toVector(f + o);
+				this.spawnObject(object, weapon_type, dir);
+			}
+			break;
+		
+		case false:
+			// no weapon to fire or on cooldown
+			break;
+
+		default:
+			this.spawnObject(object, weapon_type);
+			break;
+	}
+};
+
 horde.Engine.prototype.render = function () {
 	
 	var ctx = this.canvases["display"].getContext("2d");
 
 	switch (this.state) {
+
+		case "loading":
+			ctx.save();
+			ctx.fillStyle = "rgb(255,0,0)";
+			ctx.fillRect(0, 0, this.view.width, this.view.height);
+			ctx.restore();
+			break;
+		
+		// Company Logo
+		case "intro":
+			this.drawLogo(ctx);
+			break;
 		
 		// Title Screen
 		case "title":
 			this.drawBackground(ctx);
+			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawTitle(ctx);
 			break;
@@ -579,6 +674,22 @@ horde.Engine.prototype.render = function () {
 	if (this.debug === true) {
 		this.drawDebugInfo(ctx);
 	}
+	
+};
+
+proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
+
+	// Clear the screen
+	ctx.save();
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.restore();
+		
+	// Draw the logo
+	ctx.save();
+	ctx.globalAlpha = this.logoAlpha;
+	ctx.drawImage(this.preloader.getImage("logo"), 0, 0);
+	ctx.restore();
 	
 };
 
@@ -717,6 +828,19 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillText("Press space to begin", 110, 280);
 	ctx.restore();
 		
+};
+
+/**
+ * Draws fake gates for the title screen
+ * @param {object} Canvas 2d context
+ * @return {void}
+ */
+proto.drawFauxGates = function horde_Engine_proto_drawFauxGates (ctx) {
+	for (var g = 0; g < 3; g++) {
+		ctx.drawImage(this.images.getImage("objects"),
+			0, 192, 64, 64, 96 + (g * 192), 0, 64, 64
+		);
+	}
 };
 
 /**
