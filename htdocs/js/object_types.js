@@ -110,7 +110,7 @@ o.bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		if (horde.randomRange(0, 1) === 1) {
-			this.spriteY = 96;
+			this.spriteY = 160;
 		}
 	},
 	onUpdate: function (elapsed) {
@@ -157,14 +157,79 @@ o.goblin = {
 	}
 };
 
-o.ogre = {
+o.cyclops = {
 	role: "monster",
-	size: new horde.Size(64, 64),
 	team: 1,
-	speed: 50,
-	hitPoints: 10,
+
+	animated: true,
+	gibletSize: "large",
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 224,
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+	// This might be a dumb hack ...
+	pastGate: false,
+
 	damage: 5,
-	gibletSize: "large"
+	hitPoints: 10,
+	speed: 25,
+	worth: 50,
+
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+	},
+	onUpdate: function (elapsed, engine) {
+
+		if (this.pastGate) {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+
+				var direction = horde.directions.DOWN;
+				var p = engine.getPlayerObject();
+				var hero = {
+					x : p.position.x,
+					y : p.position.y
+				};
+				var x = this.position.x;
+				var y = this.position.y;
+
+				if (x < hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_RIGHT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_RIGHT;
+					} else {
+						direction = horde.directions.RIGHT;
+					}
+				} else if (x > hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_LEFT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_LEFT;
+					} else {
+						direction = horde.directions.LEFT;
+					}
+				} else if (y < hero.y) {
+					direction = horde.directions.DOWN;
+				} else if (y > hero.y) {
+					direction = horde.directions.UP;
+				}
+				
+				this.setDirection(horde.directions.toVector(direction));
+
+			}
+
+		} else {
+			if (this.position.y >= 50) this.pastGate = true;
+		}
+
+	}
+
 };
 
 // ENEMY WEAPONS

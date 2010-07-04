@@ -1,5 +1,7 @@
 (function define_horde_Engine () {
 
+const DIFFICULTY_INCREMENT = 0.5;
+
 /**
  * Creates a new Engine object
  * @constructor
@@ -234,6 +236,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(2, "cyclops", 10 * this.waveModifier);
 	w.addObjects(0, "bat", 5 * this.waveModifier);
 	w.addObjects(1, "bat", 5 * this.waveModifier);
 	w.addObjects(2, "bat", 5 * this.waveModifier);
@@ -402,7 +405,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
-			this.waveModifier += 0.5;
+			this.waveModifier += DIFFICULTY_INCREMENT;
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
@@ -418,14 +421,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			delete(this.objects[o.id]);
 			continue;
 		}
-		
-		var action = o.update(elapsed);
+
+		var action = o.update(elapsed, this);
 		switch (action) {
 			case "shoot":
 				this.objectAttack(o);
 				break;
 		}
-		
 
 		var px = ((o.speed / 1000) * elapsed);
 		
@@ -591,7 +593,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Move the player
 		player.stopMoving();
-		if (move.x !== 0 || move.y !== 0) {
+		if ((move.x !== 0) || (move.y !== 0)) {
 			player.setDirection(move);
 		}
 
@@ -749,7 +751,8 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			ctx.globalAlpha = o.alpha;
 		}
 		
-		ctx.drawImage(this.images.getImage(o.spriteSheet),
+		ctx.drawImage(
+			this.images.getImage(o.spriteSheet),
 			s.x, s.y, o.size.width, o.size.height,
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
@@ -764,21 +767,41 @@ horde.Engine.prototype.drawObjects = function (ctx) {
  */
 proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
+	var bar = {
+		width : 320,
+		height : 24,
+		x : 50,
+		y : 432
+	};
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
 	var w = horde.objectTypes[weaponInfo.type];
 	var wCount = (weaponInfo.count === null) ? "-": weaponInfo.count;
 	
 	// Draw health bar
-	var hpWidth = 300;
+	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
 	ctx.save();
-	ctx.fillStyle = "rgb(50, 0, 0)";
-	ctx.fillRect(10, 430, hpWidth, 30);
-	ctx.fillStyle = "rgb(255, 0, 0)";
-	ctx.strokeStyle = "rgb(255, 255, 255)";
-	ctx.lineWidth = 2;
-	ctx.fillRect(10, 430, hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints), 30);
-	ctx.strokeRect(10, 430, hpWidth, 30);
+
+	// Outside border
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
+	ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
+	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
+
+	// The bar itself
+	ctx.fillStyle = "rgb(190, 22, 29)";
+	ctx.fillRect(bar.x, bar.y, width, bar.height);
+	ctx.fillStyle = "rgb(238, 28, 36)";
+	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
+	ctx.fillStyle = "rgb(243, 97, 102)";
+	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
+
+	// Heart icon
+	ctx.drawImage(this.images.getImage("objects"),
+		64, 192, 42, 42, 18, 424, 42, 42
+	);
+
 	ctx.restore();
 	
 	// Draw gold coin
