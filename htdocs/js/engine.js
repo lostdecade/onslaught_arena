@@ -1,5 +1,7 @@
 (function define_horde_Engine () {
 
+const DIFFICULTY_INCREMENT = 0.5;
+
 /**
  * Creates a new Engine object
  * @constructor
@@ -193,6 +195,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(2, "cyclops", 10 * this.waveModifier);
 	w.addObjects(0, "bat", 5 * this.waveModifier);
 	w.addObjects(1, "bat", 5 * this.waveModifier);
 	w.addObjects(2, "bat", 5 * this.waveModifier);
@@ -330,7 +333,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
-			this.waveModifier += 0.5;
+			this.waveModifier += DIFFICULTY_INCREMENT;
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
@@ -347,7 +350,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			continue;
 		}
 		
-		o.update(elapsed);
+		o.update(elapsed, this);
 
 		var px = ((o.speed / 1000) * elapsed);
 		
@@ -511,12 +514,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Move the player
 		player.stopMoving();
-		if (move.x !== 0 || move.y !== 0) {
+		if ((move.x !== 0) || (move.y !== 0)) {
 			player.setDirection(move);
 		}
 
 		// Have the player fire
-		if (this.keyboard.isKeyDown(32) || player.autoFire === true) {
+		if (this.keyboard.isKeyDown(32) || (player.autoFire === true)) {
 			
 			var weapon_type = player.fireWeapon();
 			

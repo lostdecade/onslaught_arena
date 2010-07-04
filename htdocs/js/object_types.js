@@ -151,14 +151,39 @@ o.goblin = {
 	}
 };
 
-o.ogre = {
+o.cyclops = {
 	role: "monster",
-	size: new horde.Size(64, 64),
 	team: 1,
-	speed: 50,
-	hitPoints: 10,
+
+	animated: true,
+	gibletSize: "large",
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 224,
+
+	// This might be a dumb hack ...
+	pastGate: false,
+
 	damage: 5,
-	gibletSize: "large"
+	hitPoints: 10,
+	speed: 25,
+	worth: 50,
+
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+	},
+	onUpdate: function (elapsed, engine) {
+
+		if (this.pastGate) {
+			// Uh, move towards the hero here, haha. have fun geoff!
+			this.setDirection(horde.directions.toVector(horde.directions.DOWN_LEFT));
+		} else {
+			if (this.position.y >= 50) this.pastGate = true;
+		}
+
+	}
+
 };
 
 // ENEMY WEAPONS
