@@ -94,7 +94,7 @@ proto.preloadComplete = function () {
  */
 proto.init = function horde_Engine_proto_init () {
 
-	this.state = "loading";
+	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 
@@ -148,6 +148,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		sm.createSound("hero_attacks", "sound/effects/char_attacks.mp3");
 		sm.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
+		sm.createSound("hero_dies", "sound/effects/char_dies.mp3");
 		
 		sm.createSound("fire_attack", "sound/effects/char_attacks_fire.mp3");
 		
@@ -167,7 +168,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 };
 
 proto.initGame = function () {
-	
+
 	soundManager.play("normal_battle_music");
 	
 	this.state = "title";
@@ -414,6 +415,11 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
+		case "game_over":
+			this.updateGameOver(elapsed);
+			this.render();
+			break;
+
 	}
 
 };
@@ -452,6 +458,22 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
+};
+
+proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
+
+	if (!this.gameOverAlpha) {
+		this.gameOverReady = false;
+		this.gameOverAlpha = 0;
+	}
+
+	var alphaChange = ((0.2 / 1000) * elapsed);
+	this.gameOverAlpha += Number(alphaChange) || 0;
+	if (this.gameOverAlpha >= 0.75) {
+		this.gameOverReady = true;
+		this.gameOverAlpha = 0.75;
+	}
+
 };
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
@@ -558,6 +580,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
+		if (defender.role === "hero") {
+			soundManager.stopAll();
+			soundManager.play("hero_dies");
+			this.updateGameOver();
+			this.state = "game_over";
+			return;
+		}
 		if (attacker.ownerId === null) {
 			attacker.gold += defender.worth;
 		} else {
@@ -700,7 +729,7 @@ proto.objectAttack = function (object) {
 
 };
 
-horde.Engine.prototype.render = function () {
+proto.render = function horde_Engine_proto_render () {
 	
 	var ctx = this.canvases["display"].getContext("2d");
 
@@ -734,10 +763,41 @@ horde.Engine.prototype.render = function () {
 			this.drawUI(ctx);
 			break;
 		
+		case "game_over":
+			this.drawGameOver(ctx);
+			break;
+		
 	}
 
 	if (this.debug === true) {
 		this.drawDebugInfo(ctx);
+	}
+	
+};
+
+proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
+
+	if (!this.gameOverBg) {
+		this.drawUI(ctx);
+		this.gameOverBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
+	}
+	
+	ctx.save();
+	ctx.fillStyle = "rgb(0,0,255)";
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.putImageData(this.gameOverBg, 0, 0);
+	ctx.restore();
+
+	ctx.save();
+	ctx.globalAlpha = this.gameOverAlpha;
+	ctx.fillStyle = "rgb(200, 0, 0)";
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.restore();
+
+	if (this.gameOverReady === true) {
+		
+		// TODO: draw text
+		
 	}
 	
 };

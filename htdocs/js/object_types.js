@@ -48,9 +48,9 @@ o.h_knife = {
 
 o.h_sword = {
 	role: "projectile",
-	cooldown: 300,
+	cooldown: 450,
 	speed: 200,
-	hitPoints: 1,
+	hitPoints: 20,
 	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 64,
@@ -61,8 +61,8 @@ o.h_sword = {
 o.h_spear = {
 	role: "projectile",
 	cooldown: 500,
-	speed: 300,
-	hitPoints: 10,
+	speed: 400,
+	hitPoints: 15,
 	damage: 3,
 	spriteSheet: "objects",
 	spriteX: 96,
@@ -73,9 +73,9 @@ o.h_spear = {
 o.h_fireball = {
 	role: "projectile",
 	cooldown: 750,
-	speed: 400,
-	hitPoints: 5,
-	damage: 2,
+	speed: 100,
+	hitPoints: 10,
+	damage: 3,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
