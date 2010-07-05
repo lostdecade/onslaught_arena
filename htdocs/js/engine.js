@@ -115,7 +115,25 @@ proto.init = function horde_Engine_proto_init () {
 
 	soundManager.onload = function () {
 		var s = soundManager;
+		
+		s.useFastPolling = true;
+		s.useHighPerformace = true;
+		
 		s.createSound("music", "sound/3.mp3");
+		
+		s.createSound("hero_damage", "sound/char_takes_damage_2.mp3");
+		
+		s.createSound("bat_damage", "sound/bat_damage.mp3");
+		s.createSound("bat_dies", "sound/bat_dies.mp3");
+		
+		s.createSound("goblin_attacks", "sound/goblin_attacks.mp3");
+		s.createSound("goblin_damage", "sound/goblin_damage.mp3");
+		s.createSound("goblin_dies", "sound/goblin_dies.mp3");
+		
+		s.createSound("cyclops_attacks", "sound/cyclops_attacks.mp3");
+		s.createSound("cyclops_damage", "sound/cyclops_damage.mp3");
+		s.createSound("cyclops_dies", "sound/cyclops_dies.mp3");
+		
 	};
 	
 };

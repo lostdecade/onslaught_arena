@@ -13,6 +13,7 @@ o.hero = {
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
+	soundDamage: "hero_damage",
 	weapons: [
 		{type: "h_rock", count: null}
 	]
@@ -102,17 +103,17 @@ o.bat = {
 	damage: 1,
 	worth: 10,
 	spriteSheet: "characters",
-	spriteY: 128,
+	spriteY: 96,
 	animated: true,
 	animDelay: 150,
 	moveChangeElapsed: 0,
 	moveChangeDelay: 500,
-	//soundDamage: "bat_damage",
-	//soundDies: "bat_dies",
+	soundDamage: "bat_damage",
+	soundDies: "bat_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		if (horde.randomRange(0, 1) === 1) {
-			this.spriteY = 160;
+			this.spriteY = 128;
 		}
 	},
 	onUpdate: function (elapsed) {
@@ -142,9 +143,9 @@ o.goblin = {
 	weapons: [
 		{type: "e_arrow", count: null}
 	],
-	//soundAttacks: "goblin_attacks",
-	//soundDamage: "goblin_damage",
-	//soundDies: "goblin_dies",
+	soundAttacks: "goblin_attacks",
+	soundDamage: "goblin_damage",
+	soundDies: "goblin_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -182,9 +183,9 @@ o.cyclops = {
 	speed: 25,
 	worth: 50,
 
-	//soundAttacks: "cyclops_attacks",
-	//soundDamage: "cyclops_damage",
-	//soundDies: "cyclops_dies",
+	soundAttacks: "cyclops_attacks",
+	soundDamage: "cyclops_damage",
+	soundDies: "cyclops_dies",
 
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
