@@ -13,6 +13,7 @@ o.hero = {
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
+	soundAttacks: "hero_attacks",
 	soundDamage: "hero_damage",
 	weapons: [
 		{type: "h_rock", count: null}
@@ -78,7 +79,8 @@ o.h_fireball = {
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	soundAttacks: "fire_attack"
 };
 
 o.h_trident = {

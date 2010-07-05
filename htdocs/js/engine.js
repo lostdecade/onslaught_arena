@@ -112,48 +112,63 @@ proto.init = function horde_Engine_proto_init () {
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
+	
+	this.initSound();
+	
+};
 
-	soundManager.onload = function () {
-		var s = soundManager;
+/**
+ * Initializes music and sound effects
+ * @return {void}
+ */
+proto.initSound = function horde_Engine_proto_initSound () {
+	
+	var sm = soundManager;
+	
+	// SoundManager2 config
+	sm.useFastPolling = true;
+	sm.useHighPerformance = true;
+	sm.autoLoad = true;
+	sm.multiShot = true;
+	sm.volume = 100;
+
+	sm.onload = function () {
 		
-		s.useFastPolling = true;
-		s.useHighPerformace = true;
-		s.autoLoad = true;
-		s.volume = 100;
-		s.multiShot = true;
-		
-		s.createSound({
+		sm.createSound({
 			id: "normal_battle_music", 
 			url: "sound/music/normal_battle.mp3",
 			volume: 20
 		});
 		
-		s.createSound({
+		sm.createSound({
 			id: "final_battle_music",
 			url: "sound/music/final_battle.mp3",
 			volume: 20
 		});
 
-		s.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
+		sm.createSound("hero_attacks", "sound/effects/char_attacks.mp3");
+		sm.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
 		
-		s.createSound("bat_damage", "sound/effects/bat_damage.mp3");
-		s.createSound("bat_dies", "sound/effects/bat_dies.mp3");
+		sm.createSound("fire_attack", "sound/effects/char_attacks_fire.mp3");
 		
-		s.createSound("goblin_attacks", "sound/effects/goblin_attacks.mp3");
-		s.createSound("goblin_damage", "sound/effects/goblin_damage.mp3");
-		s.createSound("goblin_dies", "sound/effects/goblin_dies.mp3");
+		sm.createSound("bat_damage", "sound/effects/bat_damage.mp3");
+		sm.createSound("bat_dies", "sound/effects/bat_dies.mp3");
 		
-		s.createSound("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
-		s.createSound("cyclops_damage", "sound/effects/cyclops_damage.mp3");
-		s.createSound("cyclops_dies", "sound/effects/cyclops_dies.mp3");
+		sm.createSound("goblin_attacks", "sound/effects/goblin_attacks.mp3");
+		sm.createSound("goblin_damage", "sound/effects/goblin_damage.mp3");
+		sm.createSound("goblin_dies", "sound/effects/goblin_dies.mp3");
+		
+		sm.createSound("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
+		sm.createSound("cyclops_damage", "sound/effects/cyclops_damage.mp3");
+		sm.createSound("cyclops_dies", "sound/effects/cyclops_dies.mp3");
 		
 	};
-	
+
 };
 
 proto.initGame = function () {
 	
-	soundManager.play("final_battle_music");
+	soundManager.play("normal_battle_music");
 	
 	this.state = "title";
 	
@@ -582,7 +597,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "title") {
-		if (this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
+		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			console.log("KONAMI!!");
 			this.konamiEntered = true;
 		}
@@ -636,33 +651,53 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 };
 
 proto.objectAttack = function (object) {
-	var weapon_type = object.fireWeapon();
-	
-	switch (weapon_type) {
 
+	var weaponType = object.fireWeapon();
+	if (weaponType === false) {
+		return;
+	}
+	
+	var weaponDef = horde.objectTypes[weaponType];
+
+	switch (weaponType) {
+
+		// Shoot a fireball in each of the 8 directions
 		case "h_fireball":
 			for (var d = 0; d < 8; d++) {
 				var dir = horde.directions.toVector(d);
-				this.spawnObject(object, weapon_type, dir);
+				this.spawnObject(object, weaponType, dir);
 			}
 			break;
 
+		// Shoot 3 knives in a spread pattern
 		case "h_knife":
 			var f = horde.directions.fromVector(object.facing);
 			for (var o = -1; o < 2; o++) {
 				var dir = horde.directions.toVector(f + o);
-				this.spawnObject(object, weapon_type, dir);
+				this.spawnObject(object, weaponType, dir);
 			}
 			break;
-		
-		case false:
-			// no weapon to fire or on cooldown
-			break;
 
+		// Shoot one instance of the weapon in the same
+		// direction as the object is currently facing
 		default:
-			this.spawnObject(object, weapon_type);
+			this.spawnObject(object, weaponType);
 			break;
+			
 	}
+
+	// Determine what sound (if any) to play
+	// Attacking sound on weapon type > attacking sound on object performing attack
+	var sound = null;
+	if (weaponDef.soundAttacks) {
+		sound = weaponDef.soundAttacks;
+	} else if (object.soundAttacks) {
+		sound = object.soundAttacks;
+	}
+	if (sound !== null) {
+		soundManager.play(sound);
+	}
+
 };
 
 horde.Engine.prototype.render = function () {
