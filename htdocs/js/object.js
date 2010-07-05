@@ -38,6 +38,9 @@ horde.Object = function () {
 	this.cooldown = false;
 	this.cooldownElapsed = 0;
 	this.autoFire = false;
+	this.soundAttacks = null;
+	this.soundDamage = null;
+	this.soundDies = null;
 };
 
 var proto = horde.Object.prototype;
@@ -146,7 +149,13 @@ proto.wound = function horde_Object_proto_wound (damage) {
 	this.wounds += damage;
 	if (this.wounds >= this.hitPoints) {
 		this.die();
+		if (this.soundDies) {
+			soundManager.play(this.soundDies);
+		}
 		return true;
+	}
+	if (this.soundDamage) {
+		soundManager.play(this.soundDamage);
 	}
 	return false;
 };

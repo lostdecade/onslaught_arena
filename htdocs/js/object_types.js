@@ -107,6 +107,8 @@ o.bat = {
 	animDelay: 150,
 	moveChangeElapsed: 0,
 	moveChangeDelay: 500,
+	//soundDamage: "bat_damage",
+	//soundDies: "bat_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		if (horde.randomRange(0, 1) === 1) {
@@ -140,6 +142,9 @@ o.goblin = {
 	weapons: [
 		{type: "e_arrow", count: null}
 	],
+	//soundAttacks: "goblin_attacks",
+	//soundDamage: "goblin_damage",
+	//soundDies: "goblin_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -176,6 +181,10 @@ o.cyclops = {
 	hitPoints: 10,
 	speed: 25,
 	worth: 50,
+
+	//soundAttacks: "cyclops_attacks",
+	//soundDamage: "cyclops_damage",
+	//soundDies: "cyclops_dies",
 
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);

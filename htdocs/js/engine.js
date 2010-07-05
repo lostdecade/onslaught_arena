@@ -113,19 +113,16 @@ proto.init = function horde_Engine_proto_init () {
 		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
 
-	var a = new Audio();
-	a.src = "sound/3.mp3";
-	a.loop = true;
-	a.preload = true;
-
-	this.sounds = {};
-	this.sounds["music"] = a;
+	soundManager.onload = function () {
+		var s = soundManager;
+		s.createSound("music", "sound/3.mp3");
+	};
 	
 };
 
 proto.initGame = function () {
 	
-	this.sounds["music"].play();
+	soundManager.play("music");
 	
 	this.state = "title";
 	
