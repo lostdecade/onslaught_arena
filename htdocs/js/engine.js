@@ -118,21 +118,34 @@ proto.init = function horde_Engine_proto_init () {
 		
 		s.useFastPolling = true;
 		s.useHighPerformace = true;
+		s.autoLoad = true;
+		s.volume = 100;
+		s.multiShot = true;
 		
-		s.createSound("music", "sound/3.mp3");
+		s.createSound({
+			id: "normal_battle_music", 
+			url: "sound/music/normal_battle.mp3",
+			volume: 20
+		});
 		
-		s.createSound("hero_damage", "sound/char_takes_damage_2.mp3");
+		s.createSound({
+			id: "final_battle_music",
+			url: "sound/music/final_battle.mp3",
+			volume: 20
+		});
+
+		s.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
 		
-		s.createSound("bat_damage", "sound/bat_damage.mp3");
-		s.createSound("bat_dies", "sound/bat_dies.mp3");
+		s.createSound("bat_damage", "sound/effects/bat_damage.mp3");
+		s.createSound("bat_dies", "sound/effects/bat_dies.mp3");
 		
-		s.createSound("goblin_attacks", "sound/goblin_attacks.mp3");
-		s.createSound("goblin_damage", "sound/goblin_damage.mp3");
-		s.createSound("goblin_dies", "sound/goblin_dies.mp3");
+		s.createSound("goblin_attacks", "sound/effects/goblin_attacks.mp3");
+		s.createSound("goblin_damage", "sound/effects/goblin_damage.mp3");
+		s.createSound("goblin_dies", "sound/effects/goblin_dies.mp3");
 		
-		s.createSound("cyclops_attacks", "sound/cyclops_attacks.mp3");
-		s.createSound("cyclops_damage", "sound/cyclops_damage.mp3");
-		s.createSound("cyclops_dies", "sound/cyclops_dies.mp3");
+		s.createSound("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
+		s.createSound("cyclops_damage", "sound/effects/cyclops_damage.mp3");
+		s.createSound("cyclops_dies", "sound/effects/cyclops_dies.mp3");
 		
 	};
 	
@@ -140,7 +153,7 @@ proto.init = function horde_Engine_proto_init () {
 
 proto.initGame = function () {
 	
-	soundManager.play("music");
+	soundManager.play("final_battle_music");
 	
 	this.state = "title";
 	
