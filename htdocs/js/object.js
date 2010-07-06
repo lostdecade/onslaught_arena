@@ -150,12 +150,12 @@ proto.wound = function horde_Object_proto_wound (damage) {
 	if (this.wounds >= this.hitPoints) {
 		this.die();
 		if (this.soundDies) {
-			soundManager.play(this.soundDies);
+			horde.playSound(this.soundDies);
 		}
 		return true;
 	}
 	if (this.soundDamage) {
-		soundManager.play(this.soundDamage);
+		horde.playSound(this.soundDamage);
 	}
 	return false;
 };

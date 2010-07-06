@@ -221,7 +221,7 @@ o.goblin = {
 			var nearY = Math.abs(y - hero.y);
 
 			if ((nearX < 64) && (nearY < 64)) {
-				soundManager.play("goblin_attacks");
+				horde.playSound("goblin_attacks");
 				this.seenHero = true;
 			}
 

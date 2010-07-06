@@ -178,9 +178,9 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 proto.initGame = function () {
 
-	soundManager.play("normal_battle_music");
+	horde.playSound("normal_battle_music");
 
-	if (gatesY < 0) soundManager.play("gate_closes");
+	if (gatesY < 0) horde.playSound("gate_closes");
 	
 	this.objects = {};
 	this.state = "title";
@@ -657,7 +657,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			*/
 
 			soundManager.stopAll();
-			soundManager.play("hero_dies");
+			horde.playSound("hero_dies");
 			this.gameOverReady = false;
 			this.gameOverAlpha = 0;
 			this.updateGameOver();
@@ -702,6 +702,16 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
+	// Toggle sound with "M" for "mute".
+	if (this.keyboard.isKeyPressed(77)) {
+		horde.soundEnabled = !horde.soundEnabled;
+		if (horde.soundEnabled) {
+			horde.playSound("normal_battle_music");
+		} else {
+			soundManager.stopAll();
+		}
+	}
+
 	// TODO: this is broken!
 	if (this.state === "title") {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
@@ -718,7 +728,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				});
 			}
 			gatesY = 0;
-			soundManager.play("gate_opens");
+			horde.playSound("gate_opens");
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -804,7 +814,7 @@ proto.objectAttack = function (object) {
 		sound = object.soundAttacks;
 	}
 	if (sound !== null) {
-		soundManager.play(sound);
+		horde.playSound(sound);
 	}
 
 };
@@ -1116,6 +1126,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.font = "Bold 35px Monospace";
 	ctx.textAlign = "left";
 	ctx.fillText("Press space to begin", 110, 280);
+	ctx.restore();
+
+	ctx.save();
+	ctx.globalAlpha = 1;
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.font = "20px Monospace";
+	ctx.textAlign = "center";
+	ctx.fillText("Use arrow keys to move, space to attack.", 320, 330);
+	ctx.fillText('Press "M" to mute sound.', 320, 350);
 	ctx.restore();
 		
 };
