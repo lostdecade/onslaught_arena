@@ -1,6 +1,11 @@
 (function define_horde_Engine () {
 
+const VERSION = 0.1;
 const DIFFICULTY_INCREMENT = 0.5;
+const NUM_GATES = 3;
+
+var gatesX = 0;
+var gatesY = 0;
 
 /**
  * Creates a new Engine object
@@ -85,7 +90,7 @@ proto.preloadComplete = function () {
 	this.state = "intro";
 	this.logoAlpha = 0;
 	this.logoFade = "in";
-	this.logoFadeSpeed = 0.3;
+	this.logoFadeSpeed = 0.5;
 };
 
 /**
@@ -107,6 +112,7 @@ proto.init = function horde_Engine_proto_init () {
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
+		"title": "img/title.png",
 		"background": "img/arena.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
@@ -146,6 +152,9 @@ proto.initSound = function horde_Engine_proto_initSound () {
 			volume: 20
 		});
 
+		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
+		sm.createSound("gate_closes", "sound/effects/gate_closes.mp3");
+
 		sm.createSound("hero_attacks", "sound/effects/char_attacks.mp3");
 		sm.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
 		sm.createSound("hero_dies", "sound/effects/char_dies.mp3");
@@ -170,7 +179,10 @@ proto.initSound = function horde_Engine_proto_initSound () {
 proto.initGame = function () {
 
 	soundManager.play("normal_battle_music");
+
+	if (gatesY < 0) soundManager.play("gate_closes");
 	
+	this.objects = {};
 	this.state = "title";
 	
 	this.initMap();
@@ -280,7 +292,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(2, "cyclops", 10 * this.waveModifier);
+	w.addObjects(0, "cyclops", 5 * this.waveModifier);
 	w.addObjects(0, "bat", 5 * this.waveModifier);
 	w.addObjects(1, "bat", 5 * this.waveModifier);
 	w.addObjects(2, "bat", 5 * this.waveModifier);
@@ -329,6 +341,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
+	// TODO Get rid of default weapons for debugging
 	player.weapons.push({
 		type: "h_trident",
 		count: 10
@@ -360,12 +373,18 @@ proto.logoFadeOut = function () {
 };
 
 proto.updateLogo = function (elapsed) {
+
+	if (this.keyboard.keyStates[32]) {
+		this.keyboard.keyStates[32] = false; // HACK: not very elegant to force the key off
+		this.initGame();
+	}
+
 	if (this.logoFade === "in") {
 		this.logoAlpha += ((this.logoFadeSpeed / 1000) * elapsed);
 		if (this.logoAlpha >= 1) {
 			this.logoAlpha = 1;
 			this.logoFade = "none";
-			horde.setTimeout(3000, this.logoFadeOut, this);
+			horde.setTimeout(1000, this.logoFadeOut, this);
 		}
 	} else if (this.logoFade === "out") {
 		this.logoAlpha -= ((this.logoFadeSpeed / 1000) * elapsed);
@@ -400,8 +419,10 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
-		// Title Screen
 		case "title":
+			if (gatesY < 0) {
+				gatesY++;
+			}
 			this.handleInput();
 			this.render();
 			break;
@@ -412,6 +433,7 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			this.updateWaves(elapsed);
 			this.updateSpawnPoints(elapsed);
 			this.updateObjects(elapsed);
+			this.updateFauxGates(elapsed);
 			this.render();
 			break;
 
@@ -475,6 +497,30 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 	}
 
 };
+
+proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
+
+	if (gatesY > -54) {
+		gatesX = horde.randomRange(-1, 1);
+		gatesY -= 0.25;
+	}
+
+/*
+	if (!this.gameOverAlpha) {
+		this.gameOverReady = false;
+		this.gameOverAlpha = 0;
+	}
+
+	var alphaChange = ((0.2 / 1000) * elapsed);
+	this.gameOverAlpha += Number(alphaChange) || 0;
+	if (this.gameOverAlpha >= 0.75) {
+		this.gameOverReady = true;
+		this.gameOverAlpha = 0.75;
+	}
+*/
+
+};
+
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
 	
@@ -567,6 +613,16 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
+				if (o.role == "hero") {
+					if (o2.role == "powerup_food") {
+						o2.state = "dead";
+						o.wounds -= o2.amount;
+						if (o.wounds < 0) o.wounds = 0;
+					} else if (o2.role == "powerup_weapon") {
+						o2.state = "dead";
+						//TODO o.weapons.push();
+					}
+				}
 				this.dealDamage(o2, o);
 				this.dealDamage(o, o2);
 			}
@@ -581,8 +637,25 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
 		if (defender.role === "hero") {
+
+			// Draw the hero's death
+			var ctx = this.canvases["display"].getContext("2d");
+			defender.spriteX = 256;
+
+			// NOTE: TODO: I fail! can't get it to work
+			/*
+			this.drawObjects(ctx);
+			ctx.drawImage(
+				this.images.getImage(defender.spriteSheet),
+				s.x, s.y, defender.size.width, defender.size.height,
+				-(defender.size.width / 2), -(defender.size.height / 2), defender.size.width, defender.size.height
+			);
+			*/
+
 			soundManager.stopAll();
 			soundManager.play("hero_dies");
+			this.gameOverReady = false;
+			this.gameOverAlpha = 0;
 			this.updateGameOver();
 			this.state = "game_over";
 			return;
@@ -625,6 +698,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
+	// TODO: this is broken!
 	if (this.state === "title") {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			console.log("KONAMI!!");
@@ -639,6 +713,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					count: null 
 				});
 			}
+			gatesY = 0;
+			soundManager.play("gate_opens");
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -759,6 +835,7 @@ proto.render = function horde_Engine_proto_render () {
 		case "running":
 			this.drawBackground(ctx);
 			this.drawObjects(ctx);
+			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawUI(ctx);
 			break;
@@ -776,6 +853,21 @@ proto.render = function horde_Engine_proto_render () {
 };
 
 proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
+
+	if (!this.titleAlphaStep) {
+		this.titleAlphaStep = -0.025;
+		this.titleAlpha = 1;
+	} else {
+		this.titleAlpha += this.titleAlphaStep;
+		if (this.titleAlpha <= 0) {
+			this.titleAlpha = 0;
+			this.titleAlphaStep = 0.025;
+		}
+		if (this.titleAlpha >= 1) {
+			this.titleAlpha = 1;
+			this.titleAlphaStep = -0.025;
+		}
+	}
 
 	if (!this.gameOverBg) {
 		this.drawUI(ctx);
@@ -795,8 +887,35 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	ctx.restore();
 
 	if (this.gameOverReady === true) {
+
+		if (this.keyboard.keyStates[32]) {
+			this.keyboard.keyStates[32] = false; // HACK: not very elegant to force the key off
+			this.initGame();
+		}
+
+		var p = this.getPlayerObject();
 		
-		// TODO: draw text
+		ctx.save();
+
+		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.font = "Bold 35px Monospace";
+		ctx.globalAlpha = 1;
+
+		ctx.textAlign = "center";
+		ctx.fillText("Game Over", 320, 200);
+
+		ctx.drawImage(
+			this.images.getImage("objects"),
+			0, 32, 32, 32, 260, 224, 32, 32
+		);
+		ctx.textAlign = "left";
+		ctx.fillText(p.gold, 300, 250);
+
+		ctx.textAlign = "center";
+		ctx.globalAlpha = this.titleAlpha;
+		ctx.fillText("Press space to play again", 320, 300);
+
+		ctx.restore();
 		
 	}
 	
@@ -819,14 +938,16 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 };
 
 proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
-	ctx.drawImage(this.images.getImage("background"), 
+	ctx.drawImage(
+		this.images.getImage("background"), 
 		0, 0, 640, 480, 
 		0, 0, this.view.width, this.view.height
 	);
 };
 
 proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
-	ctx.drawImage(this.images.getImage("shadow"),
+	ctx.drawImage(
+		this.images.getImage("shadow"),
 		0, 0, 576, 386, 
 		32, 0, 576, 386
 	);
@@ -874,12 +995,17 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			ctx.globalAlpha = o.alpha;
 		}
 		
-		ctx.drawImage(
-			this.images.getImage(o.spriteSheet),
-			s.x, s.y, o.size.width, o.size.height,
-			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
-		);
+		try {
+			ctx.drawImage(
+				this.images.getImage(o.spriteSheet),
+				s.x, s.y, o.size.width, o.size.height,
+				-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
+			);
+		} catch (e) {
+		}
+
 		ctx.restore();
+
 	}
 };
 
@@ -921,19 +1047,22 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
 
 	// Heart icon
-	ctx.drawImage(this.images.getImage("objects"),
+	ctx.drawImage(
+		this.images.getImage("objects"),
 		64, 192, 42, 42, 18, 424, 42, 42
 	);
 
 	ctx.restore();
 	
 	// Draw gold coin
-	ctx.drawImage(this.images.getImage("objects"),
+	ctx.drawImage(
+		this.images.getImage("objects"),
 		0, 32, 32, 32, 603, 443, 32, 32
 	);
 	
 	// Draw Weapon Icon
-	ctx.drawImage(this.images.getImage("objects"),
+	ctx.drawImage(
+		this.images.getImage("objects"),
 		w.spriteX, w.spriteY, 32, 32, 603, 412, 32, 32
 	);
 	
@@ -950,7 +1079,10 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	
-	// TODO: DRAW GAME LOGO HERE
+	ctx.drawImage(
+		this.images.getImage("title"),
+		320 - 214, 100
+	);
 	
 	if (!this.titleAlphaStep) {
 		this.titleAlphaStep = -0.025;
@@ -966,11 +1098,22 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 			this.titleAlphaStep = -0.025;
 		}
 	}
+
+	ctx.save();
+	ctx.globalAlpha = 1;
+	ctx.font = "Bold 16px Monospace";
+	ctx.textAlign = "right";
+	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillText("v" + VERSION + " by Lost Decade Games", 632, 472);
+	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillText("v" + VERSION + " by Lost Decade Games", 630, 470);
+	ctx.restore();
 	
 	ctx.save();
 	ctx.globalAlpha = this.titleAlpha;
 	ctx.fillStyle = "rgb(0,0,0)";
 	ctx.font = "Bold 35px Monospace";
+	ctx.textAlign = "left";
 	ctx.fillText("Press space to begin", 110, 280);
 	ctx.restore();
 		
@@ -982,9 +1125,10 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
  * @return {void}
  */
 proto.drawFauxGates = function horde_Engine_proto_drawFauxGates (ctx) {
-	for (var g = 0; g < 3; g++) {
-		ctx.drawImage(this.images.getImage("objects"),
-			0, 192, 64, 64, 96 + (g * 192), 0, 64, 64
+	for (var g = 0; g < NUM_GATES; g++) {
+		ctx.drawImage(
+			this.images.getImage("objects"),
+			0, 192, 64, 64, gatesX + 96 + (g * 192), gatesY, 64, 64
 		);
 	}
 };

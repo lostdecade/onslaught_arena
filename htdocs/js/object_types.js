@@ -180,7 +180,7 @@ o.cyclops = {
 	// This might be a dumb hack ...
 	pastGate: false,
 
-	damage: 5,
+	damage: 2,
 	hitPoints: 10,
 	speed: 25,
 	worth: 50,
@@ -366,6 +366,17 @@ o.large_giblet = {
 		var offset = horde.randomRange(0, 6);
 		this.spriteX += (offset * this.size.width);
 	}
+};
+
+o.item_food = {
+	role: "powerup_food",
+	amount: 10
+};
+
+o.item_sword = {
+	role: "powerup_weapon",
+	weapon_type: "sword",
+	amount: 10
 };
 
 }());
