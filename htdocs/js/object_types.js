@@ -249,6 +249,7 @@ o.goblin = {
 			if ((nearX < 64) && (nearY < 64)) {
 				horde.playSound("goblin_attacks");
 				this.seenHero = true;
+				return "shoot";
 			}
 
 		}
@@ -436,6 +437,84 @@ o.cyclops = {
 	}
 
 };
+
+o.superclops = {
+	role: "monster",
+	team: 1,
+
+	animated: true,
+	gibletSize: "large",
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 288,
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+
+	damage: 5,
+	hitPoints: 30,
+	speed: 25,
+	worth: 50,
+
+	soundAttacks: "cyclops_attacks",
+	soundDamage: "cyclops_damage",
+	soundDies: "cyclops_dies",
+
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+	},
+	onUpdate: function (elapsed, engine) {
+
+		if (this.pastGate) {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+
+				var direction = horde.directions.DOWN;
+				var p = engine.getPlayerObject();
+				var hero = {
+					x : p.position.x,
+					y : p.position.y
+				};
+				var x = this.position.x;
+				var y = this.position.y;
+
+				if (x < hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_RIGHT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_RIGHT;
+					} else {
+						direction = horde.directions.RIGHT;
+					}
+				} else if (x > hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_LEFT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_LEFT;
+					} else {
+						direction = horde.directions.LEFT;
+					}
+				} else if (y < hero.y) {
+					direction = horde.directions.DOWN;
+				} else if (y > hero.y) {
+					direction = horde.directions.UP;
+				}
+				
+				this.setDirection(horde.directions.toVector(direction));
+
+			}
+
+		} else {
+			if (this.position.y >= 50) this.pastGate = true;
+		}
+
+	}
+
+};
+
 
 // ENEMY WEAPONS
 
