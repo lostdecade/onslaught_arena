@@ -267,7 +267,7 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 		sp.lastSpawnElapsed = sp.delay;
 		for (var z in p.objects) {
 			var o = p.objects[z];
-			sp.queueSpawn(o.type, o.count);
+			sp.queueSpawn(o.type, o.count * this.waveModifier);
 		}
 	}
 };
@@ -289,10 +289,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5 * this.waveModifier);
-	w.addObjects(0, "bat", 5 * this.waveModifier);
-	w.addObjects(1, "bat", 5 * this.waveModifier);
-	w.addObjects(2, "bat", 5 * this.waveModifier);
+	w.addObjects(0, "goblin", 5);
+	w.addObjects(0, "bat", 5);
+	w.addObjects(1, "bat", 5);
+	w.addObjects(2, "bat", 5);
 	this.waves.push(w);
 	
 	// Wave #2
@@ -300,9 +300,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5 * this.waveModifier);
-	w.addObjects(1, "goblin", 5 * this.waveModifier);
-	w.addObjects(2, "goblin", 5 * this.waveModifier);
+	w.addObjects(0, "goblin", 5);
+	w.addObjects(1, "goblin", 5);
+	w.addObjects(2, "goblin", 5);
 	this.waves.push(w);
 	
 	// Wave #3
@@ -310,12 +310,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5 * this.waveModifier);
-	w.addObjects(0, "bat", 5 * this.waveModifier);
-	w.addObjects(1, "bat", 10 * this.waveModifier);
-	w.addObjects(1, "goblin", 10 * this.waveModifier);
-	w.addObjects(2, "goblin", 5 * this.waveModifier);
-	w.addObjects(2, "bat", 5 * this.waveModifier);
+	w.addObjects(0, "goblin", 5);
+	w.addObjects(0, "bat", 5);
+	w.addObjects(1, "bat", 10);
+	w.addObjects(1, "goblin", 10);
+	w.addObjects(2, "goblin", 5);
+	w.addObjects(2, "bat", 5);
 	this.waves.push(w);
 	
 	// Wave #4
@@ -323,9 +323,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 200);
 	w.addSpawnPoint(1, 200);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5 * this.waveModifier);
-	w.addObjects(1, "demoblin", 5 * this.waveModifier);
-	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
+	w.addObjects(0, "dire_bat", 5);
+	w.addObjects(1, "demoblin", 5);
+	w.addObjects(2, "dire_bat", 5);
 	this.waves.push(w);
 
 	// Wave #5
@@ -333,9 +333,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 200);
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5 * this.waveModifier);
-	w.addObjects(1, "cyclops", 1 * this.waveModifier);
-	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
+	w.addObjects(0, "dire_bat", 5);
+	w.addObjects(1, "cyclops", 1);
+	w.addObjects(2, "dire_bat", 5);
 	this.waves.push(w);
 	
 	// Wave 6
@@ -343,11 +343,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 2000);
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 2000);
-	w.addObjects(0, "cyclops", 2 * this.waveModifier);
-	w.addObjects(1, "superclops", 1 * this.waveModifier);
-	w.addObjects(2, "cyclops", 2 * this.waveModifier);
+	w.addObjects(0, "cyclops", 2);
+	w.addObjects(1, "superclops", 1);
+	w.addObjects(2, "cyclops", 2);
 	this.waves.push(w);
-	
 
 };
 
@@ -477,6 +476,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			soundManager.stop("final_battle_music");
 			horde.playSound("normal_battle_music");
 			this.waveModifier += DIFFICULTY_INCREMENT;
+			this.waveDelay *= this.waveModifier;
 		}
 		if (this.currentWaveId === (this.waves.length - 1)) {
 			soundManager.stop("normal_battle_music");
@@ -1049,7 +1049,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		
 		ctx.drawImage(
 			this.images.getImage(o.spriteSheet),
-			s.x, s.y, o.size.width, o.size.height,
+			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
 
