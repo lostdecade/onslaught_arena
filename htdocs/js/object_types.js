@@ -141,7 +141,7 @@ o.goblin = {
 	animated: true,
 	gibletSize: "medium",
 	moveChangeElapsed: 0,
-	moveChangeDelay: 500,
+	moveChangeDelay: 3000,
 	weapons: [
 		{type: "e_arrow", count: null}
 	],
@@ -162,7 +162,73 @@ o.goblin = {
 		if (horde.randomRange(1, 200) === 1) {
 			return "shoot";
 		}
+	},
+	onUpdate: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : p.position.x,
+			y : p.position.y
+		};
+		var x = this.position.x;
+		var y = this.position.y;
+
+		if (this.seenHero) {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+
+				var direction = horde.directions.DOWN;
+
+				if (x < hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_RIGHT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_RIGHT;
+					} else {
+						direction = horde.directions.RIGHT;
+					}
+				} else if (x > hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_LEFT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_LEFT;
+					} else {
+						direction = horde.directions.LEFT;
+					}
+				} else if (y < hero.y) {
+					direction = horde.directions.DOWN;
+				} else if (y > hero.y) {
+					direction = horde.directions.UP;
+				}
+				
+				this.setDirection(horde.directions.toVector(direction));
+
+			}
+
+		} else {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+				var d = horde.randomDirection();
+				if (d.x === 0 && d.y === 0) { return; }
+				this.setDirection(d);
+			}
+
+			var nearX = Math.abs(x - hero.x);
+			var nearY = Math.abs(y - hero.y);
+
+			if ((nearX < 64) && (nearY < 64)) {
+				soundManager.play("goblin_attacks");
+				this.seenHero = true;
+			}
+
+		}
+
 	}
+
 };
 
 o.cyclops = {
@@ -177,8 +243,6 @@ o.cyclops = {
 
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
-	// This might be a dumb hack ...
-	pastGate: false,
 
 	damage: 2,
 	hitPoints: 10,

@@ -292,7 +292,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "cyclops", 5 * this.waveModifier);
+	w.addObjects(0, "goblin", 5 * this.waveModifier);
 	w.addObjects(0, "bat", 5 * this.waveModifier);
 	w.addObjects(1, "bat", 5 * this.waveModifier);
 	w.addObjects(2, "bat", 5 * this.waveModifier);
@@ -1026,7 +1026,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
 	var w = horde.objectTypes[weaponInfo.type];
-	var wCount = (weaponInfo.count === null) ? "-": weaponInfo.count;
+	var wCount = (weaponInfo.count === null) ? "\u221E": weaponInfo.count;
 	
 	// Draw health bar
 	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
