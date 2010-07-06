@@ -375,7 +375,7 @@ o.cyclops = {
 	moveChangeDelay: 1000,
 
 	damage: 5,
-	hitPoints: 75,
+	hitPoints: 40,
 	speed: 25,
 	worth: 100,
 
@@ -452,7 +452,7 @@ o.superclops = {
 	moveChangeDelay: 1000,
 
 	damage: 25,
-	hitPoints: 150,
+	hitPoints: 70,
 	speed: 25,
 	worth: 1000,
 
