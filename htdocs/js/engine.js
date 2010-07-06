@@ -152,6 +152,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 			volume: 20
 		});
 
+		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
+
 		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
 		sm.createSound("gate_closes", "sound/effects/gate_closes.mp3");
 
@@ -595,7 +597,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			o.wallCollide(axis);
 		}
 		
-		if (o.role === "fluff") {
+		if (o.role === "fluff" || o.role === "powerup_food") {
 			continue;
 		}
 		
@@ -608,15 +610,18 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				if (o.role == "hero") {
 					if (o2.role == "powerup_food") {
 						o2.state = "dead";
-						o.wounds -= o2.amount;
+						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
+						soundManager.play("eat_food");
 					} else if (o2.role == "powerup_weapon") {
 						o2.state = "dead";
 						//TODO o.weapons.push();
 					}
 				}
-				this.dealDamage(o2, o);
-				this.dealDamage(o, o2);
+				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
+					this.dealDamage(o2, o);
+					this.dealDamage(o, o2);
+				}
 			}
 		}
 		
@@ -672,14 +677,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				gib.setDirection(horde.randomDirection());
 				this.addObject(gib);
 			}
-			/*
-			// Random chance to drop treasure!
-			if (horde.randomRange(1, 10) === 10) {
-				var chest = this.makeObject("chest");
-				chest.position = defender.position.clone();
-				this.addObject(chest);
+			
+			// Random chance loot!
+			if (horde.randomRange(1, 10) > 8) {
+				var drop = horde.makeObject("item_food_meat");
+				drop.position = defender.position.clone();
+				this.addObject(drop);
 			}
-			*/
+
 		}
 	}
 };

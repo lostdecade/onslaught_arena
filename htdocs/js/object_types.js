@@ -264,6 +264,8 @@ o.e_arrow = {
 
 // OTHER SHIT
 
+/*
+
 o.chest = {
 	role: "chest",
 	team: 1,
@@ -278,6 +280,8 @@ o.chest = {
 o.gold_chest = {
 	
 };
+
+*/
 
 // GIBLETS
 
@@ -368,15 +372,22 @@ o.large_giblet = {
 	}
 };
 
-o.item_food = {
+o.item_food_meat = {
 	role: "powerup_food",
-	amount: 10
+	healAmount: 10,
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 32,
+	ttl: 8000
 };
 
+/*
 o.item_sword = {
 	role: "powerup_weapon",
 	weapon_type: "sword",
 	amount: 10
 };
+*/
 
 }());
