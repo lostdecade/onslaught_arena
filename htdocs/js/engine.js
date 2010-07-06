@@ -397,7 +397,7 @@ proto.updateLogo = function (elapsed) {
 horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 	var now = horde.now();
-	var elapsed = now - this.lastUpdate;
+	var elapsed = (now - this.lastUpdate);
 	this.lastUpdate = now;
 
 	this.lastElapsed = elapsed;
@@ -419,7 +419,7 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 		case "title":
 			if (gatesY < 0) {
-				gatesY++;
+				gatesY += ((200 / 1000) * elapsed);
 			}
 			this.handleInput();
 			this.render();
@@ -508,7 +508,7 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 
 	if (gatesY > -54) {
 		gatesX = horde.randomRange(-1, 1);
-		gatesY -= 0.25;
+		gatesY -= ((50 / 1000) * elapsed);
 	}
 
 /*
@@ -526,7 +526,6 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 */
 
 };
-
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
 	
