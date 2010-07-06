@@ -634,12 +634,12 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		// defender has died; assign gold
 		if (defender.role === "hero") {
 
+			/*
+			// NOTE: TODO: I fail! can't get it to work
 			// Draw the hero's death
 			var ctx = this.canvases["display"].getContext("2d");
 			defender.spriteX = 256;
 
-			// NOTE: TODO: I fail! can't get it to work
-			/*
 			this.drawObjects(ctx);
 			ctx.drawImage(
 				this.images.getImage(defender.spriteSheet),
@@ -678,11 +678,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			}
 			
 			// Random chance loot!
-			if (horde.randomRange(1, 10) > 7) {
+			if (horde.randomRange(1, 10) > 6) {
 				var lootType = "item_coin";
 				switch (horde.randomRange(1, 4)) {
 					case 3:
-						lootType = "item_food";
+						var p = this.getPlayerObject();
+						if (p.wounds) {
+							lootType = "item_food";
+						}
 						break;
 					case 4:
 						lootType = "item_weapon";
@@ -1016,7 +1019,11 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 
 		if (o.role === "powerup_weapon") {
 			ctx.fillStyle = "rgb(255,0,255)";
-			ctx.fillRect(-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height);
+			// Draw a scroll behind the weapon?
+			ctx.drawImage(
+				this.images.getImage("objects"),
+				128, 196, 48, 48, -26, -20, 48, 48
+			);
 		}
 		
 		ctx.drawImage(
