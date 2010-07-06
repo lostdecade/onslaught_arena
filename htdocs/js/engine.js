@@ -1005,12 +1005,17 @@ proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
 	);
 };
 
-horde.Engine.prototype.getObjectDrawOrder = function () {
+/**
+ * Returns the draw order of objects based on their Y position + height
+ * @return {array} Array of object IDs in the order that they should be drawn
+ */
+proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 	var drawOrder = [];
 	for (var id in this.objects) {
+		var obj = this.objects[id];
 		drawOrder.push({
-			id: this.objects[id].id,
-			y: this.objects[id].position.y
+			id: obj.id,
+			y: obj.position.y + obj.size.height
 		});
 	}
 	drawOrder.sort(function (a, b) {
