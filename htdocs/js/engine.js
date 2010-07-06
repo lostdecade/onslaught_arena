@@ -154,7 +154,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 			url: "sound/music/final_battle.mp3",
 			volume: 20,
 			onfinish: function () {
-				this.play();
+				horde.playSound("normal_battle_music");
 			}
 		});
 
@@ -480,9 +480,11 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
+			/*
 			soundManager.stop("normal_battle_music");
 			soundManager.stop("final_battle_music");
 			horde.playSound("normal_battle_music");
+			*/
 			this.waveModifier += DIFFICULTY_INCREMENT;
 			this.waveDelay *= this.waveModifier;
 		}
