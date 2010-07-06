@@ -357,9 +357,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
  */
 proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
+	// NOTE: below line shouldn't be necessary, but it fixes the weapon retention bug for now.
+	player.weapons = [
+		{type: "h_rock", count: null}
+	];
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
-console.log(player.weapons);
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
