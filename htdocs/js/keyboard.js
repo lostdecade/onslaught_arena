@@ -13,13 +13,30 @@ var proto = Keyboard.prototype;
 
 Keyboard.konamiCode = [38,38,40,40,37,39,37,39,66,65];
 
+proto.supressKeys = function (e) {
+	switch (e.keyCode) {
+		case 37:
+		case 38:
+		case 39:
+		case 40:
+		case 66:
+		case 65:
+		case 77:
+		case 32:
+			horde.stopEvent(e);
+			break;
+	}
+};
+
 proto.handleKeyDown = function (e) {
 	this.history.push(e.keyCode);
 	this.keyStates[e.keyCode] = true;
+	this.supressKeys(e);
 };
 
 proto.handleKeyUp = function (e) {
 	this.keyStates[e.keyCode] = false;
+	this.supressKeys(e);
 };
 
 proto.isKeyDown = function (keyCode) {

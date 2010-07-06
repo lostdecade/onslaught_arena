@@ -175,3 +175,10 @@ horde.playSound = function horde_Engine_proto_playSound (sound) {
 		soundManager.play(sound);
 	}
 };
+
+horde.stopEvent = function horde_stopEvent (e) {
+	e.cancelBubble = true;
+	e.stopPropagation();
+	e.preventDefault();
+};
+
