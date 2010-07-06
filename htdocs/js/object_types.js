@@ -328,6 +328,8 @@ o.e_arrow = {
 
 // OTHER SHIT
 
+/*
+
 o.chest = {
 	role: "chest",
 	team: 1,
@@ -342,6 +344,8 @@ o.chest = {
 o.gold_chest = {
 	
 };
+
+*/
 
 // GIBLETS
 
@@ -432,15 +436,42 @@ o.large_giblet = {
 	}
 };
 
-o.item_food = {
+o.item_food_meat = {
 	role: "powerup_food",
-	amount: 10
+	healAmount: 10,
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 32,
+	ttl: 8000
 };
 
-o.item_sword = {
-	role: "powerup_weapon",
-	weapon_type: "sword",
-	amount: 10
+o.item_coin = {
+	role: "powerup_coin",
+	coinAmount: 10,
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 64,
+	spriteY: 32,
+	ttl: 5000,
+	onInit: function () {
+		var rnd = horde.randomRange(1, 10);
+		if (rnd <= 5) {
+			this.coinAmount = 10;
+			this.spriteX = 64;
+			return;
+		}
+		if (rnd > 5 && rnd <= 9) {
+			this.coinAmount = 100;
+			this.spriteX = 32;			
+			return;
+		}
+		if (rnd === 10) {
+			this.coinAmount = 1000;
+			this.spriteX = 0;			
+			return;
+		}
+	}
 };
 
 }());
