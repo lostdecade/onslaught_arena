@@ -359,6 +359,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
+console.log(player.weapons);
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
