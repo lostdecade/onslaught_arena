@@ -334,7 +334,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 2000);
 	w.addSpawnPoint(2, 200);
 	w.addObjects(0, "dire_bat", 5 * this.waveModifier);
-	w.addObjects(1, "superclops", 1 * this.waveModifier);
+	w.addObjects(1, "cyclops", 1 * this.waveModifier);
 	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
 	this.waves.push(w);
 	
@@ -473,7 +473,15 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
+			soundManager.stop("normal_battle_music");
+			soundManager.stop("final_battle_music");
+			horde.playSound("normal_battle_music");
 			this.waveModifier += DIFFICULTY_INCREMENT;
+		}
+		if (this.currentWaveId === (this.waves.length - 1)) {
+			soundManager.stop("normal_battle_music");
+			soundManager.stop("final_battle_music");
+			horde.playSound("final_battle_music");
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
