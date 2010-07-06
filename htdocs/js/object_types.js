@@ -374,10 +374,10 @@ o.cyclops = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 2,
-	hitPoints: 10,
+	damage: 5,
+	hitPoints: 75,
 	speed: 25,
-	worth: 50,
+	worth: 100,
 
 	soundAttacks: "cyclops_attacks",
 	soundDamage: "cyclops_damage",
@@ -451,10 +451,10 @@ o.superclops = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 5,
-	hitPoints: 30,
+	damage: 25,
+	hitPoints: 150,
 	speed: 25,
-	worth: 50,
+	worth: 1000,
 
 	soundAttacks: "cyclops_attacks",
 	soundDamage: "cyclops_damage",

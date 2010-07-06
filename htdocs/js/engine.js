@@ -143,13 +143,15 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		sm.createSound({
 			id: "normal_battle_music", 
 			url: "sound/music/normal_battle.mp3",
-			volume: 20
+			volume: 20,
+			loops: "infinite"
 		});
 		
 		sm.createSound({
 			id: "final_battle_music",
 			url: "sound/music/final_battle.mp3",
-			volume: 20
+			volume: 20,
+			loops: "infinite"
 		});
 
 		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
@@ -328,12 +330,22 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave #5
 	var w = new horde.SpawnWave();
-	//w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
-	//w.addSpawnPoint(2, 200);
-	//w.addObjects(0, "dire_bat", 5 * this.waveModifier);
+	w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 2000);
+	w.addSpawnPoint(2, 200);
+	w.addObjects(0, "dire_bat", 5 * this.waveModifier);
 	w.addObjects(1, "superclops", 1 * this.waveModifier);
-	//w.addObjects(2, "dire_bat", 5 * this.waveModifier);
+	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
+	this.waves.push(w);
+	
+	// Wave 6
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 2000);
+	w.addSpawnPoint(1, 2000);
+	w.addSpawnPoint(2, 2000);
+	w.addObjects(0, "cyclops", 2 * this.waveModifier);
+	w.addObjects(1, "superclops", 1 * this.waveModifier);
+	w.addObjects(2, "cyclops", 2 * this.waveModifier);
 	this.waves.push(w);
 	
 
@@ -913,6 +925,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		if (this.keyboard.keyStates[32]) {
 			this.keyboard.keyStates[32] = false; // HACK: not very elegant to force the key off
 			this.initGame();
+			return;
 		}
 
 		var p = this.getPlayerObject();
