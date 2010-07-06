@@ -192,16 +192,8 @@ proto.initGame = function () {
 	
 	this.initPlayer();
 
-	/*
-	// Create gates
-	for (var gateX = 0; gateX < 3; gateX++) {
-		var gate = horde.makeObject("gate");
-		gate.position.x = 96 + (gateX * 192);
-		gate.position.y = 0;
-		this.addObject(gate);
-	}
-	*/
-	
+	this.gameOverBg = null;
+
 };
 
 /**

@@ -148,6 +148,7 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
 proto.wound = function horde_Object_proto_wound (damage) {
 	this.wounds += damage;
 	if (this.wounds >= this.hitPoints) {
+		this.wounds = this.hitPoints;
 		this.die();
 		if (this.soundDies) {
 			soundManager.play(this.soundDies);
