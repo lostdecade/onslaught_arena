@@ -705,7 +705,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	// TODO: this is broken!
 	if (this.state === "title") {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
-			console.log("KONAMI!!");
 			horde.playSound("chest_opens");
 			this.konamiEntered = true;
 		}
