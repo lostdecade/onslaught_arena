@@ -33,7 +33,6 @@ proto.handleImageLoad = function horde_ImageLoader_proto_handleImageLoad (e) {
 };
 
 proto.handleImageError = function horde_ImageLoader_proto_handleImageError (e) {
-	console.log("Error loading an image!");
 	this.increment();
 };
 
