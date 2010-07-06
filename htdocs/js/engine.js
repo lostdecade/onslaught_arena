@@ -154,6 +154,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
 		sm.createSound("coins", "sound/effects/chest_gold.mp3");
+		sm.createSound("chest_opens", "sound/effects/chest_opens.mp3");
 		sm.createSound("chest_weapon", "sound/effects/chest_weapon.mp3");
 
 		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
@@ -181,8 +182,6 @@ proto.initSound = function horde_Engine_proto_initSound () {
 };
 
 proto.initGame = function () {
-
-	horde.playSound("normal_battle_music");
 
 	if (gatesY < 0) horde.playSound("gate_closes");
 	
@@ -707,6 +706,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	if (this.state === "title") {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			console.log("KONAMI!!");
+			horde.playSound("chest_opens");
 			this.konamiEntered = true;
 		}
 		if (this.keyboard.isKeyPressed(32)) {
@@ -717,8 +717,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					type: "h_trident",
 					count: null 
 				});
+/*
+				horde.playSound("chest_weapon");
+*/
 			}
 			gatesY = 0;
+			horde.playSound("normal_battle_music");
 			horde.playSound("gate_opens");
 			this.state = "running";
 		}
