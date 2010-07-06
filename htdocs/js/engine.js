@@ -155,6 +155,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
 		sm.createSound("coins", "sound/effects/chest_gold.mp3");
 		sm.createSound("chest_opens", "sound/effects/chest_opens.mp3");
+		sm.createSound("chest_weapon", "sound/effects/chest_weapon.mp3");
 
 		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
 		sm.createSound("gate_closes", "sound/effects/gate_closes.mp3");
@@ -335,31 +336,6 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
-	// TODO Get rid of default weapons for debugging
-	player.weapons.push({
-		type: "h_knife",
-		count: 100
-	});
-	player.weapons.push({
-		type: "h_trident",
-		count: 10
-	});
-	player.weapons.push({
-		type: "h_fireball",
-		count: 20
-	});
-	player.weapons.push({
-		type: "h_spear",
-		count: 20
-	});
-	player.weapons.push({
-		type: "h_sword",
-		count: 30
-	});
-	player.weapons.push({
-		type: "h_knife",
-		count: 100
-	});
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -613,14 +589,21 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			if (o.boundingBox().intersects(o2.boundingBox())) {
 				if (o.role == "hero") {
 					if (o2.role == "powerup_food") {
-						o2.state = "dead";
+						o2.die();
 						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
 						soundManager.play("eat_food");
 					} else if (o2.role == "powerup_coin") {
-						o2.state = "dead";
+						o2.die();
 						o.gold += o2.coinAmount;
 						soundManager.play("coins");
+					} else if (o2.role == "powerup_weapon") {
+						o2.die();
+						o.weapons.push({
+							type: o2.wepType,
+							count: o2.wepCount
+						});
+						soundManager.play("chest_weapon");
 					}
 				}
 				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
@@ -686,9 +669,12 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			// Random chance loot!
 			if (horde.randomRange(1, 10) > 7) {
 				var lootType = "item_coin";
-				switch (horde.randomRange(1, 3)) {
+				switch (horde.randomRange(1, 4)) {
 					case 3:
-						lootType = "item_food_meat"
+						lootType = "item_food";
+						break;
+					case 4:
+						lootType = "item_weapon";
 						break;
 				}				
 				var drop = horde.makeObject(lootType);
@@ -1016,6 +1002,11 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		
 		if (o.alpha !== 1) {
 			ctx.globalAlpha = o.alpha;
+		}
+
+		if (o.role === "powerup_weapon") {
+			ctx.fillStyle = "rgb(255,0,255)";
+			ctx.fillRect(-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height);
 		}
 		
 		ctx.drawImage(

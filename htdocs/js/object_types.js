@@ -436,7 +436,7 @@ o.large_giblet = {
 	}
 };
 
-o.item_food_meat = {
+o.item_food = {
 	role: "powerup_food",
 	healAmount: 10,
 	speed: 0,
@@ -470,6 +470,57 @@ o.item_coin = {
 			this.coinAmount = 1000;
 			this.spriteX = 0;			
 			return;
+		}
+	}
+};
+
+o.item_weapon = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 0,
+	ttl: 5000,
+	onInit: function () {
+		switch (horde.randomRange(1, 12)) {
+
+			case 1:
+			case 2:
+			case 3:
+				this.wepType = "h_knife";
+				this.spriteX = 32;
+				this.wepCount = 100;
+				break;
+			
+			case 4:
+			case 5:
+			case 6:
+				this.wepType = "h_sword";
+				this.wepCount = 25;
+				this.spriteX = 64;
+				break;
+				
+			case 7:
+			case 8:
+			case 9:
+				this.wepType = "h_spear";
+				this.wepCount = 30;
+				this.spriteX = 96;
+				break;
+				
+			case 10:
+			case 11:
+				this.wepType = "h_fireball";
+				this.wepCount = 10;
+				this.spriteX = 192;
+				break;
+				
+			case 12:
+				this.wepType = "h_trident";
+				this.wepCount = 10;
+				this.spriteX = 160;
+				break;
+			
 		}
 	}
 };
