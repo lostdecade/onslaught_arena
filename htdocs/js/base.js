@@ -112,6 +112,7 @@ horde.directions = {
 	UP_LEFT: 7,
 	toVector: function (d) {
 		if (d < 0) d += 8; // Fix for -1 should be UP_LEFT.
+		if (d > 7) d -= 8; // Fix for -1 should be UP_LEFT.
 		switch (d) {
 			case horde.directions.UP:
 				return new horde.Vector2(0, -1);

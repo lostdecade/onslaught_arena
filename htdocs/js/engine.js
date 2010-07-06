@@ -343,6 +343,10 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	this.playerObjectId = this.addObject(player);
 	// TODO Get rid of default weapons for debugging
 	player.weapons.push({
+		type: "h_knife",
+		count: 100
+	});
+	player.weapons.push({
 		type: "h_trident",
 		count: 10
 	});
@@ -355,12 +359,12 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 		count: 20
 	});
 	player.weapons.push({
-		type: "h_knife",
-		count: 100
-	});
-	player.weapons.push({
 		type: "h_sword",
 		count: 30
+	});
+	player.weapons.push({
+		type: "h_knife",
+		count: 100
 	});
 };
 
@@ -995,14 +999,11 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			ctx.globalAlpha = o.alpha;
 		}
 		
-		try {
-			ctx.drawImage(
-				this.images.getImage(o.spriteSheet),
-				s.x, s.y, o.size.width, o.size.height,
-				-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
-			);
-		} catch (e) {
-		}
+		ctx.drawImage(
+			this.images.getImage(o.spriteSheet),
+			s.x, s.y, o.size.width, o.size.height,
+			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
+		);
 
 		ctx.restore();
 
