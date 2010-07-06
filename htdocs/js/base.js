@@ -167,3 +167,11 @@ horde.directions = {
 		}
 	}
 };
+
+horde.soundEnabled = true;
+
+horde.playSound = function horde_Engine_proto_playSound (sound) {
+	if (horde.soundEnabled) {
+		soundManager.play(sound);
+	}
+};
