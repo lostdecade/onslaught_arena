@@ -326,6 +326,17 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
 	this.waves.push(w);
 
+	// Wave #5
+	var w = new horde.SpawnWave();
+	//w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 200);
+	//w.addSpawnPoint(2, 200);
+	//w.addObjects(0, "dire_bat", 5 * this.waveModifier);
+	w.addObjects(1, "superclops", 1 * this.waveModifier);
+	//w.addObjects(2, "dire_bat", 5 * this.waveModifier);
+	this.waves.push(w);
+	
+
 };
 
 /**
