@@ -144,14 +144,18 @@ proto.initSound = function horde_Engine_proto_initSound () {
 			id: "normal_battle_music", 
 			url: "sound/music/normal_battle.mp3",
 			volume: 20,
-			loops: "infinite"
+			onfinish: function () {
+				this.play();
+			}
 		});
 		
 		sm.createSound({
 			id: "final_battle_music",
 			url: "sound/music/final_battle.mp3",
 			volume: 20,
-			loops: "infinite"
+			onfinish: function () {
+				this.play();
+			}
 		});
 
 		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
