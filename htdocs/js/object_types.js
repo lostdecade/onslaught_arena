@@ -114,9 +114,35 @@ o.bat = {
 	soundDies: "bat_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
-		if (horde.randomRange(0, 1) === 1) {
-			this.spriteY = 128;
+	},
+	onUpdate: function (elapsed) {
+		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeElapsed >= this.moveChangeDelay) {
+			this.moveChangeElapsed = 0;
+			var d = horde.randomDirection();
+			if (d.x === 0 && d.y === 0) { return; }
+			this.setDirection(d);
 		}
+	}
+};
+
+o.dire_bat = {
+	role: "monster",
+	team: 1,
+	speed: 150,
+	hitPoints: 4,
+	damage: 2,
+	worth: 10,
+	spriteSheet: "characters",
+	spriteY: 128,
+	animated: true,
+	animDelay: 150,
+	moveChangeElapsed: 0,
+	moveChangeDelay: 500,
+	soundDamage: "bat_damage",
+	soundDies: "bat_dies",
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
 	onUpdate: function (elapsed) {
 		this.moveChangeElapsed += elapsed;
@@ -230,6 +256,109 @@ o.goblin = {
 	}
 
 };
+
+o.demoblin = {
+	role: "monster",
+	team: 1,
+	speed: 100,
+	hitPoints: 10,
+	damage: 5,
+	worth: 20,
+	spriteSheet: "characters",
+	spriteY: 192,
+	animated: true,
+	gibletSize: "medium",
+	moveChangeElapsed: 0,
+	moveChangeDelay: 3000,
+	weapons: [
+		{type: "e_arrow", count: null}
+	],
+	soundAttacks: "goblin_attacks",
+	soundDamage: "goblin_damage",
+	soundDies: "goblin_dies",
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+	},
+	onUpdate: function (elapsed) {
+		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeElapsed >= this.moveChangeDelay) {
+			this.moveChangeElapsed = 0;
+			var d = horde.randomDirection();
+			if (d.x === 0 && d.y === 0) { return; }
+			this.setDirection(d);
+		}
+		if (horde.randomRange(1, 200) === 1) {
+			return "shoot";
+		}
+	},
+	onUpdate: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : p.position.x,
+			y : p.position.y
+		};
+		var x = this.position.x;
+		var y = this.position.y;
+
+		if (this.seenHero) {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+
+				var direction = horde.directions.DOWN;
+
+				if (x < hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_RIGHT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_RIGHT;
+					} else {
+						direction = horde.directions.RIGHT;
+					}
+				} else if (x > hero.x) {
+					if (y < hero.y) {
+						direction = horde.directions.DOWN_LEFT;
+					} else if (y > hero.y) {
+						direction = horde.directions.UP_LEFT;
+					} else {
+						direction = horde.directions.LEFT;
+					}
+				} else if (y < hero.y) {
+					direction = horde.directions.DOWN;
+				} else if (y > hero.y) {
+					direction = horde.directions.UP;
+				}
+				
+				this.setDirection(horde.directions.toVector(direction));
+
+			}
+
+		} else {
+
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed >= this.moveChangeDelay) {
+				this.moveChangeElapsed = 0;
+				var d = horde.randomDirection();
+				if (d.x === 0 && d.y === 0) { return; }
+				this.setDirection(d);
+			}
+
+			var nearX = Math.abs(x - hero.x);
+			var nearY = Math.abs(y - hero.y);
+
+			if ((nearX < 64) && (nearY < 64)) {
+				horde.playSound("goblin_attacks");
+				this.seenHero = true;
+			}
+
+		}
+
+	}
+
+};
+
 
 o.cyclops = {
 	role: "monster",

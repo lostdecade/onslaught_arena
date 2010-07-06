@@ -309,11 +309,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "goblin", 5 * this.waveModifier);
-	w.addObjects(0, "bat", 15 * this.waveModifier);
+	w.addObjects(0, "bat", 5 * this.waveModifier);
 	w.addObjects(1, "bat", 10 * this.waveModifier);
 	w.addObjects(1, "goblin", 10 * this.waveModifier);
 	w.addObjects(2, "goblin", 5 * this.waveModifier);
-	w.addObjects(2, "bat", 15 * this.waveModifier);
+	w.addObjects(2, "bat", 5 * this.waveModifier);
 	this.waves.push(w);
 	
 	// Wave #4
@@ -321,9 +321,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 200);
 	w.addSpawnPoint(1, 200);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "bat", 10 * this.waveModifier);
-	w.addObjects(1, "bat", 10 * this.waveModifier);
-	w.addObjects(2, "bat", 10 * this.waveModifier);
+	w.addObjects(0, "dire_bat", 5 * this.waveModifier);
+	w.addObjects(1, "demoblin", 5 * this.waveModifier);
+	w.addObjects(2, "dire_bat", 5 * this.waveModifier);
 	this.waves.push(w);
 
 };
