@@ -153,6 +153,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		});
 
 		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
+		sm.createSound("coins", "sound/effects/chest_gold.mp3");
 
 		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
 		sm.createSound("gate_closes", "sound/effects/gate_closes.mp3");
@@ -617,9 +618,10 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
 						soundManager.play("eat_food");
-					} else if (o2.role == "powerup_weapon") {
+					} else if (o2.role == "powerup_coin") {
 						o2.state = "dead";
-						//TODO o.weapons.push();
+						o.gold += o2.coinAmount;
+						soundManager.play("coins");
 					}
 				}
 				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
@@ -683,8 +685,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			}
 			
 			// Random chance loot!
-			if (horde.randomRange(1, 10) > 8) {
-				var drop = horde.makeObject("item_food_meat");
+			if (horde.randomRange(1, 10) > 7) {
+				var lootType = "item_coin";
+				switch (horde.randomRange(1, 3)) {
+					case 3:
+						lootType = "item_food_meat"
+						break;
+				}				
+				var drop = horde.makeObject(lootType);
 				drop.position = defender.position.clone();
 				this.addObject(drop);
 			}
