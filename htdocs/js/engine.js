@@ -1142,7 +1142,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = "rgb(0,0,0)";
 	ctx.font = "Bold 35px Monospace";
 	ctx.textAlign = "left";
-	ctx.fillText("Press space to begin", 110, 280);
+	ctx.fillText("Press space to play", 110, 280);
 	ctx.restore();
 
 	ctx.save();
