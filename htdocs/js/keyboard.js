@@ -36,7 +36,7 @@ proto.historyMatch = function (keys) {
 	if (toCheck.length !== len) {
 		return false;
 	}
-	for (var x = 0; x > len; x++) {
+	for (var x = 0; x < len; x++) {
 		if (keys[x] !== toCheck[x]) {
 			return false;	
 		}
