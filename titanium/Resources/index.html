@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Onslaught!</title>
+	<style type="text/css">
+		html, body {
+			background: #000;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+
+	<script src="lib/sm2/soundmanager2.js"></script>
+	<script>
+		soundManager.url = "lib/sm2/";
+	</script>
+
+	<script src="js/base.js"></script>
+	<script src="js/sound.js"></script>
+	<script src="js/size.js"></script>
+	<script src="js/vector2.js"></script>
+	<script src="js/rect.js"></script>
+	<script src="js/keyboard.js"></script>
+	<script src="js/engine.js"></script>
+	<script src="js/object.js"></script>
+	<script src="js/object_types.js"></script>
+	<script src="js/image_loader.js"></script>
+	<script src="js/spawn_point.js"></script>
+	<script src="js/spawn_wave.js"></script>
+	
+	<script>(function () {
+		var e = new horde.Engine();
+		e.run();
+	}());
+	</script>
+	
+</body>
+</html>

@@ -129,67 +129,47 @@ proto.init = function horde_Engine_proto_init () {
  */
 proto.initSound = function horde_Engine_proto_initSound () {
 	
-	var sm = soundManager;
+	horde.sound.init(function () {
 	
-	// SoundManager2 config
-	sm.useFastPolling = true;
-	sm.useHighPerformance = true;
-	sm.autoLoad = true;
-	sm.multiShot = true;
-	sm.volume = 100;
+		var s = horde.sound;
+		
+		s.create("normal_battle_music", "sound/music/normal_battle.mp3", true, 20);
+		s.create("final_battle_music", "sound/music/final_battle.mp3", true, 20);
 
-	sm.onload = function () {
-		
-		sm.createSound({
-			id: "normal_battle_music", 
-			url: "sound/music/normal_battle.mp3",
-			volume: 20,
-			onfinish: function () {
-				this.play();
-			}
-		});
-		
-		sm.createSound({
-			id: "final_battle_music",
-			url: "sound/music/final_battle.mp3",
-			volume: 20,
-			onfinish: function () {
-				horde.playSound("normal_battle_music");
-			}
-		});
+		s.create("eat_food", "sound/effects/chest_food.mp3");
+		s.create("coins", "sound/effects/chest_gold.mp3");
+		s.create("chest_opens", "sound/effects/chest_opens.mp3");
+		s.create("chest_weapon", "sound/effects/chest_weapon.mp3");horde.sound.play
 
-		sm.createSound("eat_food", "sound/effects/chest_food.mp3");
-		sm.createSound("coins", "sound/effects/chest_gold.mp3");
-		sm.createSound("chest_opens", "sound/effects/chest_opens.mp3");
-		sm.createSound("chest_weapon", "sound/effects/chest_weapon.mp3");
+		s.create("gate_opens", "sound/effects/gate_opens.mp3");
+		s.create("gate_closes", "sound/effects/gate_closes.mp3");
 
-		sm.createSound("gate_opens", "sound/effects/gate_opens.mp3");
-		sm.createSound("gate_closes", "sound/effects/gate_closes.mp3");
-
-		sm.createSound("hero_attacks", "sound/effects/char_attacks.mp3");
-		sm.createSound("hero_damage", "sound/effects/char_damage_3.mp3");
-		sm.createSound("hero_dies", "sound/effects/char_dies.mp3");
+		s.create("hero_attacks", "sound/effects/char_attacks.mp3");
+		s.create("hero_damage", "sound/effects/char_damage_3.mp3");
+		s.create("hero_dies", "sound/effects/char_dies.mp3");
 		
-		sm.createSound("fire_attack", "sound/effects/char_attacks_fire.mp3");
+		s.create("fire_attack", "sound/effects/char_attacks_fire.mp3");
 		
-		sm.createSound("bat_damage", "sound/effects/bat_damage.mp3");
-		sm.createSound("bat_dies", "sound/effects/bat_dies.mp3");
+		s.create("bat_damage", "sound/effects/bat_damage.mp3");
+		s.create("bat_dies", "sound/effects/bat_dies.mp3");
 		
-		sm.createSound("goblin_attacks", "sound/effects/goblin_attacks.mp3");
-		sm.createSound("goblin_damage", "sound/effects/goblin_damage.mp3");
-		sm.createSound("goblin_dies", "sound/effects/goblin_dies.mp3");
+		s.create("goblin_attacks", "sound/effects/goblin_attacks.mp3");
+		s.create("goblin_damage", "sound/effects/goblin_damage.mp3");
+		s.create("goblin_dies", "sound/effects/goblin_dies.mp3");
 		
-		sm.createSound("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
-		sm.createSound("cyclops_damage", "sound/effects/cyclops_damage.mp3");
-		sm.createSound("cyclops_dies", "sound/effects/cyclops_dies.mp3");
+		s.create("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
+		s.create("cyclops_damage", "sound/effects/cyclops_damage.mp3");
+		s.create("cyclops_dies", "sound/effects/cyclops_dies.mp3");
 		
-	};
-
+	});
+	
 };
 
 proto.initGame = function () {
 
-	if (gatesY < 0) horde.playSound("gate_closes");
+	this.konamiEntered = false;
+
+	if (gatesY < 0) horde.sound.play("gate_closes");
 	
 	this.objects = {};
 	this.state = "title";
@@ -481,17 +461,17 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 			/*
-			soundManager.stop("normal_battle_music");
-			soundManager.stop("final_battle_music");
-			horde.playSound("normal_battle_music");
+			horde.sound.stop("normal_battle_music");
+			horde.sound.stop("final_battle_music");
+			horde.sound.play("normal_battle_music");
 			*/
 			this.waveModifier += DIFFICULTY_INCREMENT;
 			this.waveDelay *= this.waveModifier;
 		}
 		if (this.currentWaveId === (this.waves.length - 1)) {
-			soundManager.stop("normal_battle_music");
-			soundManager.stop("final_battle_music");
-			horde.playSound("final_battle_music");
+			horde.sound.stop("normal_battle_music");
+			horde.sound.stop("final_battle_music");
+			horde.sound.play("final_battle_music");
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 	}
@@ -632,18 +612,18 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
-						soundManager.play("eat_food");
+						horde.sound.play("eat_food");
 					} else if (o2.role == "powerup_coin") {
 						o2.die();
 						o.gold += o2.coinAmount;
-						soundManager.play("coins");
+						horde.sound.play("coins");
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
 						o.weapons.push({
 							type: o2.wepType,
 							count: o2.wepCount
 						});
-						soundManager.play("chest_weapon");
+						horde.sound.play("chest_weapon");
 					}
 				}
 				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
@@ -677,8 +657,8 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			);
 			*/
 
-			soundManager.stopAll();
-			horde.playSound("hero_dies");
+			horde.sound.stopAll();
+			horde.sound.play("hero_dies");
 			this.gameOverReady = false;
 			this.gameOverAlpha = 0;
 			this.updateGameOver();
@@ -737,18 +717,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	// Toggle sound with "M" for "mute".
 	if (this.keyboard.isKeyPressed(77)) {
-		horde.soundEnabled = !horde.soundEnabled;
-		if (horde.soundEnabled) {
-			horde.playSound("normal_battle_music");
-		} else {
-			soundManager.stopAll();
-		}
+		horde.sound.toggleMuted();
 	}
 
-	// TODO: this is broken!
 	if (this.state === "title") {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
-			horde.playSound("chest_opens");
+			horde.sound.play("chest_opens");
 			this.konamiEntered = true;
 		}
 		if (this.keyboard.isKeyPressed(32)) {
@@ -759,13 +733,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					type: "h_trident",
 					count: null 
 				});
-/*
-				horde.playSound("chest_weapon");
-*/
 			}
 			gatesY = 0;
-			horde.playSound("normal_battle_music");
-			horde.playSound("gate_opens");
+			horde.sound.play("normal_battle_music");
+			horde.sound.play("gate_opens");
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -851,7 +822,7 @@ proto.objectAttack = function (object) {
 		sound = object.soundAttacks;
 	}
 	if (sound !== null) {
-		horde.playSound(sound);
+		horde.sound.play(sound);
 	}
 
 };

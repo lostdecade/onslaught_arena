@@ -18,6 +18,13 @@ horde.setInterval = function horde_setInterval (when, fn, context) {
 	return window.setInterval(f, when);
 };
 
+/**
+ * Context corrected window.setTimeout() wrapper
+ * @param {number} when Milliseconds before calling fn
+ * @param {object} fn Function to call
+ * @param {object} context Value of "this" when calling fn
+ * @return {number} Timeout ID
+ */
 horde.setTimeout = function horde_setTimeout (when, fn, context) {
 	var f = function horde_setTimeout_anon () {
 		fn.call(context);
@@ -165,14 +172,6 @@ horde.directions = {
 		if (v.x < 0 && v.y < 0) {
 			return horde.directions.UP_LEFT;
 		}
-	}
-};
-
-horde.soundEnabled = true;
-
-horde.playSound = function horde_Engine_proto_playSound (sound) {
-	if (horde.soundEnabled) {
-		soundManager.play(sound);
 	}
 };
 

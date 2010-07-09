@@ -247,7 +247,7 @@ o.goblin = {
 			var nearY = Math.abs(y - hero.y);
 
 			if ((nearX < 64) && (nearY < 64)) {
-				horde.playSound("goblin_attacks");
+				horde.sound.play("goblin_attacks");
 				this.seenHero = true;
 				return "shoot";
 			}
@@ -350,7 +350,7 @@ o.demoblin = {
 			var nearY = Math.abs(y - hero.y);
 
 			if ((nearX < 64) && (nearY < 64)) {
-				horde.playSound("goblin_attacks");
+				horde.sound.play("goblin_attacks");
 				this.seenHero = true;
 			}
 
