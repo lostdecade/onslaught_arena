@@ -181,6 +181,19 @@ proto.initGame = function () {
 	
 	this.initPlayer();
 
+	// Spawn a couple weapons scrolls to give the player an early taste of the fun!
+	var player = this.getPlayerObject();
+	
+	var wep = horde.makeObject("item_weapon");
+	wep.position = player.position.clone();
+	wep.position.x -= 128;
+	this.addObject(wep);
+
+	var wep = horde.makeObject("item_weapon");
+	wep.position = player.position.clone();
+	wep.position.x += 128;
+	this.addObject(wep);
+
 	this.gameOverBg = null;
 
 };
@@ -522,7 +535,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 		var o = this.objects[id];
 		
-		if (o.state === "dead") {
+		if (o.isDead()) {
 			delete(this.objects[o.id]);
 			continue;
 		}
@@ -603,7 +616,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
-			if (o2.state !== "alive" || o2.team === o.team || o2.role === "fluff") {
+			if (o2.isDead() || o2.team === o.team || o2.role === "fluff") {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
@@ -627,6 +640,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					}
 				}
 				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
+					if (o.hasState(horde.Object.states.INVINCIBLE) || o2.hasState(horde.Object.states.INVINCIBLE)) {
+						continue;
+					}
 					this.dealDamage(o2, o);
 					this.dealDamage(o, o2);
 				}
@@ -639,6 +655,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	if (defender.role === "hero") {
+		defender.addState(horde.Object.states.INVINCIBLE, 2500);
+	}
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
 		if (defender.role === "hero") {
