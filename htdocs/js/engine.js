@@ -632,10 +632,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						horde.sound.play("coins");
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
-						o.weapons.push({
-							type: o2.wepType,
-							count: o2.wepCount
-						});
+						o.addWeapon(o2.wepType, o2.wepCount);
 						horde.sound.play("chest_weapon");
 					}
 				}
@@ -747,11 +744,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isKeyPressed(32)) {
 			this.keyboard.keyStates[32] = false;
 			if (this.konamiEntered) {
+				// ZOMG INFINITE TRIDENTS!!!111!!
 				var p = this.getPlayerObject();
-				p.weapons.push({
-					type: "h_trident",
-					count: null 
-				});
+				p.addWeapon("h_trident", null);
 			}
 			gatesY = 0;
 			horde.sound.play("normal_battle_music");
@@ -791,6 +786,14 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player);
 		}
 
+		// Cycle weapons
+		if (this.keyboard.isKeyPressed(90)) {
+			player.cycleWeapon();
+		}
+		if (this.keyboard.isKeyPressed(88)) {
+			player.cycleWeapon(true);
+		}
+		
 		this.keyboard.storeKeyStates();
 	}
 
@@ -1175,8 +1178,9 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = "rgb(0,0,0)";
 	ctx.font = "20px Monospace";
 	ctx.textAlign = "center";
-	ctx.fillText("Use arrow keys to move, space to attack.", 320, 330);
-	ctx.fillText('Press "M" to mute sound.', 320, 350);
+	ctx.fillText("Use arrow keys to move, space to attack.", 320, 320);
+	ctx.fillText("Press \"Z\" or \"X\" to cycle weapons.", 320, 340)
+	ctx.fillText('Press \"M\" to mute sound.', 320, 360);
 	ctx.restore();
 		
 };

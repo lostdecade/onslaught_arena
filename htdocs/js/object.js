@@ -40,15 +40,10 @@ horde.Object = function () {
 	this.soundAttacks = null; // Sound to play when object attacks
 	this.soundDamage = null; // Sound to play when object takes damage
 	this.soundDies = null; // Sound to play when object dies
-	
-
 	this.alive = true;
-
 	this.states = [];
 	this.addState(horde.Object.states.IDLE);
-	
-	
-	
+	this.currentWeaponIndex = 0;
 };
 
 horde.Object.states = {
@@ -299,10 +294,48 @@ proto.execute = function horde_Object_proto_execute (method, args) {
  * @return {object} Weapon info (type & count)
  */
 proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
-	if (this.weapons.length >= 1) {
-		return this.weapons[this.weapons.length - 1];
+	var len = this.weapons.length;
+	if (len >= 1) {
+		// Object has at least one weapon
+		if (this.currentWeaponIndex < 0) {
+			this.currentWeaponIndex = 0;
+		}
+		if (this.currentWeaponIndex > len - 1) {
+			this.currentWeaponIndex = len - 1;
+		}
+		return this.weapons[this.currentWeaponIndex];
 	}
 	return false;
+};
+
+proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
+	for (var x in this.weapons) {
+		var w = this.weapons[x]; // Haha, Weapon X
+		if (typeof(w) !== "undefined" && w.type === type) {
+			w.count += count;
+			return true;
+		}
+	}
+	var len = this.weapons.push({
+		type: type,
+		count: count
+	});
+	this.currentWeaponIndex = (len - 1);
+};
+
+proto.cycleWeapon = function horde_Object_proto_cycleWeapon (reverse) {
+	var len = this.weapons.length;
+	if (reverse === true) {
+		this.currentWeaponIndex--;
+		if (this.currentWeaponIndex < 0) {
+			this.currentWeaponIndex = len - 1;
+		}
+	} else {
+		this.currentWeaponIndex++;
+		if (this.currentWeaponIndex > len - 1) {
+			this.currentWeaponIndex = 0;
+		}
+	}
 };
 
 /**
@@ -310,14 +343,15 @@ proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
  * @return {string} Weapon type to spawn
  */
 proto.fireWeapon = function horde_Object_proto_fireWeapon () {
-	if (this.cooldown === true || this.weapons.length < 1) {
+	var len = this.weapons.length;
+	if (this.cooldown === true || len < 1) {
 		return false;
 	}
-	var currentWeapon = this.weapons[this.weapons.length - 1];
+	var currentWeapon = this.getWeaponInfo();
 	if (currentWeapon.count !== null) {
 		currentWeapon.count -= 1;
 		if (currentWeapon.count < 1) {
-			this.weapons.pop();
+			this.weapons.splice(this.currentWeaponIndex, 1);
 		}
 	}
 	this.cooldown = true;
