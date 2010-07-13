@@ -138,6 +138,8 @@ var movementTypes = {
 		}
 		
 		this.setDirection(horde.directions.toVector(direction));
+		
+		return "shoot";
 
 	},
 	wander: function (elapsed, engine) {
@@ -293,6 +295,8 @@ o.cyclops = {
 	soundDamage: "cyclops_damage",
 	soundDies: "cyclops_dies",
 
+	weapons: [{type: "e_boulder", count: null}],
+
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
@@ -324,6 +328,8 @@ o.superclops = {
 	soundDamage: "cyclops_damage",
 	soundDies: "cyclops_dies",
 
+	weapons: [{type: "e_energy_ball", count: null}],
+
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
@@ -350,6 +356,30 @@ o.e_arrow = {
 	spriteX: 256,
 	spriteY: 0,
 	spriteAlign: true
+};
+
+o.e_boulder = {
+	role: "projectile",
+	cooldown: 1500 ,
+	speed: 150,
+	hitPoints: 1,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 224,
+	spriteY: 0,
+	rotate: true
+};
+
+o.e_energy_ball = {
+	role: "projectile",
+	cooldown: 2000,
+	speed: 200,
+	hitPoints: 1,
+	damage: 10,
+	spriteSheet: "objects",
+	spriteX: 320,
+	spriteY: 0,
+	rotate: true
 };
 
 // OTHER SHIT
