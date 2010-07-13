@@ -97,6 +97,88 @@ o.h_trident = {
 
 // ENEMIES
 
+var movementTypes = {
+	chase: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : Math.floor(p.position.x / 32),
+			y : Math.floor(p.position.y / 32)
+		};
+		var x = Math.floor(this.position.x / 32);
+		var y = Math.floor(this.position.y / 32);
+		this.moveChangeElapsed += elapsed;
+
+		if (this.moveChangeElapsed < this.moveChangeDelay) return;
+
+		this.moveChangeElapsed = 0;
+
+		var direction = horde.directions.DOWN;
+
+		if (x < hero.x) {
+			if (y < hero.y) {
+				direction = horde.directions.DOWN_RIGHT;
+			} else if (y > hero.y) {
+				direction = horde.directions.UP_RIGHT;
+			} else {
+				direction = horde.directions.RIGHT;
+			}
+		} else if (x > hero.x) {
+			if (y < hero.y) {
+				direction = horde.directions.DOWN_LEFT;
+			} else if (y > hero.y) {
+				direction = horde.directions.UP_LEFT;
+			} else {
+				direction = horde.directions.LEFT;
+			}
+		} else if (y < hero.y) {
+			direction = horde.directions.DOWN;
+		} else if (y > hero.y) {
+			direction = horde.directions.UP;
+		}
+		
+		this.setDirection(horde.directions.toVector(direction));
+
+	},
+	wander: function (elapsed, engine) {
+		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeElapsed >= this.moveChangeDelay) {
+			this.moveChangeElapsed = 0;
+			var d = horde.randomDirection();
+			if (d.x === 0 && d.y === 0) { return; }
+			this.setDirection(d);
+		}
+	},
+	wanderThenChase: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : p.position.x,
+			y : p.position.y
+		};
+		var x = this.position.x;
+		var y = this.position.y;
+
+		if (this.seenHero) {
+			movementTypes.chase.apply(this, arguments);
+		} else {
+
+			movementTypes.wander.apply(this, arguments);
+
+			var nearX = Math.abs(x - hero.x);
+			var nearY = Math.abs(y - hero.y);
+
+			if ((nearX < 64) && (nearY < 64)) {
+				horde.sound.play(this.soundAttacks);
+				this.seenHero = true;
+				return "shoot";
+			}
+
+		}
+
+	}
+};
+
 o.bat = {
 	role: "monster",
 	team: 1,
@@ -115,15 +197,7 @@ o.bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: function (elapsed) {
-		this.moveChangeElapsed += elapsed;
-		if (this.moveChangeElapsed >= this.moveChangeDelay) {
-			this.moveChangeElapsed = 0;
-			var d = horde.randomDirection();
-			if (d.x === 0 && d.y === 0) { return; }
-			this.setDirection(d);
-		}
-	}
+	onUpdate: movementTypes.wander
 };
 
 o.dire_bat = {
@@ -144,15 +218,7 @@ o.dire_bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: function (elapsed) {
-		this.moveChangeElapsed += elapsed;
-		if (this.moveChangeElapsed >= this.moveChangeDelay) {
-			this.moveChangeElapsed = 0;
-			var d = horde.randomDirection();
-			if (d.x === 0 && d.y === 0) { return; }
-			this.setDirection(d);
-		}
-	}
+	onUpdate: movementTypes.wander
 };
 
 o.goblin = {
@@ -177,85 +243,7 @@ o.goblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: function (elapsed) {
-		this.moveChangeElapsed += elapsed;
-		if (this.moveChangeElapsed >= this.moveChangeDelay) {
-			this.moveChangeElapsed = 0;
-			var d = horde.randomDirection();
-			if (d.x === 0 && d.y === 0) { return; }
-			this.setDirection(d);
-		}
-		if (horde.randomRange(1, 200) === 1) {
-			return "shoot";
-		}
-	},
-	onUpdate: function (elapsed, engine) {
-
-		var p = engine.getPlayerObject();
-		var hero = {
-			x : p.position.x,
-			y : p.position.y
-		};
-		var x = this.position.x;
-		var y = this.position.y;
-
-		if (this.seenHero) {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-
-				var direction = horde.directions.DOWN;
-
-				if (x < hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_RIGHT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_RIGHT;
-					} else {
-						direction = horde.directions.RIGHT;
-					}
-				} else if (x > hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_LEFT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_LEFT;
-					} else {
-						direction = horde.directions.LEFT;
-					}
-				} else if (y < hero.y) {
-					direction = horde.directions.DOWN;
-				} else if (y > hero.y) {
-					direction = horde.directions.UP;
-				}
-				
-				this.setDirection(horde.directions.toVector(direction));
-
-			}
-
-		} else {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-				var d = horde.randomDirection();
-				if (d.x === 0 && d.y === 0) { return; }
-				this.setDirection(d);
-			}
-
-			var nearX = Math.abs(x - hero.x);
-			var nearY = Math.abs(y - hero.y);
-
-			if ((nearX < 64) && (nearY < 64)) {
-				horde.sound.play("goblin_attacks");
-				this.seenHero = true;
-				return "shoot";
-			}
-
-		}
-
-	}
-
+	onUpdate: movementTypes.wanderThenChase
 };
 
 o.demoblin = {
@@ -280,86 +268,8 @@ o.demoblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: function (elapsed) {
-		this.moveChangeElapsed += elapsed;
-		if (this.moveChangeElapsed >= this.moveChangeDelay) {
-			this.moveChangeElapsed = 0;
-			var d = horde.randomDirection();
-			if (d.x === 0 && d.y === 0) { return; }
-			this.setDirection(d);
-		}
-		if (horde.randomRange(1, 200) === 1) {
-			return "shoot";
-		}
-	},
-	onUpdate: function (elapsed, engine) {
-
-		var p = engine.getPlayerObject();
-		var hero = {
-			x : p.position.x,
-			y : p.position.y
-		};
-		var x = this.position.x;
-		var y = this.position.y;
-
-		if (this.seenHero) {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-
-				var direction = horde.directions.DOWN;
-
-				if (x < hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_RIGHT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_RIGHT;
-					} else {
-						direction = horde.directions.RIGHT;
-					}
-				} else if (x > hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_LEFT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_LEFT;
-					} else {
-						direction = horde.directions.LEFT;
-					}
-				} else if (y < hero.y) {
-					direction = horde.directions.DOWN;
-				} else if (y > hero.y) {
-					direction = horde.directions.UP;
-				}
-				
-				this.setDirection(horde.directions.toVector(direction));
-
-			}
-
-		} else {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-				var d = horde.randomDirection();
-				if (d.x === 0 && d.y === 0) { return; }
-				this.setDirection(d);
-			}
-
-			var nearX = Math.abs(x - hero.x);
-			var nearY = Math.abs(y - hero.y);
-
-			if ((nearX < 64) && (nearY < 64)) {
-				horde.sound.play("goblin_attacks");
-				this.seenHero = true;
-			}
-
-		}
-
-	}
-
+	onUpdate: movementTypes.wanderThenChase
 };
-
 
 o.cyclops = {
 	role: "monster",
@@ -388,54 +298,8 @@ o.cyclops = {
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 	},
 	onUpdate: function (elapsed, engine) {
-
-		if (this.pastGate) {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-
-				var direction = horde.directions.DOWN;
-				var p = engine.getPlayerObject();
-				var hero = {
-					x : p.position.x,
-					y : p.position.y
-				};
-				var x = this.position.x;
-				var y = this.position.y;
-
-				if (x < hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_RIGHT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_RIGHT;
-					} else {
-						direction = horde.directions.RIGHT;
-					}
-				} else if (x > hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_LEFT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_LEFT;
-					} else {
-						direction = horde.directions.LEFT;
-					}
-				} else if (y < hero.y) {
-					direction = horde.directions.DOWN;
-				} else if (y > hero.y) {
-					direction = horde.directions.UP;
-				}
-				
-				this.setDirection(horde.directions.toVector(direction));
-
-			}
-
-		} else {
-			if (this.position.y >= 50) this.pastGate = true;
-		}
-
+		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
 	}
-
 };
 
 o.superclops = {
@@ -465,56 +329,10 @@ o.superclops = {
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 	},
 	onUpdate: function (elapsed, engine) {
-
-		if (this.pastGate) {
-
-			this.moveChangeElapsed += elapsed;
-			if (this.moveChangeElapsed >= this.moveChangeDelay) {
-				this.moveChangeElapsed = 0;
-
-				var direction = horde.directions.DOWN;
-				var p = engine.getPlayerObject();
-				var hero = {
-					x : p.position.x,
-					y : p.position.y
-				};
-				var x = this.position.x;
-				var y = this.position.y;
-
-				if (x < hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_RIGHT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_RIGHT;
-					} else {
-						direction = horde.directions.RIGHT;
-					}
-				} else if (x > hero.x) {
-					if (y < hero.y) {
-						direction = horde.directions.DOWN_LEFT;
-					} else if (y > hero.y) {
-						direction = horde.directions.UP_LEFT;
-					} else {
-						direction = horde.directions.LEFT;
-					}
-				} else if (y < hero.y) {
-					direction = horde.directions.DOWN;
-				} else if (y > hero.y) {
-					direction = horde.directions.UP;
-				}
-				
-				this.setDirection(horde.directions.toVector(direction));
-
-			}
-
-		} else {
-			if (this.position.y >= 50) this.pastGate = true;
-		}
-
+		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
 	}
 
 };
-
 
 // ENEMY WEAPONS
 
@@ -690,6 +508,7 @@ o.item_weapon = {
 	spriteY: 0,
 	ttl: 5000,
 	onInit: function () {
+		// Note: all these fallthroughs are intentional.
 		switch (horde.randomRange(1, 12)) {
 
 			case 1:
