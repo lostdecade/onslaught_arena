@@ -48,6 +48,20 @@ proto.stop = function horde_Engine_proto_stop () {
 };
 
 /**
+ * Toggles pausing the engine
+ * @return {void}
+ */
+proto.togglePause = function horde_Engine_proto_togglePause () {
+
+	if (this.paused) {
+		this.paused = false;
+	} else {
+		this.paused = true;
+	}
+
+};
+
+/**
  * Adds an object to the engine's collection
  * @param {horde.Object} Object to add
  * @return {number} ID of the newly added object
@@ -427,10 +441,12 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		// The game!
 		case "running":
 			this.handleInput();
-			this.updateWaves(elapsed);
-			this.updateSpawnPoints(elapsed);
-			this.updateObjects(elapsed);
-			this.updateFauxGates(elapsed);
+			if (!this.paused) {
+				this.updateWaves(elapsed);
+				this.updateSpawnPoints(elapsed);
+				this.updateObjects(elapsed);
+				this.updateFauxGates(elapsed);
+			}
 			this.render();
 			break;
 
@@ -731,9 +747,18 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
-	// Toggle sound with "M" for "mute".
-	if (this.keyboard.isKeyPressed(77)) {
-		horde.sound.toggleMuted();
+	if (this.state == "running") {
+/*
+		// "p" for pause.
+		if (this.keyboard.isKeyPressed(80)) {
+			this.togglePause();
+		}
+*/
+
+		// Toggle sound with "M" for "mute".
+		if (this.keyboard.isKeyPressed(77)) {
+			horde.sound.toggleMuted();
+		}
 	}
 
 	if (this.state === "title") {
