@@ -217,6 +217,8 @@ proto.initGame = function () {
 
 	this.gameOverBg = null;
 
+	this.monstersAlive = 0;
+
 };
 
 /**
@@ -278,6 +280,7 @@ proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
  * @param {void}
  */
 proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
+	var longestTTS = 0;
 	for (var x in wave.points) {
 		var p = wave.points[x];
 		var sp = this.spawnPoints[p.spawnPointId];
@@ -287,7 +290,13 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 			var o = p.objects[z];
 			sp.queueSpawn(o.type, o.count * this.waveModifier);
 		}
+		var timeToSpawn = ((sp.queue.length - 1) * sp.delay);
+		if (timeToSpawn > longestTTS) {
+			longestTTS = timeToSpawn;
+		}
 	}
+	var ttl = longestTTS + wave.nextWaveTime;
+	this.waveTimer.start(ttl * this.waveModifier);
 	this.openGates();
 };
 
@@ -298,8 +307,8 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	this.waves = [];
-	this.waveDelay = 20000;
-	this.lastWaveElapsed = this.waveDelay;
+	this.waveTimer = new horde.Timer();
+	this.waveTimer.start(1);
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
 	
@@ -470,6 +479,9 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
  * @return {void}
  */
 proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed) {
+	if (this.gateState !== "up") {
+		return;
+	}
 	var closeGates = true;
 	// Iterate over the spawn points and update them
 	for (var x in this.spawnPoints) {
@@ -494,15 +506,19 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
  * @return {void}
  */
 proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
-	this.lastWaveElapsed += elapsed;
-	if (this.lastWaveElapsed >= this.waveDelay) {
-		this.lastWaveElapsed = 0;
+	var spawnsEmpty = true;
+	for (var x in this.spawnPoints) {
+		if (this.spawnPoints[x].queue.length > 0) {
+			spawnsEmpty = false;
+		}
+	}
+	// If the timer has expired OR the spawns are empty AND there are no monsters alive
+	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) { 
 		this.currentWaveId++;
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 			this.waveModifier += DIFFICULTY_INCREMENT;
-			this.waveDelay *= this.waveModifier;
 		}
 		if (this.currentWaveId === (this.waves.length - 1)) {
 			horde.sound.stop("normal_battle_music");
@@ -570,6 +586,8 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 };
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
+
+	var numMonsters = 0;
 	
 	for (var id in this.objects) {
 
@@ -578,6 +596,10 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		if (o.isDead()) {
 			delete(this.objects[o.id]);
 			continue;
+		}
+
+		if (o.role === "monster") {
+			numMonsters++;
 		}
 
 		var action = o.update(elapsed, this);
@@ -687,6 +709,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		}
 		
 	}
+	
+	this.monstersAlive = numMonsters;
 	
 };
 
