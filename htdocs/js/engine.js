@@ -4,9 +4,6 @@ const VERSION = 0.1;
 const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
 
-var gatesX = 0;
-var gatesY = 0;
-
 /**
  * Creates a new Engine object
  * @constructor
@@ -24,7 +21,12 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
-	this.gatesUp = false;
+	
+	this.gateDirection = ""; // Set to "up" or "down"
+	this.gateState = "down"; // "up" or "down"
+	this.gatesX = 0;
+	this.gatesY = 0;
+
 };
 
 var proto = horde.Engine.prototype;
@@ -169,7 +171,7 @@ proto.initGame = function () {
 
 	this.konamiEntered = false;
 
-	if (gatesY < 0) horde.sound.play("gate_closes");
+	this.closeGates();
 	
 	this.objects = {};
 	this.state = "title";
@@ -267,6 +269,7 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 			sp.queueSpawn(o.type, o.count * this.waveModifier);
 		}
 	}
+	this.openGates();
 };
 
 /**
@@ -417,9 +420,6 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			break;
 
 		case "title":
-			if (gatesY < 0) {
-				gatesY += ((200 / 1000) * elapsed);
-			}
 			this.handleInput();
 			this.render();
 			break;
@@ -449,14 +449,21 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
  * @return {void}
  */
 proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed) {
+	var closeGates = true;
 	// Iterate over the spawn points and update them
 	for (var x in this.spawnPoints) {
+		if (this.spawnPoints[x].queue.length >= 1) {
+			closeGates = false;
+		}
 		// Spawn points can return an object to spawn
 		var o = this.spawnPoints[x].update(elapsed);
 		if (o !== false) {
 			// We need to spawn an object
 			this.addObject(o);
 		}
+	}
+	if (closeGates) {
+		this.closeGates();
 	}
 };
 
@@ -506,27 +513,44 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 
 };
 
+proto.openGates = function horde_Engine_proto_openGates () {
+	if (this.gateState !== "up") {
+		this.gateDirection = "up";
+		horde.sound.play("gate_opens");
+	}
+};
+
+proto.closeGates = function horde_Engine_proto_closeGates () {
+	if (this.gateState !== "down") {
+		this.gateDirection = "down";
+		horde.sound.play("gate_closes");
+	}
+};
+
 proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 
-	if (gatesY > -54) {
-		gatesX = horde.randomRange(-1, 1);
-		gatesY -= ((50 / 1000) * elapsed);
+	if (this.gateDirection === "down") {
+		this.gatesX = 0;
+		this.gatesY += ((200 / 1000) * elapsed);
+		if (this.gatesY >= 0) {
+			this.gatesX = 0;
+			this.gatesY = 0;
+			this.gateDirection = "";
+			this.gateState = "down";
+		}
 	}
-
-/*
-	if (!this.gameOverAlpha) {
-		this.gameOverReady = false;
-		this.gameOverAlpha = 0;
+	
+	if (this.gateDirection === "up") {
+		this.gatesX = horde.randomRange(-1, 1);
+		this.gatesY -= ((50 / 1000) * elapsed);
+		if (this.gatesY <= -54) {
+			this.gatesX = 0;
+			this.gatesY = -54;
+			this.gateDirection = "";
+			this.gateState = "up";
+		}
 	}
-
-	var alphaChange = ((0.2 / 1000) * elapsed);
-	this.gameOverAlpha += Number(alphaChange) || 0;
-	if (this.gameOverAlpha >= 0.75) {
-		this.gameOverReady = true;
-		this.gameOverAlpha = 0.75;
-	}
-*/
-
+	
 };
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
@@ -748,9 +772,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				var p = this.getPlayerObject();
 				p.addWeapon("h_trident", null);
 			}
-			gatesY = 0;
 			horde.sound.play("normal_battle_music");
-			horde.sound.play("gate_opens");
 			this.state = "running";
 		}
 		this.keyboard.storeKeyStates();
@@ -1194,7 +1216,7 @@ proto.drawFauxGates = function horde_Engine_proto_drawFauxGates (ctx) {
 	for (var g = 0; g < NUM_GATES; g++) {
 		ctx.drawImage(
 			this.images.getImage("objects"),
-			0, 192, 64, 64, gatesX + 96 + (g * 192), gatesY, 64, 64
+			0, 192, 64, 64, this.gatesX + 96 + (g * 192), this.gatesY, 64, 64
 		);
 	}
 };
