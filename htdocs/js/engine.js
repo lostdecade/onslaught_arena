@@ -1069,11 +1069,12 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 };
 
+/**
+ * Draws text centered horizontally. Could have many more options.
+ */
 proto.centerText = function (ctx, text, y) {
-
 	var width = ctx.measureText(text).width;
 	ctx.fillText(text, ((SCREEN_WIDTH / 2) - (width / 2)), y);
-
 };
 
 /**
