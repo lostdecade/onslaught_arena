@@ -449,6 +449,7 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 		case "title":
 			this.handleInput();
+			this.updateFauxGates(elapsed);
 			this.render();
 			break;
 			
