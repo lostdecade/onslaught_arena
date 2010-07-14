@@ -24,7 +24,6 @@ horde.Object = function () {
 	this.animFrameIndex = 0; // Current animation frame to display
 	this.animDelay = 200; // Delay (in milliseconds) between animation frames
 	this.animElapsed = 0; // Elapsed time (in milliseconds) since last animation frame increment
-	this.state = "alive"; // State of the object ("alive", "dead")
 	this.angle = 0; // Angle to draw this object
 	this.rotateSpeed = 400; // Speed at which to rotate the object
 	this.rotate = false; // Enable/disable rotation of object
@@ -33,6 +32,7 @@ horde.Object = function () {
 	this.ttl = 0; // How long (in milliseconds) this object *should* exist (0 = no TTL)
 	this.ttlElapsed = 0; // How long (in milliseconds) this object *has* existed
 	this.alpha = 1; // Alpha value for drawing this object
+	this.alphaMod = 1; // Alpha modifier (fadin [1] vs fadeout [-1])
 	this.gibletSize = "small"; // Size of giblets to spawn when this objects "dies"
 	this.cooldown = false; // Whether or not the object's attack is on cooldown
 	this.cooldownElapsed = 0; // How long the object's attack has been on cooldown
@@ -40,9 +40,54 @@ horde.Object = function () {
 	this.soundAttacks = null; // Sound to play when object attacks
 	this.soundDamage = null; // Sound to play when object takes damage
 	this.soundDies = null; // Sound to play when object dies
+	this.alive = true;
+	this.states = [];
+	this.addState(horde.Object.states.IDLE);
+	this.currentWeaponIndex = 0;
+};
+
+horde.Object.states = {
+	IDLE: 0,
+	MOVING: 1,
+	ATTACKING: 2,
+	HURTING: 3,
+	DYING: 4,
+	INVINCIBLE: 5
 };
 
 var proto = horde.Object.prototype;
+
+proto.updateStates = function () {
+	for (var x in this.states) {
+		var s = this.states[x];
+		if (s.timer.expired()) {
+			if (s.type === horde.Object.states.INVINCIBLE) {
+				this.alpha = 1;
+				this.alphaMod = -1;
+			}
+			delete(this.states[x]);
+			continue;
+		}
+	}
+};
+
+proto.hasState = function (state) {
+	for (var x in this.states) {
+		if (this.states[x].type === state) {
+			return true;
+		}
+	}
+	return false;
+};
+
+proto.addState = function (state, ttl) {
+	var t = new horde.Timer();
+	t.start(ttl);
+	this.states.push({
+		type: state,
+		timer: t
+	});
+};
 
 /**
  * Runs any initialization
@@ -62,11 +107,28 @@ proto.init = function horde_Object_proto_init () {
 };
 
 /**
+ * Causes this object to die. Do not pass go, do not collect $200.
+ * @return {void}
+ */
+proto.die = function horde_Object_proto_die () {
+	this.alive = false;
+};
+
+/**
+ * Returns whether or not this object is "dead" (this.alive === false)
+ * @return {boolean} True if the object is dead; otherwise false
+ */
+proto.isDead = function horde_Object_proto_isDead () {
+	return !this.alive;
+}
+
+/**
  * Update this object
  * @param {number} elapsed Elapsed time in milliseconds since last update
  * @return {void}
  */
 proto.update = function horde_Object_proto_update (elapsed) {
+	this.updateStates();
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -77,6 +139,19 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
+	
+	if (this.hasState(horde.Object.states.INVINCIBLE)) {
+		this.alpha += ((10  / 1000) * elapsed) * this.alphaMod;
+		if (this.alpha >= 1) {
+			this.alpha = 1;
+			this.alphaMod = -1;
+		}
+		if (this.alpha <= 0) {
+			this.alpha = 0;
+			this.alphaMod = 1;
+		}
+	}
+	
 	if (this.rotate) {
 		this.angle += ((this.rotateSpeed / 1000) * elapsed);
 	}
@@ -158,14 +233,6 @@ proto.wound = function horde_Object_proto_wound (damage) {
 };
 
 /**
- * Causes this object to die. Do not pass go, do not collect $200.
- * @return {void}
- */
-proto.die = function horde_Object_proto_die () {
-	this.state = "dead";
-};
-
-/**
  * Handles when this object collides with a wall
  * @param {array} axis Array of axes where collision occurred (x, y)
  * @return {void}
@@ -227,10 +294,48 @@ proto.execute = function horde_Object_proto_execute (method, args) {
  * @return {object} Weapon info (type & count)
  */
 proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
-	if (this.weapons.length >= 1) {
-		return this.weapons[this.weapons.length - 1];
+	var len = this.weapons.length;
+	if (len >= 1) {
+		// Object has at least one weapon
+		if (this.currentWeaponIndex < 0) {
+			this.currentWeaponIndex = 0;
+		}
+		if (this.currentWeaponIndex > len - 1) {
+			this.currentWeaponIndex = len - 1;
+		}
+		return this.weapons[this.currentWeaponIndex];
 	}
 	return false;
+};
+
+proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
+	for (var x in this.weapons) {
+		var w = this.weapons[x]; // Haha, Weapon X
+		if (typeof(w) !== "undefined" && w.type === type) {
+			w.count += count;
+			return true;
+		}
+	}
+	var len = this.weapons.push({
+		type: type,
+		count: count
+	});
+	this.currentWeaponIndex = (len - 1);
+};
+
+proto.cycleWeapon = function horde_Object_proto_cycleWeapon (reverse) {
+	var len = this.weapons.length;
+	if (reverse === true) {
+		this.currentWeaponIndex--;
+		if (this.currentWeaponIndex < 0) {
+			this.currentWeaponIndex = len - 1;
+		}
+	} else {
+		this.currentWeaponIndex++;
+		if (this.currentWeaponIndex > len - 1) {
+			this.currentWeaponIndex = 0;
+		}
+	}
 };
 
 /**
@@ -238,14 +343,15 @@ proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
  * @return {string} Weapon type to spawn
  */
 proto.fireWeapon = function horde_Object_proto_fireWeapon () {
-	if (this.cooldown === true || this.weapons.length < 1) {
+	var len = this.weapons.length;
+	if (this.cooldown === true || len < 1) {
 		return false;
 	}
-	var currentWeapon = this.weapons[this.weapons.length - 1];
+	var currentWeapon = this.getWeaponInfo();
 	if (currentWeapon.count !== null) {
 		currentWeapon.count -= 1;
 		if (currentWeapon.count < 1) {
-			this.weapons.pop();
+			this.weapons.splice(this.currentWeaponIndex, 1);
 		}
 	}
 	this.cooldown = true;

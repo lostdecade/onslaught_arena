@@ -15,14 +15,18 @@ Keyboard.konamiCode = [38,38,40,40,37,39,37,39,66,65];
 
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
-		case 37:
-		case 38:
-		case 39:
-		case 40:
-		case 66:
-		case 65:
-		case 77:
-		case 32:
+		// Note: intentional fallthroughs.
+		case 37: // left
+		case 38: // up
+		case 39: // right 
+		case 40: // down 
+		case 66: // B
+		case 65: // A
+		case 77: // M
+		case 90: // Z
+		case 88: // Z
+		case 80: // P
+		case 32: // space
 			horde.stopEvent(e);
 			break;
 	}
