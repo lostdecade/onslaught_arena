@@ -1,8 +1,10 @@
 (function define_horde_Engine () {
 
-const VERSION = 0.1;
+const VERSION = 0.2;
 const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
+const SCREEN_WIDTH = 640;
+const SCREEN_HEIGHT = 480;
 
 /**
  * Creates a new Engine object
@@ -17,7 +19,7 @@ horde.Engine = function horde_Engine () {
 	this.objectIdSeed = 0;
 	this.playerObjectId = null;
 	this.keyboard = new horde.Keyboard();
-	this.view = new horde.Size(640, 480);
+	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
@@ -57,8 +59,11 @@ proto.togglePause = function horde_Engine_proto_togglePause () {
 
 	if (this.paused) {
 		this.paused = false;
+		horde.sound.play("normal_battle_music");
 	} else {
 		this.paused = true;
+		horde.sound.stop("normal_battle_music");
+		horde.sound.stop("final_battle_music");
 	}
 
 };
@@ -496,11 +501,6 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
-			/*
-			horde.sound.stop("normal_battle_music");
-			horde.sound.stop("final_battle_music");
-			horde.sound.play("normal_battle_music");
-			*/
 			this.waveModifier += DIFFICULTY_INCREMENT;
 			this.waveDelay *= this.waveModifier;
 		}
@@ -772,17 +772,16 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state == "running") {
-/*
-		// "p" for pause.
+		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(80)) {
 			this.togglePause();
 		}
-*/
 
 		// Toggle sound with "M" for "mute".
 		if (this.keyboard.isKeyPressed(77)) {
 			horde.sound.toggleMuted();
 		}
+
 	}
 
 	if (this.state === "title") {
@@ -809,16 +808,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
-		if (this.keyboard.isKeyDown(37)) {
+		if (this.keyboard.isKeyDown(37)) { // left
 			move.x = -1;
 		}
-		if (this.keyboard.isKeyDown(38)) {
+		if (this.keyboard.isKeyDown(38)) { // up
 			move.y = -1;
 		}
-		if (this.keyboard.isKeyDown(39)) {
+		if (this.keyboard.isKeyDown(39)) { // right
 			move.x = 1;
 		}
-		if (this.keyboard.isKeyDown(40)) {
+		if (this.keyboard.isKeyDown(40)) { // down
 			move.y = 1;
 		}
 
@@ -828,15 +827,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			player.setDirection(move);
 		}
 
-		// Have the player fire
+		// Have the player fire (space key)
 		if (this.keyboard.isKeyDown(32) || player.autoFire === true) {
 			this.objectAttack(player);
 		}
 
-		// Cycle weapons
+		// Cycle weapons (Z)
 		if (this.keyboard.isKeyPressed(90)) {
 			player.cycleWeapon();
 		}
+		// X
 		if (this.keyboard.isKeyPressed(88)) {
 			player.cycleWeapon(true);
 		}
@@ -904,7 +904,7 @@ proto.render = function horde_Engine_proto_render () {
 
 		case "loading":
 			ctx.save();
-			ctx.fillStyle = "rgb(255,0,0)";
+			ctx.fillStyle = "rgb(255, 0, 0)";
 			ctx.fillRect(0, 0, this.view.width, this.view.height);
 			ctx.restore();
 			break;
@@ -929,6 +929,7 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawUI(ctx);
+			if (this.paused) this.drawPaused(ctx);
 			break;
 		
 		case "game_over":
@@ -966,7 +967,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	}
 	
 	ctx.save();
-	ctx.fillStyle = "rgb(0,0,255)";
+	ctx.fillStyle = "rgb(0, 0, 255)";
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.putImageData(this.gameOverBg, 0, 0);
 	ctx.restore();
@@ -989,7 +990,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		
 		ctx.save();
 
-		ctx.fillStyle = "rgb(255,255,255)";
+		ctx.fillStyle = "rgb(255, 255, 255)";
 		ctx.font = "Bold 35px Monospace";
 		ctx.globalAlpha = 1;
 
@@ -1017,7 +1018,7 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 
 	// Clear the screen
 	ctx.save();
-	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
 		
@@ -1032,7 +1033,7 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
 	ctx.drawImage(
 		this.images.getImage("background"), 
-		0, 0, 640, 480, 
+		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 
 		0, 0, this.view.width, this.view.height
 	);
 };
@@ -1043,6 +1044,36 @@ proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
 		0, 0, 576, 386, 
 		32, 0, 576, 386
 	);
+};
+
+proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
+	var margin = 50;
+
+	ctx.save();
+	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.globalAlpha = 0.75;
+	ctx.fillRect(
+		margin, margin,
+		(SCREEN_WIDTH - (margin * 2)), (SCREEN_HEIGHT - (margin * 2))
+	);
+	ctx.restore();
+
+	ctx.save();
+	ctx.textAlign = "left";
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.font = "Bold 32px Monospace";
+	this.centerText(ctx, "Paused", 210);
+	ctx.font = "20px Monospace";
+	this.centerText(ctx, 'Press "P" to resume.', 240);
+	ctx.restore();
+
+};
+
+proto.centerText = function (ctx, text, y) {
+
+	var width = ctx.measureText(text).width;
+	ctx.fillText(text, ((SCREEN_WIDTH / 2) - (width / 2)), y);
+
 };
 
 /**
@@ -1093,8 +1124,8 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		}
 
 		if (o.role === "powerup_weapon") {
-			ctx.fillStyle = "rgb(255,0,255)";
-			// Draw a scroll behind the weapon?
+			ctx.fillStyle = "rgb(255, 0, 255)";
+			// Draw a scroll behind the weapon
 			ctx.drawImage(
 				this.images.getImage("objects"),
 				128, 196, 48, 48, -26, -20, 48, 48
@@ -1172,7 +1203,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "right";
-	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 32px Monospace";
 	ctx.fillText(o.gold, 603, 469);
 	ctx.fillText(wCount, 603, 439);
@@ -1206,15 +1237,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.globalAlpha = 1;
 	ctx.font = "Bold 16px Monospace";
 	ctx.textAlign = "right";
-	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.fillText("v" + VERSION + " by Lost Decade Games", 632, 472);
-	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.fillText("v" + VERSION + " by Lost Decade Games", 630, 470);
 	ctx.restore();
 	
 	ctx.save();
 	ctx.globalAlpha = this.titleAlpha;
-	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.font = "Bold 35px Monospace";
 	ctx.textAlign = "left";
 	ctx.fillText("Press space to play", 110, 280);
@@ -1222,12 +1253,12 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	ctx.save();
 	ctx.globalAlpha = 1;
-	ctx.fillStyle = "rgb(0,0,0)";
+	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.font = "20px Monospace";
 	ctx.textAlign = "center";
 	ctx.fillText("Use arrow keys to move, space to attack.", 320, 320);
-	ctx.fillText("Press \"Z\" or \"X\" to cycle weapons.", 320, 340)
-	ctx.fillText('Press \"M\" to mute sound.', 320, 360);
+	ctx.fillText('Press "Z" or "X" to cycle weapons.', 320, 340)
+	ctx.fillText('Press "M" to mute sound, "P" to pause.', 320, 360);
 	ctx.restore();
 		
 };
@@ -1255,13 +1286,13 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	
 	// Semi-transparent bar so we can see the text
 	ctx.save();
-	ctx.fillStyle = "rgba(0,0,0,0.3)";
+	ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
 	ctx.fillRect(0, 0, this.view.width, 30);
 	ctx.restore();
 	
 	// Debugging info
 	ctx.save();
-	ctx.fillStyle = "rgb(255,255,255)";
+	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "bold 20px Monospace";
 	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
 	ctx.restore();
