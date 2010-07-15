@@ -142,6 +142,28 @@ var movementTypes = {
 		return "shoot";
 
 	},
+	getNear: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : p.position.x,
+			y : p.position.y
+		};
+		var x = this.position.x;
+		var y = this.position.y;
+
+		var nearX = Math.abs(x - hero.x);
+		var nearY = Math.abs(y - hero.y);
+
+		if ((nearX < 128) && (nearY < 128)) {
+			this.speed = 0;
+			return "shoot";
+		} else {
+			this.speed = this.defaultSpeed;
+			movementTypes.chase.apply(this, arguments);
+		}
+
+	},
 	wander: function (elapsed, engine) {
 		this.moveChangeElapsed += elapsed;
 		if (this.moveChangeElapsed >= this.moveChangeDelay) {
@@ -252,6 +274,7 @@ o.demoblin = {
 	role: "monster",
 	team: 1,
 	speed: 100,
+	defaultSpeed: 100,
 	hitPoints: 10,
 	damage: 5,
 	worth: 20,
@@ -262,7 +285,7 @@ o.demoblin = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
 	weapons: [
-		{type: "e_arrow", count: null}
+		{type: "e_trident", count: null}
 	],
 	soundAttacks: "goblin_attacks",
 	soundDamage: "goblin_damage",
@@ -270,7 +293,7 @@ o.demoblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wanderThenChase
+	onUpdate: movementTypes.getNear
 };
 
 o.cyclops = {
@@ -354,6 +377,18 @@ o.e_arrow = {
 	damage: 1,
 	spriteSheet: "objects",
 	spriteX: 256,
+	spriteY: 0,
+	spriteAlign: true
+};
+
+o.e_trident = {
+	role: "projectile",
+	cooldown: 1000,
+	speed: 200,
+	hitPoints: 1,
+	damage: 3,
+	spriteSheet: "objects",
+	spriteX: 288,
 	spriteY: 0,
 	spriteAlign: true
 };
