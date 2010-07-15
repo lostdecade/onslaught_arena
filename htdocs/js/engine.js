@@ -492,7 +492,7 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 			this.addObject(o);
 		}
 	}
-	if (closeGates) {
+	if (closeGates && !this.monstersAboveGates) {
 		this.closeGates();
 	}
 };
@@ -585,6 +585,7 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
+	var numMonstersAboveGate = 0;
 	
 	for (var id in this.objects) {
 
@@ -597,6 +598,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 		if (o.role === "monster") {
 			numMonsters++;
+			if (o.position.y <= 64) {
+				numMonstersAboveGate++;
+			}
 		}
 
 		var action = o.update(elapsed, this);
@@ -660,10 +664,14 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			}
 		}
 		
-		if (o.direction.y < 0 && o.position.y < 0) {
-			o.position.y = 0;
+		var yStop = (this.gateState === "down" || o.role === "monster") ? 64: 0;
+
+		if (o.direction.y < 0 && o.position.y < yStop) {
+			o.position.y = yStop;
 			axis.push("y");
 		}
+		
+		
 		
 		if (axis.length > 0) {
 			o.wallCollide(axis);
@@ -708,6 +716,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	}
 	
 	this.monstersAlive = numMonsters;
+	this.monstersAboveGates = (numMonstersAboveGate > 0);
 	
 };
 

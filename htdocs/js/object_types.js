@@ -221,7 +221,9 @@ o.bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wander
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wander;
+	}
 };
 
 o.dire_bat = {
@@ -242,7 +244,9 @@ o.dire_bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wander
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wander;
+	}
 };
 
 o.goblin = {
@@ -267,7 +271,9 @@ o.goblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wanderThenChase
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wanderThenChase;
+	}
 };
 
 o.demoblin = {
@@ -293,7 +299,9 @@ o.demoblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.getNear
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.getNear;
+	}
 };
 
 o.cyclops = {
