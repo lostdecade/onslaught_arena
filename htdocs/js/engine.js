@@ -317,20 +317,19 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
 	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "bat", 5);
+	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "bat", 5);
 	this.waves.push(w);
 	
 	// Wave #2
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 2000);
+	w.addSpawnPoint(1, 500);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "goblin", 5);
+	w.addObjects(0, "goblin", 10);
+	w.addObjects(1, "bat", 10);
+	w.addObjects(2, "goblin", 10);
 	this.waves.push(w);
 	
 	// Wave #3
@@ -338,39 +337,36 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "bat", 10);
-	w.addObjects(1, "goblin", 10);
-	w.addObjects(2, "goblin", 5);
-	w.addObjects(2, "bat", 5);
+	w.addObjects(0, "bat", 15);
+	w.addObjects(1, "goblin", 15);
+	w.addObjects(2, "dire_bat", 5);
 	this.waves.push(w);
 	
 	// Wave #4
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5);
+	w.addObjects(0, "dire_bat", 10);
 	w.addObjects(1, "demoblin", 5);
-	w.addObjects(2, "dire_bat", 5);
+	w.addObjects(2, "dire_bat", 10);
 	this.waves.push(w);
 
 	// Wave #5
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 2000);
-	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5);
-	w.addObjects(1, "cyclops", 1);
-	w.addObjects(2, "dire_bat", 5);
+	w.addSpawnPoint(0, 500);
+	w.addSpawnPoint(1, 3500);
+	w.addSpawnPoint(2, 500);
+	w.addObjects(0, "demoblin", 10);
+	w.addObjects(1, "cyclops", 3);
+	w.addObjects(2, "demoblin", 10);
 	this.waves.push(w);
 	
 	// Wave 6
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 2000);
-	w.addSpawnPoint(1, 2000);
-	w.addSpawnPoint(2, 2000);
+	w.addSpawnPoint(0, 3500);
+	w.addSpawnPoint(1, 5000);
+	w.addSpawnPoint(2, 3500);
 	w.addObjects(0, "cyclops", 2);
 	w.addObjects(1, "superclops", 1);
 	w.addObjects(2, "cyclops", 2);
