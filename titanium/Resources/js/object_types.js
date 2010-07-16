@@ -8,13 +8,14 @@ o.hero = {
 	role: "hero",
 	team: 0,
 	speed: 150,
-	hitPoints: 25,
-	damage: 1,
+	hitPoints: 20,
+	damage: 0,
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
 	soundAttacks: "hero_attacks",
 	soundDamage: "hero_damage",
+	soundDies: "hero_dies",
 	weapons: [
 		{type: "h_rock", count: null}
 	]
@@ -100,46 +101,38 @@ o.h_trident = {
 var movementTypes = {
 	chase: function (elapsed, engine) {
 
-		var p = engine.getPlayerObject();
-		var hero = {
-			x : Math.floor(p.position.x / 32),
-			y : Math.floor(p.position.y / 32)
-		};
-		var x = Math.floor(this.position.x / 32);
-		var y = Math.floor(this.position.y / 32);
 		this.moveChangeElapsed += elapsed;
 
 		if (this.moveChangeElapsed < this.moveChangeDelay) return;
 
 		this.moveChangeElapsed = 0;
-
-		var direction = horde.directions.DOWN;
-
-		if (x < hero.x) {
-			if (y < hero.y) {
-				direction = horde.directions.DOWN_RIGHT;
-			} else if (y > hero.y) {
-				direction = horde.directions.UP_RIGHT;
-			} else {
-				direction = horde.directions.RIGHT;
-			}
-		} else if (x > hero.x) {
-			if (y < hero.y) {
-				direction = horde.directions.DOWN_LEFT;
-			} else if (y > hero.y) {
-				direction = horde.directions.UP_LEFT;
-			} else {
-				direction = horde.directions.LEFT;
-			}
-		} else if (y < hero.y) {
-			direction = horde.directions.DOWN;
-		} else if (y > hero.y) {
-			direction = horde.directions.UP;
-		}
 		
-		this.setDirection(horde.directions.toVector(direction));
+		var p = engine.getPlayerObject();
+		this.chase(p);
 		
 		return "shoot";
+
+	},
+	getNear: function (elapsed, engine) {
+
+		var p = engine.getPlayerObject();
+		var hero = {
+			x : p.position.x,
+			y : p.position.y
+		};
+		var x = this.position.x;
+		var y = this.position.y;
+
+		var nearX = Math.abs(x - hero.x);
+		var nearY = Math.abs(y - hero.y);
+
+		if (!this.cooldown && (nearX < 128) && (nearY < 128)) {
+			this.speed = 0;
+			return "shoot";
+		} else {
+			this.speed = this.defaultSpeed;
+			movementTypes.chase.apply(this, arguments);
+		}
 
 	},
 	wander: function (elapsed, engine) {
@@ -199,7 +192,9 @@ o.bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wander
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wander;
+	}
 };
 
 o.dire_bat = {
@@ -220,7 +215,9 @@ o.dire_bat = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wander
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wander;
+	}
 };
 
 o.goblin = {
@@ -245,13 +242,16 @@ o.goblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wanderThenChase
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wanderThenChase;
+	}
 };
 
 o.demoblin = {
 	role: "monster",
 	team: 1,
 	speed: 100,
+	defaultSpeed: 100,
 	hitPoints: 10,
 	damage: 5,
 	worth: 20,
@@ -262,7 +262,7 @@ o.demoblin = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
 	weapons: [
-		{type: "e_arrow", count: null}
+		{type: "e_trident", count: null}
 	],
 	soundAttacks: "goblin_attacks",
 	soundDamage: "goblin_damage",
@@ -270,7 +270,9 @@ o.demoblin = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	onUpdate: movementTypes.wanderThenChase
+	onUpdate: function () {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.getNear;
+	}
 };
 
 o.cyclops = {
@@ -358,6 +360,18 @@ o.e_arrow = {
 	spriteAlign: true
 };
 
+o.e_trident = {
+	role: "projectile",
+	cooldown: 3000,
+	speed: 200,
+	hitPoints: 1,
+	damage: 3,
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 0,
+	spriteAlign: true
+};
+
 o.e_boulder = {
 	role: "projectile",
 	cooldown: 1500 ,
@@ -427,8 +441,8 @@ o.small_skull = {
 
 o.small_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 160,
@@ -453,8 +467,8 @@ o.medium_skull = {
 
 o.medium_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 128,
@@ -479,8 +493,8 @@ o.large_skull = {
 
 o.large_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 96,

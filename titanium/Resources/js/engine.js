@@ -5,6 +5,7 @@ const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
 const SCREEN_WIDTH = 640;
 const SCREEN_HEIGHT = 480;
+const GATE_CUTOFF_Y = 64;
 
 /**
  * Creates a new Engine object
@@ -311,26 +312,25 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveTimer.start(1);
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
-	
+
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
 	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "bat", 5);
+	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "bat", 5);
 	this.waves.push(w);
 	
 	// Wave #2
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 2000);
+	w.addSpawnPoint(1, 500);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "goblin", 5);
+	w.addObjects(0, "goblin", 10);
+	w.addObjects(1, "bat", 10);
+	w.addObjects(2, "goblin", 10);
 	this.waves.push(w);
 	
 	// Wave #3
@@ -338,39 +338,36 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "bat", 10);
-	w.addObjects(1, "goblin", 10);
-	w.addObjects(2, "goblin", 5);
-	w.addObjects(2, "bat", 5);
+	w.addObjects(0, "bat", 15);
+	w.addObjects(1, "goblin", 15);
+	w.addObjects(2, "dire_bat", 5);
 	this.waves.push(w);
 	
 	// Wave #4
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5);
+	w.addObjects(0, "dire_bat", 10);
 	w.addObjects(1, "demoblin", 5);
-	w.addObjects(2, "dire_bat", 5);
+	w.addObjects(2, "dire_bat", 10);
 	this.waves.push(w);
 
 	// Wave #5
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 2000);
-	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 5);
-	w.addObjects(1, "cyclops", 1);
-	w.addObjects(2, "dire_bat", 5);
+	w.addSpawnPoint(0, 500);
+	w.addSpawnPoint(1, 3500);
+	w.addSpawnPoint(2, 500);
+	w.addObjects(0, "demoblin", 10);
+	w.addObjects(1, "cyclops", 3);
+	w.addObjects(2, "demoblin", 10);
 	this.waves.push(w);
 	
 	// Wave 6
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 2000);
-	w.addSpawnPoint(1, 2000);
-	w.addSpawnPoint(2, 2000);
+	w.addSpawnPoint(0, 3500);
+	w.addSpawnPoint(1, 5000);
+	w.addSpawnPoint(2, 3500);
 	w.addObjects(0, "cyclops", 2);
 	w.addObjects(1, "superclops", 1);
 	w.addObjects(2, "cyclops", 2);
@@ -496,7 +493,7 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 			this.addObject(o);
 		}
 	}
-	if (closeGates) {
+	if (closeGates && !this.monstersAboveGates) {
 		this.closeGates();
 	}
 };
@@ -586,21 +583,165 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 	
 };
 
+/**
+ * Returns an array of tiles which intersect a given rectangle
+ * @param {horde.Rect} rect Rectangle
+ * @return {array} Array of tiles
+ */
+proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
+
+	var tiles = [];
+
+	var origin = new horde.Vector2(rect.left, rect.top);
+	var size = new horde.Vector2(rect.width, rect.height);
+	
+	var begin = origin.clone().scale(1 / this.tileSize.width).floor();
+	var end = origin.clone().add(size).scale(1 / this.tileSize.width).floor();
+	
+	for (var ty = begin.y; ty <= end.y; ty++) {
+		for (var tx = begin.x; tx <= end.x; tx++) {
+			tiles.push({
+				x: tx,
+				y: ty
+			});
+		}
+	}
+	
+	return tiles;
+	
+};
+
+/**
+ * Checks if a given object is colliding with any tiles
+ * @param {horde.Object} object Object to check
+ * @return {boolean} True if object is colliding with tiles, otherwise false
+ */
+proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (object) {
+	
+	var tilesToCheck = this.getTilesByRect(object.boundingBox());
+	
+	for (var x in tilesToCheck) {
+		var t = tilesToCheck[x];
+		if (this.map[t.y] && this.map[t.y][t.x] === 0) {
+			// COLLISION!
+			return t;
+		}
+	}
+	
+	// No tile collision
+	return false;
+	
+};
+
+proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
+	
+	if (object.hasState(horde.Object.states.HURTING)) {
+		return false;
+	}
+	
+	var px = ((object.speed / 1000) * elapsed);
+	
+	var axis = [];
+	var collisionX = false;
+	var collisionY = false;
+	
+	// Check tile collision for X axis
+	if (object.direction.x !== 0) {
+		// the object is moving along the "x" axis
+		object.position.x += (object.direction.x * px);
+		var tile = this.checkTileCollision(object);
+		if (tile !== false) {
+			axis.push("x");
+			collisionX = true;
+			if (object.direction.x > 0) { // moving right
+				object.position.x = tile.x * this.tileSize.width - object.size.width;
+			} else { // moving left
+				object.position.x = tile.x * this.tileSize.width + this.tileSize.width;
+			}
+		}
+	}
+	
+	// Check tile collision for Y axis
+	if (object.direction.y !== 0) {
+		// the object is moving along the "y" axis
+		object.position.y += (object.direction.y * px);
+		var tile = this.checkTileCollision(object);
+		if (tile !== false) {
+			axis.push("y");
+			collisionY = true;
+			if (object.direction.y > 0) { // moving down
+				object.position.y = tile.y * this.tileSize.height - object.size.height;
+			} else { // moving up
+				object.position.y = tile.y * this.tileSize.height + this.tileSize.height;
+			}
+		}
+	}
+	
+	var yStop = (this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y: 0;
+
+	if (object.direction.y < 0 && object.position.y < yStop) {
+		object.position.y = yStop;
+		axis.push("y");
+	}
+
+	if (axis.length > 0) {
+		object.wallCollide(axis);
+	}
+
+};
+
+proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {
+	
+	// Random chance loot!
+	if (horde.randomRange(1, 10) > 6) {
+		var lootType = "item_coin";
+		switch (horde.randomRange(1, 4)) {
+			case 3:
+				var p = this.getPlayerObject();
+				if (p.wounds) {
+					lootType = "item_food";
+				}
+				break;
+			case 4:
+				lootType = "item_weapon";
+				break;
+		}				
+		var drop = horde.makeObject(lootType);
+		drop.position = position.clone();
+		this.addObject(drop);
+	}
+	
+};
+
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
+	var numMonstersAboveGate = 0;
 	
 	for (var id in this.objects) {
 
 		var o = this.objects[id];
 		
 		if (o.isDead()) {
+			if (o.role === "monster") {
+				this.spawnLoot(o.position.clone());
+			}
+			if (o.role === "hero") {
+				this.gameOverReady = false;
+				this.gameOverAlpha = 0;
+				this.updateGameOver();
+				this.state = "game_over";
+				return;
+			}
 			delete(this.objects[o.id]);
 			continue;
 		}
 
 		if (o.role === "monster") {
 			numMonsters++;
+			if (o.position.y <= GATE_CUTOFF_Y) {
+				numMonstersAboveGate++;
+			}
 		}
 
 		var action = o.update(elapsed, this);
@@ -610,76 +751,17 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				break;
 		}
 
-		var px = ((o.speed / 1000) * elapsed);
-		
-		var axis = [];
-		
-		if (o.direction.x !== 0) {
-			// the object is moving along the "x" axis
-			o.position.x += (o.direction.x * px);
-			var b = o.boundingBox();
-			var size = new horde.Vector2(b.width, b.height);
-			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
-			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
-			check_x:
-			for (var y = b.y; y <= e.y; y++) {
-				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y] && this.map[y][x] === 0) {
-						if (o.direction.x > 0) {
-							// moving right
-							o.position.x = x * this.tileSize.width - o.size.width;
-						} else {
-							// moving left
-							o.position.x = x * this.tileSize.width + this.tileSize.width;
-						}
-						axis.push("x");
-						break check_x;
-					}
-				}
-			}
+		if (o.isMoving()) {
+			this.moveObject(o, elapsed);
 		}
-		
-		if (o.direction.y !== 0) {
-			// the object is moving along the "y" axis
-			o.position.y += (o.direction.y * px);
-			var b = o.boundingBox();
-			var size = new horde.Vector2(b.width, b.height);
-			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
-			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
-			check_y:
-			for (var y = b.y; y <= e.y; y++) {
-				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y] && this.map[y][x] === 0) {
-						if (o.direction.y > 0) {
-							// moving down
-							o.position.y = y * this.tileSize.height - o.size.height;
-						} else {
-							// moving up
-							o.position.y = y * this.tileSize.height + this.tileSize.height;
-						}
-						axis.push("y");
-						break check_y;
-					}
-				}
-			}
-		}
-		
-		if (o.direction.y < 0 && o.position.y < 0) {
-			o.position.y = 0;
-			axis.push("y");
-		}
-		
-		if (axis.length > 0) {
-			o.wallCollide(axis);
-		}
-		
-		if (o.role === "fluff" || o.role === "powerup_food") {
+
+		if (o.role === "fluff" || o.role === "powerup_food" || o.hasState(horde.Object.states.DYING)) {
 			continue;
 		}
 		
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
-			if (o2.isDead() || o2.team === o.team || o2.role === "fluff") {
+			if (o2.isDead() || o2.team === o.team || o2.role === "fluff" || o2.hasState(horde.Object.states.DYING)) {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
@@ -712,6 +794,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	}
 	
 	this.monstersAlive = numMonsters;
+	this.monstersAboveGates = (numMonstersAboveGate > 0);
 	
 };
 
@@ -722,30 +805,6 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	}
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
-		if (defender.role === "hero") {
-
-			/*
-			// NOTE: TODO: I fail! can't get it to work
-			// Draw the hero's death
-			var ctx = this.canvases["display"].getContext("2d");
-			defender.spriteX = 256;
-
-			this.drawObjects(ctx);
-			ctx.drawImage(
-				this.images.getImage(defender.spriteSheet),
-				s.x, s.y, defender.size.width, defender.size.height,
-				-(defender.size.width / 2), -(defender.size.height / 2), defender.size.width, defender.size.height
-			);
-			*/
-
-			horde.sound.stopAll();
-			horde.sound.play("hero_dies");
-			this.gameOverReady = false;
-			this.gameOverAlpha = 0;
-			this.updateGameOver();
-			this.state = "game_over";
-			return;
-		}
 		if (attacker.ownerId === null) {
 			attacker.gold += defender.worth;
 		} else {
@@ -754,38 +813,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				owner.gold += defender.worth;
 			}
 		}
-		if (defender.role === "monster") {
-			var skull = horde.makeObject(defender.gibletSize + "_skull");
-			skull.position = defender.position.clone();
-			skull.setDirection(horde.randomDirection());
-			this.addObject(skull);
-			var numGiblets = horde.randomRange(1, 2);
+		if (defender.role === "monster" || defender.role === "hero") {
+			var numGiblets = horde.randomRange(2, 3);
 			for (var g = 0; g < numGiblets; g++) {
 				var gib = horde.makeObject(defender.gibletSize + "_giblet");
 				gib.position = defender.position.clone();
 				gib.setDirection(horde.randomDirection());
 				this.addObject(gib);
 			}
-			
-			// Random chance loot!
-			if (horde.randomRange(1, 10) > 6) {
-				var lootType = "item_coin";
-				switch (horde.randomRange(1, 4)) {
-					case 3:
-						var p = this.getPlayerObject();
-						if (p.wounds) {
-							lootType = "item_food";
-						}
-						break;
-					case 4:
-						lootType = "item_weapon";
-						break;
-				}				
-				var drop = horde.makeObject(lootType);
-				drop.position = defender.position.clone();
-				this.addObject(drop);
-			}
-
 		}
 	}
 };
@@ -1241,7 +1276,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	
 	ctx.drawImage(
 		this.images.getImage("title"),
-		320 - 214, 100
+		320 - (483 / 2), 120
 	);
 	
 	if (!this.titleAlphaStep) {
