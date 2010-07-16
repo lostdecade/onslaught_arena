@@ -813,6 +813,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				owner.gold += defender.worth;
 			}
 		}
+		/*
 		if (defender.role === "monster" || defender.role === "hero") {
 			var numGiblets = horde.randomRange(2, 3);
 			for (var g = 0; g < numGiblets; g++) {
@@ -822,6 +823,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				this.addObject(gib);
 			}
 		}
+		*/
 	}
 };
 

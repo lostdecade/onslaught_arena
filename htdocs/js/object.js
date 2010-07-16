@@ -140,7 +140,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.deathTimer.reset();
 			if (this.deathFrameIndex > 2) {
 				this.deathFrameIndex = 2;
-				this.die();
+				this.ttl = 1500;
 			}
 		}
 	}
@@ -189,6 +189,12 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.cooldownElapsed = 0;
 		}
 	}
+	
+	if (this.hasState(horde.Object.states.DYING)) {
+		// Don't proceed with calling any AI behavior if this thing is dying...
+		return;
+	}
+	
 	return this.execute("onUpdate", arguments);
 };
 
