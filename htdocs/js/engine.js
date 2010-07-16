@@ -1287,7 +1287,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	
 	ctx.drawImage(
 		this.images.getImage("title"),
-		320 - 214, 100
+		320 - (483 / 2), 120
 	);
 	
 	if (!this.titleAlphaStep) {
