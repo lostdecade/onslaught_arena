@@ -81,6 +81,9 @@ proto.hasState = function (state) {
 };
 
 proto.addState = function (state, ttl) {
+	if (this.hasState(state)) {
+		return false;
+	}
 	var t = new horde.Timer();
 	t.start(ttl);
 	this.states.push({
@@ -128,7 +131,20 @@ proto.isDead = function horde_Object_proto_isDead () {
  * @return {void}
  */
 proto.update = function horde_Object_proto_update (elapsed) {
+	
 	this.updateStates();
+	
+	if (this.hasState(horde.Object.states.DYING)) {
+		if (this.deathTimer.expired()) {
+			this.deathFrameIndex++;
+			this.deathTimer.reset();
+			if (this.deathFrameIndex > 2) {
+				this.deathFrameIndex = 2;
+				this.die();
+			}
+		}
+	}
+	
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -182,6 +198,11 @@ proto.update = function horde_Object_proto_update (elapsed) {
  */
 proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 	if (this.animated) {
+		if (this.hasState(horde.Object.states.DYING)) {
+			return new horde.Vector2(
+				(17 + this.deathFrameIndex) * this.size.width, this.spriteY
+			);
+		}
 		if (this.hasState(horde.Object.states.HURTING)) {
 			return new horde.Vector2(
 				16 * this.size.width, this.spriteY
@@ -228,7 +249,17 @@ proto.wound = function horde_Object_proto_wound (damage) {
 	}
 	if (this.wounds >= this.hitPoints) {
 		this.wounds = this.hitPoints;
-		this.die();
+		if (this.role === "monster" || this.role === "hero") {
+			this.addState(horde.Object.states.DYING);
+			this.deathFrameIndex = 0;
+			this.deathTimer = new horde.Timer();
+			this.deathTimer.start(200);
+		} else {
+			this.die();
+		}
+		if (this.role === "hero") {
+			horde.sound.stopAll();
+		}
 		if (this.soundDies) {
 			horde.sound.play(this.soundDies);
 		}
@@ -291,6 +322,9 @@ proto.chase = function horde_Object_proto_chase (object) {
  * @return {boolean} True if the object is moving, otherwise false
  */
 proto.isMoving = function horde_Object_proto_isMoving () {
+	if (this.hasState(horde.Object.states.DYING)) {
+		return false;
+	}
 	return (this.direction.x !== 0 || this.direction.y !== 0);
 };
 

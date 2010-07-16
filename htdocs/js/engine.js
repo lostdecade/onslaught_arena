@@ -312,7 +312,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveTimer.start(1);
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
-	
+
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
@@ -690,6 +690,29 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 
 };
 
+proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {
+	
+	// Random chance loot!
+	if (horde.randomRange(1, 10) > 6) {
+		var lootType = "item_coin";
+		switch (horde.randomRange(1, 4)) {
+			case 3:
+				var p = this.getPlayerObject();
+				if (p.wounds) {
+					lootType = "item_food";
+				}
+				break;
+			case 4:
+				lootType = "item_weapon";
+				break;
+		}				
+		var drop = horde.makeObject(lootType);
+		drop.position = position.clone();
+		this.addObject(drop);
+	}
+	
+};
+
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
@@ -700,6 +723,16 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		var o = this.objects[id];
 		
 		if (o.isDead()) {
+			if (o.role === "monster") {
+				this.spawnLoot(o.position.clone());
+			}
+			if (o.role === "hero") {
+				this.gameOverReady = false;
+				this.gameOverAlpha = 0;
+				this.updateGameOver();
+				this.state = "game_over";
+				return;
+			}
 			delete(this.objects[o.id]);
 			continue;
 		}
@@ -722,13 +755,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			this.moveObject(o, elapsed);
 		}
 
-		if (o.role === "fluff" || o.role === "powerup_food") {
+		if (o.role === "fluff" || o.role === "powerup_food" || o.hasState(horde.Object.states.DYING)) {
 			continue;
 		}
 		
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
-			if (o2.isDead() || o2.team === o.team || o2.role === "fluff") {
+			if (o2.isDead() || o2.team === o.team || o2.role === "fluff" || o2.hasState(horde.Object.states.DYING)) {
 				continue;
 			}
 			if (o.boundingBox().intersects(o2.boundingBox())) {
@@ -772,30 +805,6 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	}
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
-		if (defender.role === "hero") {
-
-			/*
-			// NOTE: TODO: I fail! can't get it to work
-			// Draw the hero's death
-			var ctx = this.canvases["display"].getContext("2d");
-			defender.spriteX = 256;
-
-			this.drawObjects(ctx);
-			ctx.drawImage(
-				this.images.getImage(defender.spriteSheet),
-				s.x, s.y, defender.size.width, defender.size.height,
-				-(defender.size.width / 2), -(defender.size.height / 2), defender.size.width, defender.size.height
-			);
-			*/
-
-			horde.sound.stopAll();
-			horde.sound.play("hero_dies");
-			this.gameOverReady = false;
-			this.gameOverAlpha = 0;
-			this.updateGameOver();
-			this.state = "game_over";
-			return;
-		}
 		if (attacker.ownerId === null) {
 			attacker.gold += defender.worth;
 		} else {
@@ -804,38 +813,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				owner.gold += defender.worth;
 			}
 		}
-		if (defender.role === "monster") {
-			var skull = horde.makeObject(defender.gibletSize + "_skull");
-			skull.position = defender.position.clone();
-			skull.setDirection(horde.randomDirection());
-			this.addObject(skull);
-			var numGiblets = horde.randomRange(1, 2);
+		if (defender.role === "monster" || defender.role === "hero") {
+			var numGiblets = horde.randomRange(2, 3);
 			for (var g = 0; g < numGiblets; g++) {
 				var gib = horde.makeObject(defender.gibletSize + "_giblet");
 				gib.position = defender.position.clone();
 				gib.setDirection(horde.randomDirection());
 				this.addObject(gib);
 			}
-			
-			// Random chance loot!
-			if (horde.randomRange(1, 10) > 6) {
-				var lootType = "item_coin";
-				switch (horde.randomRange(1, 4)) {
-					case 3:
-						var p = this.getPlayerObject();
-						if (p.wounds) {
-							lootType = "item_food";
-						}
-						break;
-					case 4:
-						lootType = "item_weapon";
-						break;
-				}				
-				var drop = horde.makeObject(lootType);
-				drop.position = defender.position.clone();
-				this.addObject(drop);
-			}
-
 		}
 	}
 };

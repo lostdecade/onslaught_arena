@@ -8,13 +8,14 @@ o.hero = {
 	role: "hero",
 	team: 0,
 	speed: 150,
-	hitPoints: 25,
-	damage: 1,
+	hitPoints: 20,
+	damage: 0,
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
 	soundAttacks: "hero_attacks",
 	soundDamage: "hero_damage",
+	soundDies: "hero_dies",
 	weapons: [
 		{type: "h_rock", count: null}
 	]
@@ -440,8 +441,8 @@ o.small_skull = {
 
 o.small_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 160,
@@ -466,8 +467,8 @@ o.medium_skull = {
 
 o.medium_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 128,
@@ -492,8 +493,8 @@ o.large_skull = {
 
 o.large_giblet = {
 	role: "fluff",
-	speed: 25,
-	ttl: 1000,
+	speed: 50,
+	ttl: 1500,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 96,
