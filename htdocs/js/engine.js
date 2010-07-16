@@ -1192,7 +1192,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			// Draw a scroll behind the weapon
 			ctx.drawImage(
 				this.images.getImage("objects"),
-				128, 196, 48, 48, -26, -20, 48, 48
+				128, 192, 48, 48, -22, -20, 48, 48
 			);
 		}
 		
