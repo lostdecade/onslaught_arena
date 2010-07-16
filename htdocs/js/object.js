@@ -182,6 +182,11 @@ proto.update = function horde_Object_proto_update (elapsed) {
  */
 proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 	if (this.animated) {
+		if (this.hasState(horde.Object.states.HURTING)) {
+			return new horde.Vector2(
+				16 * this.size.width, this.spriteY
+			);
+		}
 		var offset = horde.directions.fromVector(this.facing.clone());
 		return new horde.Vector2(
 			((offset * 2) + this.animFrameIndex) * this.size.width,
@@ -218,6 +223,9 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
  */
 proto.wound = function horde_Object_proto_wound (damage) {
 	this.wounds += damage;
+	if (this.role === "monster" || this.role === "hero") {
+		this.addState(horde.Object.states.HURTING, 300);
+	}
 	if (this.wounds >= this.hitPoints) {
 		this.wounds = this.hitPoints;
 		this.die();

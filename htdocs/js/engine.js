@@ -635,6 +635,10 @@ proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (objec
 
 proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
+	if (object.hasState(horde.Object.states.HURTING)) {
+		return false;
+	}
+	
 	var px = ((object.speed / 1000) * elapsed);
 	
 	var axis = [];
