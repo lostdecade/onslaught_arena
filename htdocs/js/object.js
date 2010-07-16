@@ -270,6 +270,23 @@ proto.setDirection = function horde_Object_proto_setDirection (v) {
 };
 
 /**
+ * "Chases" another object by setting this objects direction toward another
+ * @return {void}
+ */
+proto.chase = function horde_Object_proto_chase (object) {
+	var direction = object.position.clone().subtract(this.position).normalize();
+	this.setDirection(direction);
+};
+
+/**
+ * Returns if this object is moving or not
+ * @return {boolean} True if the object is moving, otherwise false
+ */
+proto.isMoving = function horde_Object_proto_isMoving () {
+	return (this.direction.x !== 0 || this.direction.y !== 0);
+};
+
+/**
  * Stops this object from moving (resets direction vector to zero)
  * @return {void}
  */

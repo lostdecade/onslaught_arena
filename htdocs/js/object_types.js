@@ -100,44 +100,14 @@ o.h_trident = {
 var movementTypes = {
 	chase: function (elapsed, engine) {
 
-		var p = engine.getPlayerObject();
-		var hero = {
-			x : Math.floor(p.position.x / 32),
-			y : Math.floor(p.position.y / 32)
-		};
-		var x = Math.floor(this.position.x / 32);
-		var y = Math.floor(this.position.y / 32);
 		this.moveChangeElapsed += elapsed;
 
 		if (this.moveChangeElapsed < this.moveChangeDelay) return;
 
 		this.moveChangeElapsed = 0;
-
-		var direction = horde.directions.DOWN;
-
-		if (x < hero.x) {
-			if (y < hero.y) {
-				direction = horde.directions.DOWN_RIGHT;
-			} else if (y > hero.y) {
-				direction = horde.directions.UP_RIGHT;
-			} else {
-				direction = horde.directions.RIGHT;
-			}
-		} else if (x > hero.x) {
-			if (y < hero.y) {
-				direction = horde.directions.DOWN_LEFT;
-			} else if (y > hero.y) {
-				direction = horde.directions.UP_LEFT;
-			} else {
-				direction = horde.directions.LEFT;
-			}
-		} else if (y < hero.y) {
-			direction = horde.directions.DOWN;
-		} else if (y > hero.y) {
-			direction = horde.directions.UP;
-		}
 		
-		this.setDirection(horde.directions.toVector(direction));
+		var p = engine.getPlayerObject();
+		this.chase(p);
 		
 		return "shoot";
 
@@ -155,7 +125,7 @@ var movementTypes = {
 		var nearX = Math.abs(x - hero.x);
 		var nearY = Math.abs(y - hero.y);
 
-		if ((nearX < 128) && (nearY < 128)) {
+		if (!this.cooldown && (nearX < 128) && (nearY < 128)) {
 			this.speed = 0;
 			return "shoot";
 		} else {
@@ -391,7 +361,7 @@ o.e_arrow = {
 
 o.e_trident = {
 	role: "projectile",
-	cooldown: 1000,
+	cooldown: 3000,
 	speed: 200,
 	hitPoints: 1,
 	damage: 3,

@@ -5,6 +5,7 @@ const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
 const SCREEN_WIDTH = 640;
 const SCREEN_HEIGHT = 480;
+const GATE_CUTOFF_Y = 64;
 
 /**
  * Creates a new Engine object
@@ -582,6 +583,109 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 	
 };
 
+/**
+ * Returns an array of tiles which intersect a given rectangle
+ * @param {horde.Rect} rect Rectangle
+ * @return {array} Array of tiles
+ */
+proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
+
+	var tiles = [];
+
+	var origin = new horde.Vector2(rect.left, rect.top);
+	var size = new horde.Vector2(rect.width, rect.height);
+	
+	var begin = origin.clone().scale(1 / this.tileSize.width).floor();
+	var end = origin.clone().add(size).scale(1 / this.tileSize.width).floor();
+	
+	for (var ty = begin.y; ty <= end.y; ty++) {
+		for (var tx = begin.x; tx <= end.x; tx++) {
+			tiles.push({
+				x: tx,
+				y: ty
+			});
+		}
+	}
+	
+	return tiles;
+	
+};
+
+/**
+ * Checks if a given object is colliding with any tiles
+ * @param {horde.Object} object Object to check
+ * @return {boolean} True if object is colliding with tiles, otherwise false
+ */
+proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (object) {
+	
+	var tilesToCheck = this.getTilesByRect(object.boundingBox());
+	
+	for (var x in tilesToCheck) {
+		var t = tilesToCheck[x];
+		if (this.map[t.y] && this.map[t.y][t.x] === 0) {
+			// COLLISION!
+			return t;
+		}
+	}
+	
+	// No tile collision
+	return false;
+	
+};
+
+proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
+	
+	var px = ((object.speed / 1000) * elapsed);
+	
+	var axis = [];
+	var collisionX = false;
+	var collisionY = false;
+	
+	// Check tile collision for X axis
+	if (object.direction.x !== 0) {
+		// the object is moving along the "x" axis
+		object.position.x += (object.direction.x * px);
+		var tile = this.checkTileCollision(object);
+		if (tile !== false) {
+			axis.push("x");
+			collisionX = true;
+			if (object.direction.x > 0) { // moving right
+				object.position.x = tile.x * this.tileSize.width - object.size.width;
+			} else { // moving left
+				object.position.x = tile.x * this.tileSize.width + this.tileSize.width;
+			}
+		}
+	}
+	
+	// Check tile collision for Y axis
+	if (object.direction.y !== 0) {
+		// the object is moving along the "y" axis
+		object.position.y += (object.direction.y * px);
+		var tile = this.checkTileCollision(object);
+		if (tile !== false) {
+			axis.push("y");
+			collisionY = true;
+			if (object.direction.y > 0) { // moving down
+				object.position.y = tile.y * this.tileSize.height - object.size.height;
+			} else { // moving up
+				object.position.y = tile.y * this.tileSize.height + this.tileSize.height;
+			}
+		}
+	}
+	
+	var yStop = (this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y: 0;
+
+	if (object.direction.y < 0 && object.position.y < yStop) {
+		object.position.y = yStop;
+		axis.push("y");
+	}
+
+	if (axis.length > 0) {
+		object.wallCollide(axis);
+	}
+
+};
+
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
@@ -598,7 +702,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 		if (o.role === "monster") {
 			numMonsters++;
-			if (o.position.y <= 64) {
+			if (o.position.y <= GATE_CUTOFF_Y) {
 				numMonstersAboveGate++;
 			}
 		}
@@ -610,73 +714,10 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				break;
 		}
 
-		var px = ((o.speed / 1000) * elapsed);
-		
-		var axis = [];
-		
-		if (o.direction.x !== 0) {
-			// the object is moving along the "x" axis
-			o.position.x += (o.direction.x * px);
-			var b = o.boundingBox();
-			var size = new horde.Vector2(b.width, b.height);
-			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
-			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
-			check_x:
-			for (var y = b.y; y <= e.y; y++) {
-				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y] && this.map[y][x] === 0) {
-						if (o.direction.x > 0) {
-							// moving right
-							o.position.x = x * this.tileSize.width - o.size.width;
-						} else {
-							// moving left
-							o.position.x = x * this.tileSize.width + this.tileSize.width;
-						}
-						axis.push("x");
-						break check_x;
-					}
-				}
-			}
+		if (o.isMoving()) {
+			this.moveObject(o, elapsed);
 		}
-		
-		if (o.direction.y !== 0) {
-			// the object is moving along the "y" axis
-			o.position.y += (o.direction.y * px);
-			var b = o.boundingBox();
-			var size = new horde.Vector2(b.width, b.height);
-			var b = o.position.clone().scale(1 / this.tileSize.width).floor();
-			var e = o.position.clone().add(size).scale(1 / this.tileSize.width).floor();
-			check_y:
-			for (var y = b.y; y <= e.y; y++) {
-				for (var x = b.x; x <= e.x; x++) {
-					if (this.map[y] && this.map[y][x] === 0) {
-						if (o.direction.y > 0) {
-							// moving down
-							o.position.y = y * this.tileSize.height - o.size.height;
-						} else {
-							// moving up
-							o.position.y = y * this.tileSize.height + this.tileSize.height;
-						}
-						axis.push("y");
-						break check_y;
-					}
-				}
-			}
-		}
-		
-		var yStop = (this.gateState === "down" || o.role === "monster") ? 64: 0;
 
-		if (o.direction.y < 0 && o.position.y < yStop) {
-			o.position.y = yStop;
-			axis.push("y");
-		}
-		
-		
-		
-		if (axis.length > 0) {
-			o.wallCollide(axis);
-		}
-		
 		if (o.role === "fluff" || o.role === "powerup_food") {
 			continue;
 		}
