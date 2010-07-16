@@ -51,4 +51,17 @@ proto.intersects = function horde_Rect_proto_intersects (rect) {
 	return Rect.intersects(this, rect);
 };
 
+/**
+ * Reduces the size of this rect by a given amount
+ * @param {number} amount Amount to reduce on each side
+ * @return {void}
+ */
+proto.reduce = function horde_Rect_proto_reduce (amount) {
+	this.left += amount;
+	this.top += amount;
+	this.width -= amount * 2;
+	this.height -= amount * 2;
+	return this;
+};
+
 }());

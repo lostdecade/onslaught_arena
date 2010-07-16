@@ -764,7 +764,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			if (o2.isDead() || o2.team === o.team || o2.role === "fluff" || o2.hasState(horde.Object.states.DYING)) {
 				continue;
 			}
-			if (o.boundingBox().intersects(o2.boundingBox())) {
+			// Reduce the size of the bounding boxes a tad when evaluating object => object collision
+			if (o.boundingBox().reduce(5).intersects(o2.boundingBox().reduce(5))) {
 				if (o.role == "hero") {
 					if (o2.role == "powerup_food") {
 						o2.die();
