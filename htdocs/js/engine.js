@@ -182,6 +182,10 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
 		s.create("cyclops_damage", "sound/effects/cyclops_damage.mp3");
 		s.create("cyclops_dies", "sound/effects/cyclops_dies.mp3");
+
+		s.create("dragon_attacks", "sound/effects/dragon_attacks.mp3");
+		s.create("dragon_damage", "sound/effects/dragon_damage.mp3");
+		s.create("dragon_dies", "sound/effects/dragon_dies.mp3");
 		
 	});
 	
@@ -318,9 +322,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "dragon", 1);
+/*
 	w.addObjects(0, "bat", 5);
 	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "bat", 5);
+*/
 	this.waves.push(w);
 	
 	// Wave #2

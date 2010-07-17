@@ -342,6 +342,40 @@ o.superclops = {
 
 };
 
+o.dragon = {
+	role: "monster",
+	team: 1,
+
+	animated: true,
+	gibletSize: "large",
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 352,
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+
+	damage: 50,
+	hitPoints: 350,
+	speed: 20,
+	worth: 9000,
+
+	soundAttacks: "dragon_attacks",
+	soundDamage: "dragon_damage",
+	soundDies: "dragon_dies",
+
+	weapons: [{type: "e_fireball", count: null}],
+
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+	},
+	onUpdate: function (elapsed, engine) {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+	}
+
+};
+
 // ENEMY WEAPONS
 
 o.e_rock = {
@@ -392,6 +426,18 @@ o.e_energy_ball = {
 	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 320,
+	spriteY: 0,
+	rotate: true
+};
+
+o.e_fireball = {
+	role: "projectile",
+	cooldown: 2000,
+	speed: 200,
+	hitPoints: 1,
+	damage: 15,
+	spriteSheet: "objects",
+	spriteX: 192,
 	spriteY: 0,
 	rotate: true
 };
