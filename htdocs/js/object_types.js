@@ -356,7 +356,7 @@ o.dragon = {
 	moveChangeDelay: 1000,
 
 	damage: 50,
-	hitPoints: 350,
+	hitPoints: 250,
 	speed: 20,
 	worth: 9000,
 
