@@ -708,6 +708,7 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {
 		}				
 		var drop = horde.makeObject(lootType);
 		drop.position = position.clone();
+		drop.position.y -= 1;
 		this.addObject(drop);
 	}
 	
@@ -723,9 +724,6 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		var o = this.objects[id];
 		
 		if (o.isDead()) {
-			if (o.role === "monster") {
-				this.spawnLoot(o.position.clone());
-			}
 			if (o.role === "hero") {
 				this.gameOverReady = false;
 				this.gameOverAlpha = 0;
@@ -814,17 +812,9 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				owner.gold += defender.worth;
 			}
 		}
-		/*
-		if (defender.role === "monster" || defender.role === "hero") {
-			var numGiblets = horde.randomRange(2, 3);
-			for (var g = 0; g < numGiblets; g++) {
-				var gib = horde.makeObject(defender.gibletSize + "_giblet");
-				gib.position = defender.position.clone();
-				gib.setDirection(horde.randomDirection());
-				this.addObject(gib);
-			}
+		if (defender.role === "monster") {
+			this.spawnLoot(defender.position.clone());
 		}
-		*/
 	}
 };
 
