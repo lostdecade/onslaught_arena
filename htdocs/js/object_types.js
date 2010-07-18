@@ -438,7 +438,7 @@ o.e_fireball = {
 	hitPoints: 100,
 	damage: 35,
 	spriteSheet: "objects",
-	spriteX: 192,
+	spriteX: 352,
 	spriteY: 0,
 	rotate: true
 };
