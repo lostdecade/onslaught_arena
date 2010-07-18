@@ -1122,7 +1122,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 		ctx.textAlign = "center";
 		ctx.globalAlpha = this.titleAlpha;
-		ctx.fillText("Press space to play again", 320, 300);
+		ctx.fillText("Press space to continue", 320, 300);
 
 		ctx.restore();
 		
