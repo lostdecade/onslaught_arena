@@ -22,7 +22,7 @@ horde.Engine = function horde_Engine () {
 	this.keyboard = new horde.Keyboard();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
-	this.false = true; // Debugging toggle
+	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
 	
 	this.gateDirection = ""; // Set to "up" or "down"
