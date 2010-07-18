@@ -209,7 +209,7 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 				(17 + this.deathFrameIndex) * this.size.width, this.spriteY
 			);
 		}
-		if (this.hasState(horde.Object.states.HURTING)) {
+		if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
 			return new horde.Vector2(
 				16 * this.size.width, this.spriteY
 			);
