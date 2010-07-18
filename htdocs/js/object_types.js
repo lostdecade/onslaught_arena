@@ -86,7 +86,7 @@ o.h_fireball = {
 
 o.h_trident = {
 	role: "projectile",
-	cooldown: 1000,
+	cooldown: 750,
 	speed: 500,
 	hitPoints: 100,
 	damage: 50,
