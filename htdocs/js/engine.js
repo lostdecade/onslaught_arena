@@ -394,23 +394,23 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave 7
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 2000);
+	w.addSpawnPoint(0, 2500);
 	w.addSpawnPoint(1, 2500);
-	w.addSpawnPoint(2, 2000);
-	w.addObjects(0, "demoblin", 5);
-	w.addObjects(1, "demoblin", 5);
-	w.addObjects(2, "demoblin", 5);
+	w.addSpawnPoint(2, 2500);
+	w.addObjects(0, "demoblin", 3);
+	w.addObjects(1, "demoblin", 3);
+	w.addObjects(2, "demoblin", 3);
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
 	// Wave 8
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1500);
-	w.addSpawnPoint(1, 4500);
+	w.addSpawnPoint(1, 5000);
 	w.addSpawnPoint(2, 1500);
-	w.addObjects(0, "demoblin", 10);
-	w.addObjects(1, "cyclops", 10);
-	w.addObjects(2, "demoblin", 10);
+	w.addObjects(0, "demoblin", 5);
+	w.addObjects(1, "cyclops", 3);
+	w.addObjects(2, "demoblin", 5);
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
@@ -428,7 +428,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	// Wave 10 aka THE DRAGON!!
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 5000);
+	w.addSpawnPoint(1, 7500);
 	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "dire_bat", 5);
 	w.addObjects(1, "dragon", 1);
