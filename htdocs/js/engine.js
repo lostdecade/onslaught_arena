@@ -22,14 +22,13 @@ horde.Engine = function horde_Engine () {
 	this.keyboard = new horde.Keyboard();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
-	this.debug = false; // Debugging toggle
+	this.false = true; // Debugging toggle
 	this.konamiEntered = false;
 	
 	this.gateDirection = ""; // Set to "up" or "down"
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
 	this.gatesY = 0;
-
 };
 
 var proto = horde.Engine.prototype;
@@ -1209,6 +1208,22 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
+
+		var hpWidth = (o.size.width - 2);
+		var hpHeight = 8;
+		var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
+
+		if (
+			(this.debug && (o.role === "monster"))
+			|| (o.badass)
+		) {
+			ctx.fillStyle = "rgb(255, 255, 255)";
+			ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
+			ctx.fillStyle = "rgb(0, 0, 0)";
+			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), (o.size.width - 2), (hpHeight - 2));
+			ctx.fillStyle = "rgb(190, 22, 29)";
+			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), width, (hpHeight - 2));
+		}
 
 		ctx.restore();
 

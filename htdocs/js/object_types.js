@@ -312,6 +312,7 @@ o.cyclops = {
 o.superclops = {
 	role: "monster",
 	team: 1,
+	badass: true,
 
 	animated: true,
 	gibletSize: "large",
@@ -346,6 +347,7 @@ o.superclops = {
 o.dragon = {
 	role: "monster",
 	team: 1,
+	badass: true,
 
 	animated: true,
 	gibletSize: "large",
