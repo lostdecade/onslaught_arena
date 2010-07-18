@@ -355,7 +355,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 6000);
 	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "cyclops", 3);
+	w.addObjects(1, "cyclops", 2);
 	w.addObjects(2, "goblin", 5);
 	this.waves.push(w);
 	
@@ -386,9 +386,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 4000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 4000);
-	w.addObjects(0, "cyclops", 5);
+	w.addObjects(0, "cyclops", 2);
 	w.addObjects(1, "goblin", 15);
-	w.addObjects(2, "cyclops", 5);
+	w.addObjects(2, "cyclops", 2);
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
