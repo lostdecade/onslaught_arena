@@ -328,6 +328,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "bat", 5);
 */
+	w.nextWaveTime = 1000 * 60 * 10; // 10 minutes
 	this.waves.push(w);
 	
 	// Wave #2
