@@ -557,7 +557,7 @@ o.large_giblet = {
 
 o.item_food = {
 	role: "powerup_food",
-	healAmount: 15,
+	healAmount: 5,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 96,
