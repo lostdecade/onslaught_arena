@@ -547,6 +547,9 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 			this.waveModifier += DIFFICULTY_INCREMENT;
+			horde.sound.stop("normal_battle_music");
+			horde.sound.stop("final_battle_music");
+			horde.sound.play("normal_battle_music");
 		}
 		if (this.currentWaveId === (this.waves.length - 1)) {
 			horde.sound.stop("normal_battle_music");
@@ -888,6 +891,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "running") {
 		var player = this.getPlayerObject();
+
+		if (player.hasState(horde.Object.states.DYING)) {
+			this.keyboard.storeKeyStates();
+			return;
+		}
 
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
