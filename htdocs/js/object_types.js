@@ -63,7 +63,7 @@ o.h_spear = {
 	role: "projectile",
 	cooldown: 350,
 	speed: 500,
-	hitPoints: 50,
+	hitPoints: 100,
 	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 96,
@@ -430,7 +430,7 @@ o.e_energy_ball = {
 	cooldown: 2000,
 	speed: 200,
 	hitPoints: 100,
-	damage: 30,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 320,
 	spriteY: 0,
@@ -441,8 +441,8 @@ o.e_fireball = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
-	hitPoints: 100,
-	damage: 35,
+	hitPoints: 50,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 352,
 	spriteY: 0,
@@ -635,7 +635,7 @@ o.item_weapon = {
 			case 10:
 			case 11:
 				this.wepType = "h_fireball";
-				this.wepCount = 10;
+				this.wepCount = 25;
 				this.spriteX = 192;
 				break;
 				

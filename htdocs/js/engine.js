@@ -334,6 +334,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "superclops", 1);
 	w.addObjects(0, "goblin", 3);
 	w.addObjects(1, "goblin", 3);
 	w.addObjects(2, "goblin", 3);
@@ -740,7 +741,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		}
 	}
 	
-	var yStop = (this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y: 0;
+	var yStop = ((this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y : 0);
 
 	if (object.direction.y < 0 && object.position.y < yStop) {
 		object.position.y = yStop;
@@ -1261,7 +1262,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 
 		if (
 			(this.debug && (o.role === "monster"))
-			|| (o.badass)
+			|| (o.badass && !o.hasState(horde.Object.states.DYING))
 		) {
 			ctx.fillStyle = "rgb(255, 255, 255)";
 			ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
@@ -1366,14 +1367,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		}
 	}
 
+	var version = "v" + VERSION + " \u00A9 Lost Decade Games";
 	ctx.save();
 	ctx.globalAlpha = 1;
 	ctx.font = "Bold 16px Monospace";
 	ctx.textAlign = "right";
 	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillText("v" + VERSION + " by Lost Decade Games", 632, 472);
+	ctx.fillText(version, 632, 472);
 	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillText("v" + VERSION + " by Lost Decade Games", 630, 470);
+	ctx.fillText(version, 630, 470);
 	ctx.restore();
 	
 	ctx.save();
