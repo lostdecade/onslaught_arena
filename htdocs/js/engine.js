@@ -55,18 +55,27 @@ proto.stop = function horde_Engine_proto_stop () {
  * Toggles pausing the engine
  * @return {void}
  */
-proto.togglePause = function horde_Engine_proto_togglePause () {
+proto.togglePause = (function horde_Engine_proto_togglePause () {
 
-	if (this.paused) {
-		this.paused = false;
-		horde.sound.play("normal_battle_music");
-	} else {
-		this.paused = true;
-		horde.sound.stop("normal_battle_music");
-		horde.sound.stop("final_battle_music");
-	}
+	var isMuted = false;
 
-};
+	return function horde_Engine_proto_togglePause () {
+
+		if (this.paused) {
+			this.paused = false;
+			horde.sound.setMuted(isMuted);
+			//horde.sound.play("normal_battle_music");
+		} else {
+			this.paused = true;
+			isMuted = horde.sound.isMuted();
+			horde.sound.setMuted(true);
+			//horde.sound.stop("normal_battle_music");
+			//horde.sound.stop("final_battle_music");
+		}
+
+	};
+
+})();
 
 /**
  * Adds an object to the engine's collection
