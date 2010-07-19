@@ -116,23 +116,27 @@ var movementTypes = {
 	},
 	getNear: function (elapsed, engine) {
 
+		this.speed = this.defaultSpeed;
+
 		var p = engine.getPlayerObject();
-		var hero = {
-			x : p.position.x,
-			y : p.position.y
-		};
-		var x = this.position.x;
-		var y = this.position.y;
 
-		var nearX = Math.abs(x - hero.x);
-		var nearY = Math.abs(y - hero.y);
-
-		if (!this.cooldown && (nearX < 128) && (nearY < 128)) {
+		// Get the distance from the player
+		var distance = p.position.clone().subtract(this.position).magnitude();
+		
+		if (distance < 100) {
+			// too close! run away
+			this.chase(p);
+			this.setDirection(this.direction.invert());
+		} else if (distance > 150) {
+			// too far, chase him down!
+			this.chase(p);
+		} else if (!this.cooldown) {
+			// shoot the fucker in the FACE
+			this.chase(p);
 			this.speed = 0;
 			return "shoot";
 		} else {
-			this.speed = this.defaultSpeed;
-			movementTypes.chase.apply(this, arguments);
+			movementTypes.wander.apply(this, arguments);
 		}
 
 	},
