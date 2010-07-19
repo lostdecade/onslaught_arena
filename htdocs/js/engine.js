@@ -1379,19 +1379,9 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = "rgb(0, 0, 0)";
 	ctx.font = "Bold 35px Monospace";
 	ctx.textAlign = "left";
-	ctx.fillText("Press space to play", 110, 280);
+	ctx.fillText("Press space to play", 110, 300);
 	ctx.restore();
 
-	ctx.save();
-	ctx.globalAlpha = 1;
-	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.font = "20px Monospace";
-	ctx.textAlign = "center";
-	ctx.fillText("Use arrow keys to move, space to attack.", 320, 320);
-	ctx.fillText('Press "Z" or "X" to cycle weapons.', 320, 340)
-	ctx.fillText('Press "M" to mute sound, "P" to pause.', 320, 360);
-	ctx.restore();
-		
 };
 
 proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
