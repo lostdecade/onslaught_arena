@@ -355,9 +355,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 500);
 	w.addSpawnPoint(1, 6000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "bat", 5);
-	w.addObjects(1, "cyclops", 2);
-	w.addObjects(2, "goblin", 5);
+	w.addObjects(0, "goblin", 3);
+	w.addObjects(1, "cyclops", 1);
+	w.addObjects(2, "goblin", 3);
 	this.waves.push(w);
 	
 	// Wave #4
@@ -365,9 +365,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 200);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "goblin", 10);
-	w.addObjects(1, "goblin", 10);
-	w.addObjects(2, "goblin", 10);
+	w.addObjects(0, "demoblin", 3);
+	w.addObjects(1, "demoblin", 3);
+	w.addObjects(2, "demoblin", 3);
 	w.nextWaveTime = 60000; // 1 min
 	this.waves.push(w);
 
@@ -379,64 +379,31 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(0, "goblin", 10);
 	w.addObjects(1, "superclops", 1);
 	w.addObjects(2, "goblin", 10);
-	w.nextWaveTime = 60000; // 1 min
+	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 	
 	// Wave 6
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 4000);
-	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 4000);
-	w.addObjects(0, "cyclops", 2);
-	w.addObjects(1, "goblin", 15);
-	w.addObjects(2, "cyclops", 2);
+	w.addSpawnPoint(0, 300);
+	w.addSpawnPoint(1, 300);
+	w.addSpawnPoint(2, 300);
+	w.addObjects(0, "dire_bat", 10);
+	w.addObjects(1, "bat", 10);
+	w.addObjects(2, "dire_bat", 10);
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
 	// Wave 7
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 2500);
-	w.addSpawnPoint(1, 2500);
-	w.addSpawnPoint(2, 2500);
-	w.addObjects(0, "demoblin", 3);
-	w.addObjects(1, "demoblin", 3);
-	w.addObjects(2, "demoblin", 3);
-	w.nextWaveTime = 120000; // 2 min
-	this.waves.push(w);
-
-	// Wave 8
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1500);
-	w.addSpawnPoint(1, 5000);
-	w.addSpawnPoint(2, 1500);
-	w.addObjects(0, "demoblin", 5);
-	w.addObjects(1, "cyclops", 3);
-	w.addObjects(2, "demoblin", 5);
-	w.nextWaveTime = 120000; // 2 min
-	this.waves.push(w);
-
-	// Wave 9
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
-	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "dire_bat", 20);
-	w.addObjects(1, "bat", 20);
-	w.addObjects(2, "dire_bat", 20);
-	w.nextWaveTime = 120000; // 2 min
-	this.waves.push(w);
-
-	// Wave 10 aka THE DRAGON!!
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 7500);
-	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "dire_bat", 5);
+	w.addSpawnPoint(0, 500);
+	w.addSpawnPoint(1, 8000);
+	w.addSpawnPoint(2, 500);
+	w.addObjects(0, "dire_bat", 10);
 	w.addObjects(1, "dragon", 1);
-	w.addObjects(2, "dire_bat", 5);
-	w.nextWaveTime = 60000 * 5; // 5 minutes
+	w.addObjects(2, "dire_bat", 10);
+	w.nextWaveTime = 60000 * 5; // 5 mins
 	this.waves.push(w);
-
+	
 };
 
 /**
@@ -586,6 +553,9 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 			this.waveModifier += DIFFICULTY_INCREMENT;
+			horde.sound.stop("normal_battle_music");
+			horde.sound.stop("final_battle_music");
+			horde.sound.play("normal_battle_music");
 		}
 		if (this.currentWaveId === (this.waves.length - 1)) {
 			horde.sound.stop("normal_battle_music");
@@ -934,6 +904,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "running") {
 		var player = this.getPlayerObject();
+
+		if (player.hasState(horde.Object.states.DYING)) {
+			this.keyboard.storeKeyStates();
+			return;
+		}
 
 		// Determine which way we should move the player
 		var move = new horde.Vector2();

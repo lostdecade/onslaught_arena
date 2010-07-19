@@ -262,6 +262,8 @@ o.demoblin = {
 	soundDies: "goblin_dies",
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.cooldown = true;
+		this.cooldownElapsed = horde.randomRange(0, 5000);
 	},
 	onUpdate: function () {
 		if (this.position.y >= 50) this.onUpdate = movementTypes.getNear;
@@ -387,7 +389,7 @@ o.e_arrow = {
 
 o.e_trident = {
 	role: "projectile",
-	cooldown: 3000,
+	cooldown: 5000,
 	speed: 200,
 	hitPoints: 1,
 	damage: 10,
@@ -413,7 +415,7 @@ o.e_energy_ball = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
-	hitPoints: 100,
+	hitPoints: 9999,
 	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 320,
@@ -425,7 +427,7 @@ o.e_fireball = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
-	hitPoints: 50,
+	hitPoints: 9999,
 	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 352,
@@ -590,7 +592,7 @@ o.item_weapon = {
 	ttl: 5000,
 	onInit: function () {
 		// Note: all these fallthroughs are intentional.
-		switch (horde.randomRange(1, 12)) {
+		switch (horde.randomRange(1, 10)) {
 
 			case 1:
 			case 2:

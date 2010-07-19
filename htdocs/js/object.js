@@ -377,7 +377,9 @@ proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
 	for (var x in this.weapons) {
 		var w = this.weapons[x]; // Haha, Weapon X
 		if (typeof(w) !== "undefined" && w.type === type) {
-			w.count += count;
+			if (w.count !== null) {
+				w.count += count;
+			}
 			return true;
 		}
 	}
