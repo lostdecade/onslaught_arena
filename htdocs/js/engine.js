@@ -334,7 +334,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "superclops", 1);
 	w.addObjects(0, "goblin", 3);
 	w.addObjects(1, "goblin", 3);
 	w.addObjects(2, "goblin", 3);
@@ -447,7 +446,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	// NOTE: below line shouldn't be necessary, but it fixes the weapon retention bug for now.
 	player.weapons = [
-		{type: "h_rock", count: null}
+		{type: "h_sword", count: null}
 	];
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);

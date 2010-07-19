@@ -17,23 +17,11 @@ o.hero = {
 	soundDamage: "hero_damage",
 	soundDies: "hero_dies",
 	weapons: [
-		{type: "h_rock", count: null}
+		{type: "h_sword", count: null}
 	]
 };
 
 // HERO WEAPONS
-
-o.h_rock = {
-	role: "projectile",
-	cooldown: 300,
-	speed: 250,
-	hitPoints: 1,
-	damage: 5,
-	spriteSheet: "objects",
-	spriteX: 0,
-	spriteY: 0,
-	rotate: true
-};
 
 o.h_knife = {
 	role: "projectile",
@@ -385,10 +373,6 @@ o.dragon = {
 
 // ENEMY WEAPONS
 
-o.e_rock = {
-	
-};
-
 o.e_arrow = {
 	role: "projectile",
 	cooldown: 300,
@@ -613,33 +597,26 @@ o.item_weapon = {
 			case 3:
 				this.wepType = "h_knife";
 				this.spriteX = 32;
-				this.wepCount = 100;
+				this.wepCount = 150;
 				break;
 			
 			case 4:
 			case 5:
 			case 6:
-				this.wepType = "h_sword";
-				this.wepCount = 25;
-				this.spriteX = 64;
-				break;
-				
-			case 7:
-			case 8:
-			case 9:
 				this.wepType = "h_spear";
 				this.wepCount = 30;
 				this.spriteX = 96;
 				break;
 				
-			case 10:
-			case 11:
+			case 7:
+			case 8:
 				this.wepType = "h_fireball";
 				this.wepCount = 25;
 				this.spriteX = 192;
 				break;
 				
-			case 12:
+			case 9:
+			case 10:
 				this.wepType = "h_trident";
 				this.wepCount = 10;
 				this.spriteX = 160;
