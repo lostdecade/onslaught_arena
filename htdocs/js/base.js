@@ -148,26 +148,26 @@ horde.directions = {
 		}
 	},
 	fromVector: function (v) {
-		if (v.x === 0 && v.y < 0) {
+		if (v.x > -0.25 && v.x < 0.25 && v.y < 0) {
 			return horde.directions.UP;
+		}
+		if (v.x > -0.25 && v.x < 0.25 && v.y > 0) {
+			return horde.directions.DOWN;
+		}
+		if (v.x > 0 && v.y > -0.25 && v.y < 0.25) {
+			return horde.directions.RIGHT;
+		}
+		if (v.x < 0 && v.y > -0.25 && v.y < 0.25) {
+			return horde.directions.LEFT;
 		}
 		if (v.x > 0 && v.y < 0) {
 			return horde.directions.UP_RIGHT;
 		}
-		if (v.x > 0 && v.y === 0) {
-			return horde.directions.RIGHT;
-		}
 		if (v.x > 0 && v.y > 0) {
 			return horde.directions.DOWN_RIGHT;
 		}
-		if (v.x === 0 && v.y > 0) {
-			return horde.directions.DOWN;
-		}
 		if (v.x < 0 && v.y > 0) {
 			return horde.directions.DOWN_LEFT;
-		}
-		if (v.x < 0 && v.y === 0) {
-			return horde.directions.LEFT;
 		}
 		if (v.x < 0 && v.y < 0) {
 			return horde.directions.UP_LEFT;
