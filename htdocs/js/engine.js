@@ -413,7 +413,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	var player = horde.makeObject("hero");
 	// NOTE: below line shouldn't be necessary, but it fixes the weapon retention bug for now.
 	player.weapons = [
-		{type: "h_rock", count: null}
+		{type: "h_sword", count: null}
 	];
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
@@ -707,7 +707,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		}
 	}
 	
-	var yStop = (this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y: 0;
+	var yStop = ((this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y : 0);
 
 	if (object.direction.y < 0 && object.position.y < yStop) {
 		object.position.y = yStop;
@@ -1089,7 +1089,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 		ctx.textAlign = "center";
 		ctx.globalAlpha = this.titleAlpha;
-		ctx.fillText("Press space to play again", 320, 300);
+		ctx.fillText("Press space to continue", 320, 300);
 
 		ctx.restore();
 		
@@ -1228,7 +1228,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 
 		if (
 			(this.debug && (o.role === "monster"))
-			|| (o.badass)
+			|| (o.badass && !o.hasState(horde.Object.states.DYING))
 		) {
 			ctx.fillStyle = "rgb(255, 255, 255)";
 			ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
@@ -1333,14 +1333,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		}
 	}
 
+	var version = "v" + VERSION + " \u00A9 Lost Decade Games";
 	ctx.save();
 	ctx.globalAlpha = 1;
 	ctx.font = "Bold 16px Monospace";
 	ctx.textAlign = "right";
 	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillText("v" + VERSION + " by Lost Decade Games", 632, 472);
+	ctx.fillText(version, 632, 472);
 	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillText("v" + VERSION + " by Lost Decade Games", 630, 470);
+	ctx.fillText(version, 630, 470);
 	ctx.restore();
 	
 	ctx.save();
