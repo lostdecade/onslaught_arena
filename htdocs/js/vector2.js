@@ -59,7 +59,13 @@ proto.zero = function horde_Vector2_proto_zero () {
 	this.y = 0;
 	return this;
 };
-	
+
+proto.invert = function horde_Vector2_proto_invert () {
+	this.x *= -1;
+	this.y *= -1;
+	return this;
+};
+
 proto.magnitude = function horde_Vector2_proto_magnitude () {
 	return Math.sqrt(this.x * this.x + this.y * this.y);
 };
