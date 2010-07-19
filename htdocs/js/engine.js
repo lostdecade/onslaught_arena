@@ -134,6 +134,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.images = new horde.ImageLoader();
 	this.images.load({
 		"title": "img/title.png",
+		"how_to_play": "img/how_to_play.png",
 		"background": "img/arena.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
@@ -510,6 +511,11 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 		case "title":
 			this.handleInput();
 			this.updateFauxGates(elapsed);
+			this.render();
+			break;
+
+		case "how_to_play":
+			this.handleInput();
 			this.render();
 			break;
 			
@@ -912,11 +918,18 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				var p = this.getPlayerObject();
 				p.addWeapon("h_trident", null);
 			}
-			horde.sound.play("normal_battle_music");
-			this.state = "running";
+			this.state = "how_to_play";
 		}
 		this.keyboard.storeKeyStates();
 		return;
+	}
+
+	if (this.state === "how_to_play") {
+		if (this.keyboard.isKeyPressed(32)) {
+			this.keyboard.keyStates[32] = false;
+			horde.sound.play("normal_battle_music");
+			this.state = "running";
+		}
 	}
 
 	if (this.state === "running") {
@@ -1036,6 +1049,15 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawTitle(ctx);
+			break;
+
+		// How to Play
+		case "how_to_play":
+			this.drawBackground(ctx);
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			this.drawTitle(ctx);
+			this.drawHowToPlay(ctx);
 			break;
 
 		// The game!
@@ -1395,6 +1417,13 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillText('Press "M" to mute sound, "P" to pause.', 320, 360);
 	ctx.restore();
 		
+};
+
+proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
+	ctx.drawImage(
+		this.images.getImage("how_to_play"),
+		40, 40, 560, 400
+	);
 };
 
 /**
