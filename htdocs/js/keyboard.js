@@ -12,7 +12,35 @@ horde.Keyboard = function () {
 var Keyboard = horde.Keyboard;
 var proto = Keyboard.prototype;
 
-Keyboard.konamiCode = [38,38,40,40,37,39,37,39,66,65];
+Keyboard.Keys = {
+	SPACE: 32,
+	LEFT: 37,
+	UP: 38,
+	RIGHT: 39,
+	DOWN: 40,
+	A: 65,
+	B: 66,
+	D: 68,
+	M: 77,
+	P: 80,
+	S: 83,
+	W: 87,
+	X: 88,
+	Z: 90
+};
+
+Keyboard.konamiCode = [
+	Keyboard.Keys.UP,
+	Keyboard.Keys.UP,
+	Keyboard.Keys.DOWN,
+	Keyboard.Keys.DOWN,
+	Keyboard.Keys.LEFT,
+	Keyboard.Keys.RIGHT,
+	Keyboard.Keys.LEFT,
+	Keyboard.Keys.RIGHT,
+	Keyboard.Keys.B,
+	Keyboard.Keys.A
+];
 
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
@@ -28,6 +56,9 @@ proto.supressKeys = function (e) {
 		case 88: // Z
 		case 80: // P
 		case 32: // space
+		case 87: // W
+		case 83: // S
+		case 68: // D
 			horde.stopEvent(e);
 			break;
 	}

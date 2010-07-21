@@ -20,6 +20,7 @@ horde.Engine = function horde_Engine () {
 	this.objectIdSeed = 0;
 	this.playerObjectId = null;
 	this.keyboard = new horde.Keyboard();
+	this.mouse = new horde.Mouse();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
@@ -869,6 +870,9 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
+	var keys = horde.Keyboard.Keys;
+	var buttons = horde.Mouse.Buttons;
+
 	if (this.state == "running") {
 		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(80)) {
@@ -918,19 +922,20 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
-		if (this.keyboard.isKeyDown(37)) { // left
-			move.x = -1;
-		}
-		if (this.keyboard.isKeyDown(38)) { // up
+
+		if (this.keyboard.isKeyDown(keys.W)) {
 			move.y = -1;
 		}
-		if (this.keyboard.isKeyDown(39)) { // right
-			move.x = 1;
+		if (this.keyboard.isKeyDown(keys.A)) {
+			move.x = -1;
 		}
-		if (this.keyboard.isKeyDown(40)) { // down
+		if (this.keyboard.isKeyDown(keys.S)) {
 			move.y = 1;
 		}
-
+		if (this.keyboard.isKeyDown(keys.D)) {
+			move.x = 1;
+		}
+		
 		// Move the player
 		player.stopMoving();
 		if ((move.x !== 0) || (move.y !== 0)) {
@@ -938,8 +943,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Have the player fire (space key)
-		if (this.keyboard.isKeyDown(32) || player.autoFire === true) {
-			this.objectAttack(player);
+		if (this.mouse.isButtonDown(buttons.LEFT) || player.autoFire === true) {
+			var v = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
+			v.subtract(player.position).normalize();
+			this.objectAttack(player, v);
 		}
 
 		// Cycle weapons (Z)
@@ -956,7 +963,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 };
 
-proto.objectAttack = function (object) {
+proto.objectAttack = function (object, v) {
 
 	var weaponType = object.fireWeapon();
 	if (weaponType === false) {
@@ -987,7 +994,7 @@ proto.objectAttack = function (object) {
 		// Shoot one instance of the weapon in the same
 		// direction as the object is currently facing
 		default:
-			this.spawnObject(object, weaponType);
+			this.spawnObject(object, weaponType, v);
 			break;
 			
 	}
@@ -1044,6 +1051,7 @@ proto.render = function horde_Engine_proto_render () {
 		// The game!
 		case "running":
 			this.drawBackground(ctx);
+			this.drawTargetReticle(ctx);
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
@@ -1277,6 +1285,19 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		ctx.restore();
 
 	}
+};
+
+/** 
+ * Draws the targeting reticle to the screen
+ * @param {object} Canvas 2d context to draw on
+ * @return {void}
+ */
+proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
+	ctx.save();
+	ctx.globalAlpha = 0.25;
+	ctx.fillStyle = "rgb(0, 255, 0)";
+	ctx.fillRect(this.mouse.mouseX - 32, this.mouse.mouseY - 32, 64, 64);
+	ctx.restore();
 };
 
 /**
