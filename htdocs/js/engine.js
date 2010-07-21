@@ -30,6 +30,11 @@ horde.Engine = function horde_Engine () {
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
 	this.gatesY = 0;
+	
+	this.targetReticle = {
+		angle: 0,
+		rotateSpeed: 1
+	};
 };
 
 var proto = horde.Engine.prototype;
@@ -762,6 +767,12 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
+	var tr = this.targetReticle;
+	tr.angle += (tr.rotateSpeed / 1000) * elapsed;
+	if (tr.angle > 360) {
+		tr.angle = 0;
+	}
+
 	var numMonsters = 0;
 	var numMonstersAboveGate = 0;
 	
@@ -1294,9 +1305,13 @@ horde.Engine.prototype.drawObjects = function (ctx) {
  */
 proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.save();
-	ctx.globalAlpha = 0.25;
-	ctx.fillStyle = "rgb(0, 255, 0)";
-	ctx.fillRect(this.mouse.mouseX - 32, this.mouse.mouseY - 32, 64, 64);
+	ctx.globalAlpha = 0.50;
+	ctx.translate(this.mouse.mouseX, this.mouse.mouseY);
+	ctx.rotate(this.targetReticle.angle);
+	ctx.drawImage(this.images.getImage("objects"),
+			256, 192, 64, 64, 
+			-32, -32, 64, 64
+	);
 	ctx.restore();
 };
 
