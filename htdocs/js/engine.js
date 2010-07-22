@@ -84,7 +84,7 @@ proto.togglePause = (function horde_Engine_proto_togglePause () {
  * Adds an object to the engine's collection
  * @param {horde.Object} Object to add
  * @return {number} ID of the newly added object
- */ 
+ */
 proto.addObject = function horde_Engine_proto_addObject (object) {
 	this.objectIdSeed++;
 	var id = "o" + this.objectIdSeed;
@@ -559,7 +559,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		}
 	}
 	// If the timer has expired OR the spawns are empty AND there are no monsters alive
-	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) { 
+	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
@@ -1170,8 +1170,8 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 
 proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
 	ctx.drawImage(
-		this.images.getImage("background"), 
-		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 
+		this.images.getImage("background"),
+		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
 		0, 0, this.view.width, this.view.height
 	);
 };
@@ -1179,7 +1179,7 @@ proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
 proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
 	ctx.drawImage(
 		this.images.getImage("shadow"),
-		0, 0, 576, 386, 
+		0, 0, 576, 386,
 		32, 0, 576, 386
 	);
 };
@@ -1250,7 +1250,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		ctx.save();
 		
 		ctx.translate(
-			o.position.x + o.size.width / 2, 
+			o.position.x + o.size.width / 2,
 			o.position.y + o.size.height / 2
 		);
 		
@@ -1298,7 +1298,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 	}
 };
 
-/** 
+/**
  * Draws the targeting reticle to the screen
  * @param {object} Canvas 2d context to draw on
  * @return {void}
@@ -1309,7 +1309,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.translate(this.mouse.mouseX, this.mouse.mouseY);
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(this.images.getImage("objects"),
-			256, 192, 64, 64, 
+			256, 192, 64, 64,
 			-32, -32, 64, 64
 	);
 	ctx.restore();

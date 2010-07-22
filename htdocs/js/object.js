@@ -305,7 +305,7 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
  * @param {horde.Vector2} v Vector representing the direction
  * @return {void}
  */
-proto.setDirection = function horde_Object_proto_setDirection (v) { 
+proto.setDirection = function horde_Object_proto_setDirection (v) {
 	if (v.x === 0 && v.y === 0) {
 		this.stopMoving();
 	} else {
@@ -347,7 +347,7 @@ proto.stopMoving = function horde_Object_proto_stopMoving () {
  * @param {string} method Method to call
  * @param {array} args Array of arguments
  * @return {void}
- */ 
+ */
 proto.execute = function horde_Object_proto_execute (method, args) {
 	if (this[method]) {
 		return this[method].apply(this, args);
