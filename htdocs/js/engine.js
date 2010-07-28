@@ -648,9 +648,15 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
 	
 	var begin = origin.clone().scale(1 / this.tileSize.width).floor();
 	var end = origin.clone().add(size).scale(1 / this.tileSize.width).floor();
+/*
+div.style.left = begin.x;
+div.style.top = begin.y;
+div.style.width = size.x;
+div.style.height = begin.y;
+*/
 	
-	for (var ty = begin.y; ty <= end.y; ty++) {
-		for (var tx = begin.x; tx <= end.x; tx++) {
+	for (var tx = begin.x; tx <= end.x; tx++) {
+		for (var ty = begin.y; ty <= end.y; ty++) {
 			tiles.push({
 				x: tx,
 				y: ty
@@ -669,10 +675,11 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
  */
 proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (object) {
 	
+console.log(object.boundingBox());
 	var tilesToCheck = this.getTilesByRect(object.boundingBox());
 	
-	for (var x in tilesToCheck) {
-		var t = tilesToCheck[x];
+	for (var i = 0, len = tilesToCheck.length; i < len; i++) {
+		var t = tilesToCheck[i];
 		if (this.map[t.y] && this.map[t.y][t.x] === 0) {
 			// COLLISION!
 			return t;

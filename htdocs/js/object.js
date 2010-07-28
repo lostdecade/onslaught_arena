@@ -230,8 +230,9 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
  */
 proto.boundingBox = function horde_Object_proto_boundingBox () {
 	return new horde.Rect(
-			this.position.x, this.position.y,
-			this.size.width - 1, this.size.height - 1);
+		this.position.x, this.position.y,
+		this.size.width - 1, this.size.height - 1
+	);
 };
 
 /**
