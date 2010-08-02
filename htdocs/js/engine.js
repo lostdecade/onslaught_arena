@@ -136,6 +136,18 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 
+	var paused;
+
+	horde.on("blur", function () {
+		paused = this.paused;
+		this.keyboard.keyStates = {};
+		if (!this.paused) this.togglePause();
+	}, window, this);
+
+	horde.on("focus", function () {
+		if (!paused) this.togglePause();
+	}, window, this);
+
 	// Load just the logo
 	this.preloader = new horde.ImageLoader();
 	this.preloader.load({
@@ -675,7 +687,6 @@ div.style.height = begin.y;
  */
 proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (object) {
 	
-console.log(object.boundingBox());
 	var tilesToCheck = this.getTilesByRect(object.boundingBox());
 	
 	for (var i = 0, len = tilesToCheck.length; i < len; i++) {

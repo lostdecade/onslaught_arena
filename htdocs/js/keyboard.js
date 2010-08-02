@@ -4,7 +4,6 @@ horde.Keyboard = function () {
 	this.history = [];
 	this.keyStates = {};
 	this.lastKeyStates = {};
-	horde.on("blur", this.handleBlur, window, this);
 	horde.on("keydown", this.handleKeyDown, window, this);
 	horde.on("keyup", this.handleKeyUp, window, this);
 };
@@ -62,10 +61,6 @@ proto.supressKeys = function (e) {
 			horde.stopEvent(e);
 			break;
 	}
-};
-
-proto.handleBlur = function (e) {
-	this.keyStates = {};
 };
 
 proto.handleKeyDown = function (e) {
