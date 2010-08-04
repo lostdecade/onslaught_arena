@@ -1,6 +1,6 @@
 (function define_horde_Engine () {
 
-const VERSION = 0.2;
+const VERSION = 0.3;
 const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
 const SCREEN_WIDTH = 640;
