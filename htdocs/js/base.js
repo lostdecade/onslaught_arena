@@ -85,12 +85,11 @@ horde.randomRange = function horde_randomRange (min, max) {
 };
 
 horde.randomDirection = function () {
-	var d = horde.directions.toVector(horde.randomRange(0, 7));
-	if (horde.randomRange(1, 100) > 50) {
-		d.x *= Math.random();
-	} else {
-		d.y *= Math.random();
-	}
+	var d = new horde.Vector2(
+		horde.randomRange(-10, 10),
+		horde.randomRange(-10, 10)
+	);
+	d.normalize();
 	return d;
 };
 
