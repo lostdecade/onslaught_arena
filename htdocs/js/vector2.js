@@ -83,5 +83,11 @@ proto.floor = function horde_Vector2_proto_floor () {
 	this.y = Math.floor(this.y);
 	return this;
 };
+
+proto.abs = function horde_Vector2_proto_abs () {
+	this.x = Math.abs(this.x);
+	this.y = Math.abs(this.y);
+	return this;
+};
 	
 }());

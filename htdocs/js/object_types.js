@@ -137,6 +137,20 @@ var movementTypes = {
 			this.setDirection(d);
 		}
 	},
+	wanderShoot: function (elapsed, engine) {
+		
+		var p = engine.getPlayerObject();
+		
+		var diff = p.position.clone().subtract(this.position).abs();
+		
+		if (!this.cooldown && (diff.x < (p.size.width / 2) || diff.y < (p.size.height / 2))) {
+			this.chase(p);
+			return "shoot";
+		} else {
+			movementTypes.wander.apply(this, arguments);
+		}
+		
+	},
 	wanderThenChase: function (elapsed, engine) {
 
 		var p = engine.getPlayerObject();
@@ -236,7 +250,7 @@ o.goblin = {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
 	onUpdate: function () {
-		if (this.position.y >= 50) this.onUpdate = movementTypes.wanderThenChase;
+		if (this.position.y >= 50) this.onUpdate = movementTypes.wanderShoot;
 	}
 };
 
@@ -377,7 +391,7 @@ o.dragon = {
 
 o.e_arrow = {
 	role: "projectile",
-	cooldown: 300,
+	cooldown: 1000,
 	speed: 200,
 	hitPoints: 1,
 	damage: 5,
