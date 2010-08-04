@@ -47,6 +47,17 @@ horde.on = function horde_on (type, fn, target, context) {
 };
 
 /**
+ * Stops an event
+ * @param {object} e Event
+ * @return {void}
+ */
+horde.stopEvent = function horde_stopEvent (e) {
+	e.cancelBubble = true;
+	e.stopPropagation();
+	e.preventDefault();
+};
+
+/**
  * Returns the current UNIX time
  * @return {number} Millisecodns since epoch
  */
@@ -84,7 +95,11 @@ horde.randomRange = function horde_randomRange (min, max) {
 	return (Math.round(Math.random() * (max - min)) + min);
 };
 
-horde.randomDirection = function () {
+/**
+ * Returns a randomly generated direction
+ * @return {horde.Vector2} Direction vector
+ */
+horde.randomDirection = function horde_randomDirection () {
 	var d = new horde.Vector2(
 		horde.randomRange(-10, 10),
 		horde.randomRange(-10, 10)
@@ -93,6 +108,12 @@ horde.randomDirection = function () {
 	return d;
 };
 
+/**
+ * Creates an object of a given type
+ * @param {string} type Object Type (maps to object_types.js)
+ * @param {boolean} supressInit Supress the init for this object?
+ * @return {object} New game object
+ */
 horde.makeObject = function horde_makeObject (type, supressInit) {
 	var obj = new horde.Object();
 	for (var x in horde.objectTypes[type]) {
@@ -173,10 +194,3 @@ horde.directions = {
 		}
 	}
 };
-
-horde.stopEvent = function horde_stopEvent (e) {
-	e.cancelBubble = true;
-	e.stopPropagation();
-	e.preventDefault();
-};
-
