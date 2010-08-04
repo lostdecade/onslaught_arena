@@ -136,16 +136,11 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 
-	var paused;
+	//var paused;
 
 	horde.on("blur", function () {
-		paused = this.paused;
 		this.keyboard.keyStates = {};
 		if (!this.paused) this.togglePause();
-	}, window, this);
-
-	horde.on("focus", function () {
-		if (!paused) this.togglePause();
 	}, window, this);
 
 	// Load just the logo
@@ -185,7 +180,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("eat_food", "sound/effects/chest_food.mp3");
 		s.create("coins", "sound/effects/chest_gold.mp3");
 		s.create("chest_opens", "sound/effects/chest_opens.mp3");
-		s.create("chest_weapon", "sound/effects/chest_weapon.mp3");horde.sound.play
+		s.create("chest_weapon", "sound/effects/chest_weapon.mp3");
 
 		s.create("gate_opens", "sound/effects/gate_opens.mp3");
 		s.create("gate_closes", "sound/effects/gate_closes.mp3");
@@ -952,16 +947,28 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
 
-		if (this.keyboard.isKeyDown(keys.W)) {
+		if (
+			this.keyboard.isKeyDown(keys.W)
+			|| this.keyboard.isKeyDown(keys.UP)
+		) {
 			move.y = -1;
 		}
-		if (this.keyboard.isKeyDown(keys.A)) {
+		if (
+			this.keyboard.isKeyDown(keys.A)
+			|| this.keyboard.isKeyDown(keys.LEFT)
+		) {
 			move.x = -1;
 		}
-		if (this.keyboard.isKeyDown(keys.S)) {
+		if (
+			this.keyboard.isKeyDown(keys.S)
+			|| this.keyboard.isKeyDown(keys.DOWN)
+		) {
 			move.y = 1;
 		}
-		if (this.keyboard.isKeyDown(keys.D)) {
+		if (
+			this.keyboard.isKeyDown(keys.D)
+			|| this.keyboard.isKeyDown(keys.RIGHT)
+		) {
 			move.x = 1;
 		}
 		
@@ -971,11 +978,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			player.setDirection(move);
 		}
 
-		// Have the player fire (space key)
-		if (this.mouse.isButtonDown(buttons.LEFT) || player.autoFire === true) {
+		// Fire using the targeting reticle
+		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			var v = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 			v.subtract(player.position).normalize();
 			this.objectAttack(player, v);
+		}
+		
+		// Fire using the keyboard
+		if (this.keyboard.isKeyDown(keys.SPACE)) {
+			this.objectAttack(player);
 		}
 
 		// Cycle weapons (Z)
