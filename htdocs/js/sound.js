@@ -56,6 +56,7 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 			break;
 		case "html5":
 			var audio = new Audio();
+			audio.preload = "auto";
 			audio.src = url;
 			if (loops) {
 				audio.loops = true; // This is a hack to get resumeAll to work
@@ -65,6 +66,7 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 				}, false);
 			}
 			audio.volume = (volume / 100);
+			audio.load();
 			sounds[id] = audio;
 			break;
 		case "Titanium":
