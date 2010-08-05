@@ -1,11 +1,14 @@
 (function define_horde_Engine () {
 
 const VERSION = 0.3;
+const DEMO = false;
 const DIFFICULTY_INCREMENT = 0.5;
 const NUM_GATES = 3;
 const SCREEN_WIDTH = 640;
 const SCREEN_HEIGHT = 480;
 const GATE_CUTOFF_Y = 64;
+const POINTER_Y_INC = 24;
+const POINTER_Y_START = 280;
 
 /**
  * Creates a new Engine object
@@ -30,6 +33,13 @@ horde.Engine = function horde_Engine () {
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
 	this.gatesY = 0;
+	this.pointerY = POINTER_Y_START;
+
+	if (typeof(Titanium) == "undefined") {
+		this.maxPointerY = (this.pointerY + (POINTER_Y_INC * 2));
+	} else {
+		this.maxPointerY = (this.pointerY + (POINTER_Y_INC * 3));
+	}
 	
 	this.targetReticle = {
 		angle: 0,
@@ -177,6 +187,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("normal_battle_music", "sound/music/normal_battle.mp3", true, 20);
 		s.create("final_battle_music", "sound/music/final_battle.mp3", true, 20);
 
+		s.create("move_pointer", "sound/effects/chest_damage.mp3");
 		s.create("eat_food", "sound/effects/chest_food.mp3");
 		s.create("coins", "sound/effects/chest_gold.mp3");
 		s.create("chest_opens", "sound/effects/chest_opens.mp3");
@@ -911,28 +922,69 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "title") {
+
+		// ZOMG INFINITE TRIDENTS!!!111!!
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			horde.sound.play("chest_opens");
 			this.konamiEntered = true;
+
+			var p = this.getPlayerObject();
+			p.addWeapon("h_trident", null);
 		}
+
 		if (this.keyboard.isKeyPressed(32)) {
+
 			this.keyboard.keyStates[32] = false;
-			if (this.konamiEntered) {
-				// ZOMG INFINITE TRIDENTS!!!111!!
-				var p = this.getPlayerObject();
-				p.addWeapon("h_trident", null);
-			}
 			this.state = "how_to_play";
+
+			switch (this.pointerY) {
+				case POINTER_Y_START:
+					horde.sound.play("normal_battle_music");
+					this.state = "running";
+					break;
+				case (POINTER_Y_START + POINTER_Y_INC):
+					this.state = "how_to_play";
+					break;
+				case (POINTER_Y_START + POINTER_Y_INC*2):
+					this.state = "credits";
+					break;
+				case (POINTER_Y_START + POINTER_Y_INC*3):
+					console.log("Look up how to close an app in Titanium!");
+					break;
+			}
+
 		}
+
+		if (
+			this.keyboard.isKeyPressed(keys.W)
+			|| this.keyboard.isKeyPressed(keys.UP)
+		) {
+			this.keyboard.keyStates[keys.W] = false;
+			this.keyboard.keyStates[keys.UP] = false;
+			this.pointerY -= POINTER_Y_INC;
+			if (this.pointerY < POINTER_Y_START) this.pointerY = this.maxPointerY;
+			horde.sound.play("move_pointer");
+		}
+		if (
+			this.keyboard.isKeyPressed(keys.S)
+			|| this.keyboard.isKeyPressed(keys.DOWN)
+		) {
+			this.keyboard.keyStates[keys.S] = false;
+			this.keyboard.keyStates[keys.DOWN] = false;
+			this.pointerY += POINTER_Y_INC;
+			if (this.pointerY > this.maxPointerY) this.pointerY = POINTER_Y_START;
+			horde.sound.play("move_pointer");
+		}
+
 		this.keyboard.storeKeyStates();
 		return;
+
 	}
 
 	if (this.state === "how_to_play") {
 		if (this.keyboard.isKeyPressed(32)) {
 			this.keyboard.keyStates[32] = false;
-			horde.sound.play("normal_battle_music");
-			this.state = "running";
+			this.state = "title";
 		}
 	}
 
@@ -1338,9 +1390,10 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.globalAlpha = 0.50;
 	ctx.translate(this.mouse.mouseX, this.mouse.mouseY);
 	ctx.rotate(this.targetReticle.angle);
-	ctx.drawImage(this.images.getImage("objects"),
-			256, 192, 64, 64,
-			-32, -32, 64, 64
+	ctx.drawImage(
+		this.images.getImage("objects"),
+		256, 192, 64, 64,
+		-32, -32, 64, 64
 	);
 	ctx.restore();
 };
@@ -1447,11 +1500,30 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.restore();
 	
 	ctx.save();
-	ctx.globalAlpha = this.titleAlpha;
 	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.font = "Bold 35px Monospace";
+	ctx.font = "Bold 24px Monospace";
 	ctx.textAlign = "left";
-	ctx.fillText("Press space to play", 110, 300);
+
+	var textX = 240;
+	var textY = POINTER_Y_START;
+
+	ctx.fillText("Play!", textX, textY);
+	ctx.fillText("How to play", textX, (textY + POINTER_Y_INC));
+	ctx.fillText("Credits", textX, (textY + POINTER_Y_INC*2));
+	if (typeof(Titanium) != "undefined") {
+		ctx.fillText("Exit", textX, (textY + POINTER_Y_INC*3));
+	}
+	ctx.restore();
+
+	// Sword pointer
+	ctx.save();
+	//ctx.globalAlpha = this.titleAlpha;
+	ctx.drawImage(
+		this.images.getImage("objects"),
+		320, 192, 36, 26,
+		(textX - 48), (this.pointerY - 20),
+		36, 26
+	);
 	ctx.restore();
 
 };

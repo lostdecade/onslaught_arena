@@ -59,7 +59,6 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 			audio.preload = "auto";
 			audio.src = url;
 			if (loops) {
-				audio.loops = true; // This is a hack to get resumeAll to work
 				audio.addEventListener('ended', function () {
 					this.currentTime = 0;
 					this.play();
@@ -99,9 +98,11 @@ horde.sound.play = function horde_sound_play (id) {
 			soundManager.play(id);
 			break;
 		case "html5":
-			sounds[id].pause();
-			sounds[id].currentTime = 0;
-			sounds[id].play();
+			try {
+				sounds[id].pause();
+				sounds[id].currentTime = 0;
+				sounds[id].play();
+			} catch (e) {}
 			break;
 		case "Titanium":
 			if (sounds[id].isPlaying()) {

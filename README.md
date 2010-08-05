@@ -4,11 +4,10 @@ Onslaught! is a quick and simple game originally created for the ["Games Inspire
 
 ## Credits
 
-**Design:** Geoff Blair, Matt Hackett
+**Design:** Geoff Blair, [Matt Hackett](http://richtaur.com/)
 
 **Programming:** Geoff Blair, Matt Hackett
 
 **Art:** Matt Hackett
 
-**Music & Sound Effects:** Joshua Morse
- 
+**Music & Sound Effects:** [Joshua Morse](http://jmflava.com/)
