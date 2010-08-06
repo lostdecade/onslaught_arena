@@ -1035,7 +1035,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			return;
 		}
 
-		updateTargetReticle();
+		this.updateTargetReticle();
 
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
