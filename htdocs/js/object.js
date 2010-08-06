@@ -229,10 +229,14 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
  * @return {horde.Rect} Rectangle representing the bounding box
  */
 proto.boundingBox = function horde_Object_proto_boundingBox () {
-	return new horde.Rect(
+	var rect = new horde.Rect(
 		this.position.x, this.position.y,
 		this.size.width - 1, this.size.height - 1
 	);
+	if (this.role === "projectile") {
+		rect.reduce(1);
+	}
+	return rect;
 };
 
 /**
