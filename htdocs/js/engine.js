@@ -1108,21 +1108,27 @@ proto.objectAttack = function (object, v) {
 	switch (weaponType) {
 
 		// Shoot a fireball in each of the 8 directions
+		/*
 		case "h_fireball":
 			for (var d = 0; d < 8; d++) {
 				var dir = horde.directions.toVector(d);
 				this.spawnObject(object, weaponType, dir);
 			}
 			break;
-
+		*/
+		
 		// Shoot 3 knives in a spread pattern
+
 		case "h_knife":
-			var f = horde.directions.fromVector(object.facing);
-			for (var o = -1; o < 2; o++) {
-				var dir = horde.directions.toVector(f + o);
-				this.spawnObject(object, weaponType, dir);
-			}
+			var h = v.heading();
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h - 0.1
+			));
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h + 0.1
+			));
 			break;
+
 
 		// Shoot one instance of the weapon in the same
 		// direction as the object is currently facing

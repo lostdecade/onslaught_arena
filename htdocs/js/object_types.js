@@ -61,16 +61,16 @@ o.h_spear = {
 
 o.h_fireball = {
 	role: "projectile",
-	cooldown: 750,
-	speed: 100,
+	cooldown: 75,
+	speed: 400,
 	hitPoints: 25,
-	damage: 25,
+	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
 	rotate: true,
 	soundAttacks: "fire_attack",
-	ttl: 2000
+	ttl: 350
 };
 
 o.h_trident = {
@@ -746,7 +746,7 @@ o.item_weapon = {
 			case 7:
 			case 8:
 				this.wepType = "h_fireball";
-				this.wepCount = 25;
+				this.wepCount = 200;
 				this.spriteX = 192;
 				break;
 				

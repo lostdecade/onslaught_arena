@@ -99,7 +99,7 @@ proto.addState = function (state, ttl) {
 proto.init = function horde_Object_proto_init () {
 	this.execute("onInit");
 	if (this.spriteAlign) {
-		this.angle = (horde.directions.fromVector(this.facing) * 45);
+		this.angle = this.facing.angle();
 	}
 	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);

@@ -24,6 +24,20 @@ Vector2.fromSize = function horde_Vector2_fromSize (size) {
 };
 
 /**
+ * Creates a vector from a heading (and optionaly a magnitude)
+ * @param {number} heading Heading in radians
+ * @param {number} mag Magnitude (Optional; Defaults to 1)
+ * @return {horde.Vector2}
+ */
+Vector2.fromHeading = function horde_Vector2_fromHeading (heading, mag) {
+	mag = Number(mag) || 1;
+	return new horde.Vector2(
+		Math.sin(heading) * mag,
+		-Math.cos(heading) * mag
+	);
+};
+
+/**
  * Clones this vector
  * @return {horde.Vector2} A clone of this vector
  */
@@ -89,5 +103,13 @@ proto.abs = function horde_Vector2_proto_abs () {
 	this.y = Math.abs(this.y);
 	return this;
 };
-	
+
+proto.angle = function horde_Vector2_proto_angle () {
+	return this.heading() * (180 / Math.PI);
+};
+
+proto.heading = function horde_Vector2_proto_heading () {
+	return Math.atan2(this.x, -this.y);
+};
+
 }());
