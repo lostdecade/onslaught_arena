@@ -90,12 +90,14 @@ o.h_trident = {
 var movementTypes = {
 	chase: function (elapsed, engine) {
 
-		this.moveChangeElapsed += elapsed;
+		if (this.moveChangeDelay > 0) {
+			this.moveChangeElapsed += elapsed;
+			if (this.moveChangeElapsed < this.moveChangeDelay) {
+				return;
+			}
+			this.moveChangeElapsed = 0;
+		}
 
-		if (this.moveChangeElapsed < this.moveChangeDelay) return;
-
-		this.moveChangeElapsed = 0;
-		
 		var p = engine.getPlayerObject();
 		this.chase(p);
 		
@@ -364,7 +366,7 @@ o.dragon = {
 	spriteY: 352,
 
 	moveChangeElapsed: 0,
-	moveChangeDelay: 1000,
+	moveChangeDelay: 0,
 
 	damage: 50,
 	hitPoints: 500,
@@ -377,12 +379,115 @@ o.dragon = {
 
 	weapons: [{type: "e_fireball", count: null}],
 
+	phase: 0,
+	phaseInit: false,
+
 	onInit: function () {
+		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 	},
 	onUpdate: function (elapsed, engine) {
-		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+
+		switch (this.phase) {
+			
+			// Charge out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 50;
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 50) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+
+			// Chase player and shoot fireballs
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 20;
+					this.animDelay = 200;
+					this.weapons = [{type: "e_fireball", count: null}];
+					this.phaseTimer.start(10000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				return movementTypes.chase.apply(this, arguments);
+				break;
+			
+			// Wiggle it!
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 0;
+					this.animDelay = 100;
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				break;
+			
+			// Charge player
+			case 3:
+				if (!this.phaseInit) {
+					this.speed = 350;
+					this.animDelay = 100;
+					this.phaseTimer.start(500);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				var p = engine.getPlayerObject();
+				this.chase(p);
+				break;
+			
+			// Stand still and spew flames!
+			case 4:
+				if (!this.phaseInit) {
+					this.speed = 0;
+					this.animDelay = 400;
+					this.weapons = [{type: "e_fireball_2", count: null}];
+					this.cooldown = false;
+					this.cooldownElapsed = 0;
+					this.phaseTimer.start(10000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				var p = engine.getPlayerObject();
+				this.chase(p);
+				return "shoot";
+				break;
+			
+			// Kinda stunned, allow player to get some shots in
+			case 5:
+				if (!this.phaseInit) {
+					this.speed = 10;
+					this.animDelay = 400;
+					this.phaseTimer.start(3000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase = 1;
+					this.phaseInit = false;
+				}
+				movementTypes.wander.apply(this, arguments);
+				break;
+			
+		}
+
 	}
 
 };
@@ -448,6 +553,20 @@ o.e_fireball = {
 	spriteY: 0,
 	rotate: true
 };
+
+o.e_fireball_2 = {
+	role: "projectile",
+	cooldown: 75,
+	speed: 350,
+	hitPoints: 9999,
+	damage: 15,
+	spriteSheet: "objects",
+	spriteX: 352,
+	spriteY: 0,
+	rotate: true,
+	ttl: 750
+};
+
 
 // OTHER SHIT
 
