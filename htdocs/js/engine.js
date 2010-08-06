@@ -28,7 +28,7 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
-	
+		
 	this.gateDirection = ""; // Set to "up" or "down"
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
@@ -43,7 +43,8 @@ horde.Engine = function horde_Engine () {
 	
 	this.targetReticle = {
 		angle: 0,
-		rotateSpeed: 1
+		rotateSpeed: 1,
+		position: new horde.Vector2()
 	};
 };
 
@@ -900,6 +901,42 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 };
 
 /**
+ * Updates the targeting reticle position based on mouse input
+ * @return {void}
+ */
+proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
+	
+	// Grab the current mouse position as a vector
+	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
+
+	// Keep the targeting reticle inside of the play area
+	// NOTE: This will need to be update if the non-blocked map area changes
+	var mouseBounds = new horde.Rect(
+		32, 64, SCREEN_WIDTH - 64, SCREEN_HEIGHT - 160);
+
+	var trp = this.targetReticle.position;
+
+	// Adjust the X position
+	if (mouseV.x < mouseBounds.left) {
+		trp.x = mouseBounds.left;
+	} else if (mouseV.x > mouseBounds.left + mouseBounds.width) {
+		trp.x = mouseBounds.left + mouseBounds.width;
+	} else {
+		trp.x = mouseV.x;
+	}
+
+	// Adjust the Y position
+	if (mouseV.y < mouseBounds.top) {
+		trp.y = mouseBounds.top;
+	} else if (mouseV.y > mouseBounds.top + mouseBounds.height) {
+		trp.y = mouseBounds.top + mouseBounds.height;
+	} else {
+		trp.y = mouseV.y;
+	}
+	
+};
+
+/**
  * Handles game input
  * @return {void}
  */
@@ -907,6 +944,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	var keys = horde.Keyboard.Keys;
 	var buttons = horde.Mouse.Buttons;
+
+	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 
 	if (this.state == "running") {
 		// Press "p" to pause.
@@ -996,6 +1035,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			return;
 		}
 
+		updateTargetReticle();
+
 		// Determine which way we should move the player
 		var move = new horde.Vector2();
 
@@ -1032,8 +1073,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Fire using the targeting reticle
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
-			var v = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
-			v.subtract(player.position).normalize();
+			var v = this.targetReticle.position.clone().subtract(player.position).normalize();
 			this.objectAttack(player, v);
 		}
 		
@@ -1388,7 +1428,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.save();
 	ctx.globalAlpha = 0.50;
-	ctx.translate(this.mouse.mouseX, this.mouse.mouseY);
+	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
 		this.images.getImage("objects"),
