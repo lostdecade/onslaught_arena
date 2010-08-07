@@ -165,7 +165,8 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"title": "img/title.png",
 		"how_to_play": "img/how_to_play.png",
-		"background": "img/arena.png",
+		"arena_floor": "img/arena_floor.png",
+		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png"
@@ -1172,7 +1173,7 @@ proto.render = function horde_Engine_proto_render () {
 		
 		// Title Screen
 		case "title":
-			this.drawBackground(ctx);
+			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawTitle(ctx);
@@ -1180,7 +1181,7 @@ proto.render = function horde_Engine_proto_render () {
 
 		// How to Play
 		case "how_to_play":
-			this.drawBackground(ctx);
+			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
 			this.drawTitle(ctx);
@@ -1189,8 +1190,9 @@ proto.render = function horde_Engine_proto_render () {
 
 		// The game!
 		case "running":
-			this.drawBackground(ctx);
+			this.drawFloor(ctx);
 			this.drawTargetReticle(ctx);
+			this.drawWalls(ctx);
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
@@ -1296,12 +1298,25 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 	
 };
 
-proto.drawBackground = function horde_Engine_proto_drawBackground (ctx) {
+proto.drawFloor = function horde_Engine_proto_drawFloor (ctx) {
 	ctx.drawImage(
-		this.images.getImage("background"),
+		this.images.getImage("arena_floor"),
+		0, 0, 576, 386,
+		32, 0, 576, 386
+	);
+};
+
+proto.drawWalls = function horde_Engine_proto_drawWalls (ctx) {
+	ctx.drawImage(
+		this.images.getImage("arena_walls"),
 		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
 		0, 0, this.view.width, this.view.height
 	);
+};
+
+proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
+	this.drawFloor(ctx);
+	this.drawWalls(ctx);
 };
 
 proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
