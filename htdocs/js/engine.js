@@ -9,6 +9,8 @@ const SCREEN_HEIGHT = 480;
 const GATE_CUTOFF_Y = 64;
 const POINTER_Y_INC = 24;
 const POINTER_Y_START = 280;
+const KEY_ENTER = 13;
+const KEY_SPACE = 32;
 
 /**
  * Creates a new Engine object
@@ -165,6 +167,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"title": "img/title.png",
 		"how_to_play": "img/how_to_play.png",
+		"credits": "img/credits.png",
 		"arena_floor": "img/arena_floor.png",
 		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
@@ -462,8 +465,9 @@ proto.logoFadeOut = function () {
 
 proto.updateLogo = function (elapsed) {
 
-	if (this.keyboard.keyStates[32]) {
-		this.keyboard.keyStates[32] = false; // HACK: not very elegant to force the key off
+	if (this.keyboard.keyStates[KEY_ENTER] || this.keyboard.keyStates[KEY_SPACE]) {
+		this.keyboard.keyStates[KEY_ENTER] = false; // HACK: not very elegant to force the key off
+		this.keyboard.keyStates[KEY_SPACE] = false; // HACK: not very elegant to force the key off
 		this.initGame();
 	}
 
@@ -514,6 +518,11 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			break;
 
 		case "how_to_play":
+			this.handleInput();
+			this.render();
+			break;
+
+		case "credits":
 			this.handleInput();
 			this.render();
 			break;
@@ -913,7 +922,8 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 	// Keep the targeting reticle inside of the play area
 	// NOTE: This will need to be update if the non-blocked map area changes
 	var mouseBounds = new horde.Rect(
-		32, 64, SCREEN_WIDTH - 64, SCREEN_HEIGHT - 160);
+		32, 64, SCREEN_WIDTH - 64, SCREEN_HEIGHT - 160
+	);
 
 	var trp = this.targetReticle.position;
 
@@ -972,10 +982,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			p.addWeapon("h_trident", null);
 		}
 
-		if (this.keyboard.isKeyPressed(32)) {
+		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
 
-			this.keyboard.keyStates[32] = false;
-			this.state = "how_to_play";
+			this.keyboard.keyStates[KEY_ENTER] = false;
+			this.keyboard.keyStates[KEY_SPACE] = false;
 
 			switch (this.pointerY) {
 				case POINTER_Y_START:
@@ -1022,8 +1032,17 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "how_to_play") {
-		if (this.keyboard.isKeyPressed(32)) {
-			this.keyboard.keyStates[32] = false;
+		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
+			this.keyboard.keyStates[KEY_ENTER] = false;
+			this.keyboard.keyStates[KEY_SPACE] = false;
+			this.state = "title";
+		}
+	}
+
+	if (this.state === "credits") {
+		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
+			this.keyboard.keyStates[KEY_ENTER] = false;
+			this.keyboard.keyStates[KEY_SPACE] = false;
 			this.state = "title";
 		}
 	}
@@ -1188,6 +1207,15 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawHowToPlay(ctx);
 			break;
 
+		// Credits
+		case "credits":
+			this.drawArena(ctx);
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			this.drawTitle(ctx);
+			this.drawCredits(ctx);
+			break;
+
 		// The game!
 		case "running":
 			this.drawFloor(ctx);
@@ -1248,8 +1276,8 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	if (this.gameOverReady === true) {
 
-		if (this.keyboard.keyStates[32]) {
-			this.keyboard.keyStates[32] = false; // HACK: not very elegant to force the key off
+		if (this.keyboard.keyStates[KEY_SPACE]) {
+			this.keyboard.keyStates[KEY_SPACE] = false; // HACK: not very elegant to force the key off
 			this.initGame();
 			return;
 		}
@@ -1590,10 +1618,27 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 };
 
 proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
+	ctx.save();
+	ctx.globalAlpha = 0.5;
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.globalAlpha = 1;
 	ctx.drawImage(
 		this.images.getImage("how_to_play"),
-		40, 40, 560, 400
+		38, 38, 564, 404
 	);
+	ctx.restore();
+};
+
+proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
+	ctx.save();
+	ctx.globalAlpha = 0.5;
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.globalAlpha = 1;
+	ctx.drawImage(
+		this.images.getImage("credits"),
+		38, 38, 564, 404
+	);
+	ctx.restore();
 };
 
 /**
