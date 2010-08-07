@@ -152,6 +152,7 @@ proto.init = function horde_Engine_proto_init () {
 	//var paused;
 
 	horde.on("blur", function () {
+		if (this.state != "running") return;
 		this.keyboard.keyStates = {};
 		if (!this.paused) this.togglePause();
 	}, window, this);
