@@ -442,13 +442,13 @@ o.dragon = {
 					this.animDelay = 100;
 					this.phaseTimer.start(500);
 					this.phaseInit = true;
+					var p = engine.getPlayerObject();
+					this.chase(p);
 				}
 				if (this.phaseTimer.expired()) {
 					this.phase++;
 					this.phaseInit = false;
 				}
-				var p = engine.getPlayerObject();
-				this.chase(p);
 				break;
 			
 			// Stand still and spew flames!
@@ -496,7 +496,7 @@ o.dragon = {
 
 o.e_arrow = {
 	role: "projectile",
-	cooldown: 1000,
+	cooldown: 3000,
 	speed: 200,
 	hitPoints: 1,
 	damage: 5,
