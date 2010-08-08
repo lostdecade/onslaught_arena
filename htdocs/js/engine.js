@@ -107,6 +107,28 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 };
 
 /**
+ * Returns the RGB for either red, orange or green depending on the percentage.
+ * @param {Number} max The max number, eg 100.
+ * @param {Number current The current number, eg 50 (which would be 50%).
+ * @return {String} The RGB value based on the percentage.
+ */
+proto.getBarColor = function (max, current) {
+
+	var percentage = ((current / max) * 100);
+
+	console.log(max, current, percentage);
+
+	if (percentage > 50) {
+		return "rgb(98, 187, 70)";
+	} else if (percentage > 25) {
+		return "rgb(246, 139, 31)";
+	} else {
+		return "rgb(190, 22, 29)";
+	}
+
+};
+
+/**
  * Spawns an object from a parent object
  * @param {horde.Object} parent Parent object
  * @param {string} type Type of object to spawn
@@ -1449,19 +1471,20 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 		);
 
-		var hpWidth = (o.size.width - 2);
-		var hpHeight = 8;
-		var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
-
+		// HP bar
 		if (
 			(this.debug && (o.role === "monster"))
 			|| (o.badass && !o.hasState(horde.Object.states.DYING))
 		) {
+			var hpWidth = (o.size.width - 2);
+			var hpHeight = 8;
+			var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
+
 			ctx.fillStyle = "rgb(255, 255, 255)";
 			ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
 			ctx.fillStyle = "rgb(0, 0, 0)";
 			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), (o.size.width - 2), (hpHeight - 2));
-			ctx.fillStyle = "rgb(190, 22, 29)";
+			ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
 			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), width, (hpHeight - 2));
 		}
 
@@ -1508,9 +1531,9 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	
 	// Draw health bar
 	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
-	ctx.save();
 
 	// Outside border
+	ctx.save();
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
 	ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
@@ -1518,20 +1541,26 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
 
 	// The bar itself
+	ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
+	ctx.globalAlpha = 0.6;
+	ctx.fillRect(bar.x, bar.y, width, bar.height);
+	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
+	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
+	ctx.restore();
+/*
 	ctx.fillStyle = "rgb(190, 22, 29)";
 	ctx.fillRect(bar.x, bar.y, width, bar.height);
 	ctx.fillStyle = "rgb(238, 28, 36)";
 	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
 	ctx.fillStyle = "rgb(243, 97, 102)";
 	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
+*/
 
 	// Heart icon
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		64, 192, 42, 42, 18, 424, 42, 42
 	);
-
-	ctx.restore();
 	
 	// Draw gold coin
 	ctx.drawImage(
