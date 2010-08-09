@@ -116,8 +116,6 @@ proto.getBarColor = function (max, current) {
 
 	var percentage = ((current / max) * 100);
 
-	console.log(max, current, percentage);
-
 	if (percentage > 50) {
 		return "rgb(98, 187, 70)";
 	} else if (percentage > 25) {
