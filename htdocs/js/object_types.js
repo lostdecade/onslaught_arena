@@ -608,7 +608,7 @@ o.small_skull = {
 	spriteX: 64,
 	spriteY: 64,
 	rotate: true,
-	rotateSpeed: 50,
+	rotateSpeed: 50
 };
 
 o.small_giblet = {
@@ -634,7 +634,7 @@ o.medium_skull = {
 	spriteX: 32,
 	spriteY: 64,
 	rotate: true,
-	rotateSpeed: 50,
+	rotateSpeed: 50
 };
 
 o.medium_giblet = {
@@ -660,7 +660,7 @@ o.large_skull = {
 	spriteX: 0,
 	spriteY: 64,
 	rotate: true,
-	rotateSpeed: 50,
+	rotateSpeed: 50
 };
 
 o.large_giblet = {

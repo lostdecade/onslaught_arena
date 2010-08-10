@@ -6,7 +6,7 @@
 <version>0.1</version>
 <publisher>Lost Decade Games</publisher>
 <url>http://lostdecadegames.com</url>
-<icon>default_app_logo.png</icon>
+<icon>icon.png</icon>
 <copyright>2010 by Lost Decade Games</copyright>
 <!-- Window Definition - these values can be edited -->
 <window>
