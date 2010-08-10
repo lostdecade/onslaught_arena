@@ -9,8 +9,6 @@ const SCREEN_HEIGHT = 480;
 const GATE_CUTOFF_Y = 64;
 const POINTER_Y_INC = 24;
 const POINTER_Y_START = 280;
-const KEY_ENTER = 13;
-const KEY_SPACE = 32;
 
 /**
  * Creates a new Engine object
@@ -486,9 +484,12 @@ proto.logoFadeOut = function () {
 
 proto.updateLogo = function (elapsed) {
 
-	if (this.keyboard.keyStates[KEY_ENTER] || this.keyboard.keyStates[KEY_SPACE]) {
-		this.keyboard.keyStates[KEY_ENTER] = false; // HACK: not very elegant to force the key off
-		this.keyboard.keyStates[KEY_SPACE] = false; // HACK: not very elegant to force the key off
+	var kb = this.keyboard;
+	var keys = horde.Keyboard.Keys;
+
+	if (kb.isKeyDown(keys.ENTER) || kb.isKeyDown(keys.SPACE)) {
+		kb.clearKey(keys.ENTER);
+		kb.clearKey(keys.SPACE);
 		this.initGame();
 	}
 
@@ -941,7 +942,7 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 
 	// Keep the targeting reticle inside of the play area
-	// NOTE: This will need to be update if the non-blocked map area changes
+	// NOTE: This will need to be updated if the non-blocked map area changes
 	var mouseBounds = new horde.Rect(
 		32, 64, SCREEN_WIDTH - 64, SCREEN_HEIGHT - 160
 	);
@@ -974,6 +975,7 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
  */
 proto.handleInput = function horde_Engine_proto_handleInput () {
 
+	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 	var buttons = horde.Mouse.Buttons;
 
@@ -1003,10 +1005,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			p.addWeapon("h_trident", null);
 		}
 
-		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
-
-			this.keyboard.keyStates[KEY_ENTER] = false;
-			this.keyboard.keyStates[KEY_SPACE] = false;
+		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+		
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
 
 			switch (this.pointerY) {
 				case POINTER_Y_START:
@@ -1020,7 +1022,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.state = "credits";
 					break;
 				case (POINTER_Y_START + POINTER_Y_INC*3):
-					console.log("Look up how to close an app in Titanium!");
+					if (Titanium) {
+						Titanium.App.exit();
+					}
 					break;
 			}
 
@@ -1053,17 +1057,17 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "how_to_play") {
-		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
-			this.keyboard.keyStates[KEY_ENTER] = false;
-			this.keyboard.keyStates[KEY_SPACE] = false;
+		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
 			this.state = "title";
 		}
 	}
 
 	if (this.state === "credits") {
-		if (this.keyboard.isKeyPressed(KEY_ENTER) || this.keyboard.isKeyPressed(KEY_SPACE)) {
-			this.keyboard.keyStates[KEY_ENTER] = false;
-			this.keyboard.keyStates[KEY_SPACE] = false;
+		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
 			this.state = "title";
 		}
 	}
@@ -1071,7 +1075,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	if (this.state === "running") {
 		var player = this.getPlayerObject();
 
-		if (player.hasState(horde.Object.states.DYING)) {
+		if (this.paused || player.hasState(horde.Object.states.DYING)) {
 			this.keyboard.storeKeyStates();
 			return;
 		}
@@ -1297,8 +1301,8 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	if (this.gameOverReady === true) {
 
-		if (this.keyboard.keyStates[KEY_SPACE]) {
-			this.keyboard.keyStates[KEY_SPACE] = false; // HACK: not very elegant to force the key off
+		if (this.keyboard.isKeyDown(horde.Keyboard.Keys.SPACE)) {
+			this.keyboard.clearKey(horde.Keyboard.Keys.SPACE);
 			this.initGame();
 			return;
 		}
