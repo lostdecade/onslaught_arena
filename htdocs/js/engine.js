@@ -116,8 +116,6 @@ proto.getBarColor = function (max, current) {
 
 	var percentage = ((current / max) * 100);
 
-	console.log(max, current, percentage);
-
 	if (percentage > 50) {
 		return "rgb(98, 187, 70)";
 	} else if (percentage > 25) {
@@ -1547,14 +1545,6 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
 	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
 	ctx.restore();
-/*
-	ctx.fillStyle = "rgb(190, 22, 29)";
-	ctx.fillRect(bar.x, bar.y, width, bar.height);
-	ctx.fillStyle = "rgb(238, 28, 36)";
-	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
-	ctx.fillStyle = "rgb(243, 97, 102)";
-	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
-*/
 
 	// Heart icon
 	ctx.drawImage(
