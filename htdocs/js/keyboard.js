@@ -12,6 +12,7 @@ var Keyboard = horde.Keyboard;
 var proto = Keyboard.prototype;
 
 Keyboard.Keys = {
+	ENTER: 13,
 	SPACE: 32,
 	LEFT: 37,
 	UP: 38,
@@ -44,20 +45,21 @@ Keyboard.konamiCode = [
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
-		case 37: // left
-		case 38: // up
-		case 39: // right 
-		case 40: // down 
-		case 66: // B
-		case 65: // A
-		case 77: // M
-		case 90: // Z
-		case 88: // Z
-		case 80: // P
-		case 32: // space
-		case 87: // W
-		case 83: // S
-		case 68: // D
+		case Keyboard.Keys.ENTER:
+		case Keyboard.Keys.LEFT:
+		case Keyboard.Keys.UP:
+		case Keyboard.Keys.RIGHT:
+		case Keyboard.Keys.DOWN:
+		case Keyboard.Keys.B:
+		case Keyboard.Keys.A:
+		case Keyboard.Keys.M:
+		case Keyboard.Keys.Z:
+		case Keyboard.Keys.X:
+		case Keyboard.Keys.P:
+		case Keyboard.Keys.SPACE:
+		case Keyboard.Keys.W:
+		case Keyboard.Keys.S:
+		case Keyboard.Keys.D:
 			horde.stopEvent(e);
 			break;
 	}
@@ -80,6 +82,10 @@ proto.isKeyDown = function (keyCode) {
 
 proto.isKeyPressed = function (keyCode) {
 	return (this.isKeyDown(keyCode) && this.lastKeyStates[keyCode] !== true);
+};
+
+proto.clearKey = function (keyCode) {
+	this.keyStates[keyCode] = false;
 };
 
 proto.historyMatch = function (keys) {
