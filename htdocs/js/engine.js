@@ -1,14 +1,14 @@
 (function define_horde_Engine () {
 
-const VERSION = 0.3;
-const DEMO = false;
-const DIFFICULTY_INCREMENT = 0.5;
-const NUM_GATES = 3;
-const SCREEN_WIDTH = 640;
-const SCREEN_HEIGHT = 480;
-const GATE_CUTOFF_Y = 64;
-const POINTER_Y_INC = 24;
-const POINTER_Y_START = 280;
+var VERSION = 0.3;
+var DEMO = false;
+var DIFFICULTY_INCREMENT = 0.5;
+var NUM_GATES = 3;
+var SCREEN_WIDTH = 640;
+var SCREEN_HEIGHT = 480;
+var GATE_CUTOFF_Y = 64;
+var POINTER_Y_INC = 24;
+var POINTER_Y_START = 280;
 
 /**
  * Creates a new Engine object
@@ -107,7 +107,7 @@ proto.addObject = function horde_Engine_proto_addObject (object) {
 /**
  * Returns the RGB for either red, orange or green depending on the percentage.
  * @param {Number} max The max number, eg 100.
- * @param {Number current The current number, eg 50 (which would be 50%).
+ * @param {Number} current The current number, eg 50 (which would be 50%).
  * @return {String} The RGB value based on the percentage.
  */
 proto.getBarColor = function (max, current) {
@@ -336,7 +336,7 @@ proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
 /**
  * Queues up a wave of spawns in the spawn points
  * @param {horde.SpawnWave} Wave to spawn
- * @param {void}
+ * @return {void}
  */
 proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 	var longestTTS = 0;
