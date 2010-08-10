@@ -1020,7 +1020,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.state = "credits";
 					break;
 				case (POINTER_Y_START + POINTER_Y_INC*3):
-					console.log("Look up how to close an app in Titanium!");
+					if (Titanium) {
+						Titanium.App.exit();
+					}
 					break;
 			}
 
