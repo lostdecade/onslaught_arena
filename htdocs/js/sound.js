@@ -38,8 +38,12 @@ horde.sound.init = function horde_sound_init (callback) {
 };
 
 horde.sound.create = function horde_sound_create (id, url, loops, volume) {
+
 	loops = loops || false;
-	volume = Number(volume) || 100;
+	if (!volume && volume !== 0) {
+		volume = 100;
+	}
+
 	switch (api) {
 		case "SoundManager2":
 			var params = {
@@ -64,8 +68,8 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 					this.play();
 				}, false);
 			}
-			audio.volume = (volume / 100);
 			audio.load();
+			audio.volume = volume / 100;
 			sounds[id] = audio;
 			break;
 		case "Titanium":
