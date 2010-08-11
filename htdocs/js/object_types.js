@@ -383,6 +383,7 @@ o.wizard = {
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.moveToY = horde.randomRange(50, 75);
 	},
 	onUpdate: function (elapsed, engine) {
 		
@@ -393,7 +394,7 @@ o.wizard = {
 				if (!this.phaseInit) {
 					this.phaseInit = true;
 				}
-				if (this.position.y >= 50) {
+				if (this.position.y >= this.moveToY) {
 					this.phase++;
 					this.phaseInit = false;
 				}
@@ -404,7 +405,7 @@ o.wizard = {
 				if (!this.phaseInit) {
 					this.stopMoving();
 					this.addState(horde.Object.states.INVINCIBLE);
-					this.phaseTimer.start(2000);
+					this.phaseTimer.start(1000);
 					this.phaseInit = true;
 				}
 				if (this.phaseTimer.expired()) {
@@ -418,7 +419,7 @@ o.wizard = {
 				if (!this.phaseInit) {
 					this.speed = 400;
 					this.addState(horde.Object.states.INVISIBLE);
-					this.phaseTimer.start(horde.randomRange(5000, 10000));
+					this.phaseTimer.start(horde.randomRange(3000, 10000));
 					this.phaseInit = true;
 				}
 				movementTypes.wander.apply(this, arguments);
@@ -433,7 +434,7 @@ o.wizard = {
 				if (!this.phaseInit) {
 					this.stopMoving();
 					this.removeState(horde.Object.states.INVISIBLE);
-					this.phaseTimer.start(2000);
+					this.phaseTimer.start(1000);
 					this.phaseInit = true;
 				}
 				if (this.phaseTimer.expired()) {
@@ -447,8 +448,9 @@ o.wizard = {
 				if (!this.phaseInit) {
 					this.speed = 0;
 					this.removeState(horde.Object.states.INVINCIBLE);
-					this.phaseTimer.start(horde.randomRange(3000, 5000));
+					this.phaseTimer.start(horde.randomRange(2000, 3000));
 					this.phaseInit = true;
+					this.shotOnce = false;
 				}
 				var p = engine.getPlayerObject();
 				this.chase(p);
@@ -456,7 +458,10 @@ o.wizard = {
 					this.phase = 1;
 					this.phaseInit = false;
 				}
-				return "shoot";
+				if (!this.shotOnce) {
+					this.shotOnce = true;
+					return "shoot";
+				}
 				break;
 
 		}
