@@ -78,10 +78,9 @@ horde.makeCanvas = function horde_makeCanvas (id, width, height, hidden) {
 	canvas.id = id;
 	canvas.width = Number(width) || 0;
 	canvas.height = Number(height) || 0;
-	if (hidden === true) {
-		canvas.style.display = "none";
+	if (hidden !== true) {
+		document.body.appendChild(canvas);
 	}
-	document.body.appendChild(canvas);
 	return canvas;
 };
 

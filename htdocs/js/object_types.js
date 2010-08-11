@@ -355,6 +355,105 @@ o.superclops = {
 
 };
 
+o.imp = {
+
+	role: "monster",
+	team: 1,
+
+	speed: 100,
+
+	hitPoints: 35,
+	damage: 15,
+
+	worth: 50,
+
+	spriteSheet: "characters",
+	spriteY: 448,
+	animated: true,
+
+	gibletSize: "medium",
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 3000,
+	
+	/*
+	weapons: [
+		{type: "e_energy_ball", count: null}
+	],
+	*/
+
+	// TODO: Imp sounds?
+	soundAttacks: "bat_attacks",
+	soundDamage: "bat_damage",
+	soundDies: "bat_dies",
+	
+	phase: 0,
+	phaseInit: false,
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+	},
+	
+	onKilled: function (attacker, engine) {
+		if (attacker.role === "projectile") {
+			attacker.die();
+		}
+		for (var x = 0; x < 2; x++) {
+			engine.spawnObject(this, "dire_bat", horde.randomDirection());
+		}
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			// Move past the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 50) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+			
+			// Wander slowly
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 50;
+					this.animDelay = 400;
+					this.phaseTimer.start(2500, 7500);
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+			
+			// Wander fast!
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 150;
+					this.animDelay = 150;
+					this.phaseTimer.start(2500, 7500);
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this. arguments);
+				if (this.phaseTimer.expired()) {
+					this.phase = 1;
+					this.phaseInit = false;
+				}
+				break;
+			
+		}
+		
+	}
+};
+
 o.wizard = {
 	role: "monster",
 	team: 1,
@@ -404,6 +503,7 @@ o.wizard = {
 			// Phase out
 			case 1:
 				if (!this.phaseInit) {
+					this.animated = false;
 					this.stopMoving();
 					this.addState(horde.Object.states.INVINCIBLE);
 					this.phaseTimer.start(1000);
@@ -448,6 +548,7 @@ o.wizard = {
 			case 4:
 				if (!this.phaseInit) {
 					this.speed = 0;
+					this.animated = true;
 					this.removeState(horde.Object.states.INVINCIBLE);
 					this.phaseTimer.start(horde.randomRange(2000, 3000));
 					this.phaseInit = true;

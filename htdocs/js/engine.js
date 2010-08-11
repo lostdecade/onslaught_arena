@@ -166,9 +166,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
-
-	//var paused;
-
+	
 	horde.on("blur", function () {
 		if (this.state != "running") return;
 		this.keyboard.keyStates = {};
@@ -184,7 +182,6 @@ proto.init = function horde_Engine_proto_init () {
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		//"title": "img/title.png",
 		"title_screen": "img/title_screen.png",
 		"how_to_play": "img/how_to_play.png",
 		"credits": "img/credits.png",
@@ -366,19 +363,6 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
  */
 proto.initWaves = function horde_Engine_proto_initWaves () {
 	
-	/*
-	1. Goblins
-	2. Bats & Dire Bats
-	3. Cyclops & Goblins
-	4. Ton o' Goblins
-	5. Superclops & Goblins
-	6. Cyclops & Goblins
-	7. Demoblins
-	8. Cyclops & demoblins
-	9. Dire Bats
-	10. Dragon & Dire Bats
-	*/
-	
 	this.waves = [];
 	this.waveTimer = new horde.Timer();
 	this.waveTimer.start(1);
@@ -437,18 +421,29 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
-	// TESTING WAVE
+	// Wave #6
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
-	w.addSpawnPoint(2, 200);
-	w.nextWaveTime = 60000 * 10;
+	w.addSpawnPoint(0, 750);
+	w.addSpawnPoint(1, 750);
+	w.addSpawnPoint(2, 750);
+	w.addObjects(0, "imp", 3);
+	w.addObjects(1, "imp", 3);
+	w.addObjects(2, "imp", 3);
+	w.nextWaveTime = 60000; // 1 min
+	this.waves.push(w);
+
+	// Wave #7
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1500);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1500);
 	w.addObjects(0, "wizard", 2);
-	w.addObjects(1, "wizard", 2);
+	w.addObjects(1, "wizard", 1);
 	w.addObjects(2, "wizard", 2);
+	w.nextWaveTime = 60000; // 1 min
 	this.waves.push(w);
 	
-	// Wave 6
+	// Wave #8
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 300);
 	w.addSpawnPoint(1, 300);
@@ -459,7 +454,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 120000; // 2 min
 	this.waves.push(w);
 
-	// Wave 7
+	// Wave #9
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 50);
 	w.addSpawnPoint(1, 12000);
@@ -949,6 +944,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 				owner.gold += defender.worth;
 			}
 		}
+		defender.execute("onKilled", [attacker, this]);
 		if (defender.role === "monster") {
 			this.spawnLoot(defender.position.clone());
 		}
