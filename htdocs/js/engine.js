@@ -184,7 +184,8 @@ proto.init = function horde_Engine_proto_init () {
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		"title": "img/title.png",
+		//"title": "img/title.png",
+		"title_screen": "img/title_screen.png",
 		"how_to_play": "img/how_to_play.png",
 		"credits": "img/credits.png",
 		"arena_floor": "img/arena_floor.png",
@@ -384,17 +385,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
 
-	// TESTING WAVE
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
-	w.addSpawnPoint(2, 200);
-	w.nextWaveTime = 60000 * 10;
-	w.addObjects(0, "wizard", 2);
-	w.addObjects(1, "wizard", 2);
-	w.addObjects(2, "wizard", 2);
-	this.waves.push(w);
-
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
@@ -445,6 +435,17 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "superclops", 1);
 	w.addObjects(2, "goblin", 5);
 	w.nextWaveTime = 120000; // 2 min
+	this.waves.push(w);
+
+	// TESTING WAVE
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(2, 200);
+	w.nextWaveTime = 60000 * 10;
+	w.addObjects(0, "wizard", 2);
+	w.addObjects(1, "wizard", 2);
+	w.addObjects(2, "wizard", 2);
 	this.waves.push(w);
 	
 	// Wave 6
@@ -1044,7 +1045,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.state = "credits";
 					break;
 				case (POINTER_Y_START + POINTER_Y_INC*3):
-					if (Titanium) {
+					if (typeof(Titanium) != "undefined") {
 						Titanium.App.exit();
 					}
 					break;
@@ -1239,26 +1240,32 @@ proto.render = function horde_Engine_proto_render () {
 		
 		// Title Screen
 		case "title":
+/*
 			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
+*/
 			this.drawTitle(ctx);
 			break;
 
 		// How to Play
 		case "how_to_play":
+/*
 			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
+*/
 			this.drawTitle(ctx);
 			this.drawHowToPlay(ctx);
 			break;
 
 		// Credits
 		case "credits":
+/*
 			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
+*/
 			this.drawTitle(ctx);
 			this.drawCredits(ctx);
 			break;
@@ -1529,7 +1536,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		256, 192, 64, 64,
+		192 /* 256 is purple */, 192, 64, 64,
 		-32, -32, 64, 64
 	);
 	ctx.restore();
@@ -1601,11 +1608,16 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 };
 
+/**
+ * Draws the title screen.
+ * @param {object} Canvas 2d context to draw on.
+ * @return {void}
+ */
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	
 	ctx.drawImage(
-		this.images.getImage("title"),
-		320 - (483 / 2), 120
+		this.images.getImage("title_screen"),
+		0, 0
 	);
 	
 	if (!this.titleAlphaStep) {
@@ -1623,7 +1635,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		}
 	}
 
-	var version = "v" + VERSION + " \u00A9 Lost Decade Games";
+	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
 	ctx.save();
 	ctx.globalAlpha = 1;
 	ctx.font = "Bold 16px Monospace";
@@ -1633,9 +1645,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.fillText(version, 630, 470);
 	ctx.restore();
+
+	ctx.save();
+	ctx.globalAlpha = 0.75;
+	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillRect(185, 245, 270, 105);
+	ctx.restore();
 	
 	ctx.save();
-	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 24px Monospace";
 	ctx.textAlign = "left";
 

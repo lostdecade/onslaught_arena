@@ -289,6 +289,7 @@ o.demoblin = {
 o.cyclops = {
 	role: "monster",
 	team: 1,
+	badass: true,
 
 	animated: true,
 	gibletSize: "large",
@@ -300,7 +301,7 @@ o.cyclops = {
 	moveChangeDelay: 1000,
 
 	damage: 25,
-	hitPoints: 75,
+	hitPoints: 100,
 	speed: 25,
 	worth: 100,
 
