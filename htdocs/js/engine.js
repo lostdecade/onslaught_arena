@@ -384,6 +384,17 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
 
+	// TESTING WAVE
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(2, 200);
+	w.nextWaveTime = 60000 * 10;
+	w.addObjects(0, "wizard", 2);
+	w.addObjects(1, "wizard", 2);
+	w.addObjects(2, "wizard", 2);
+	this.waves.push(w);
+
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
@@ -867,13 +878,24 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			this.moveObject(o, elapsed);
 		}
 
-		if (o.role === "fluff" || o.role === "powerup_food" || o.hasState(horde.Object.states.DYING)) {
+		if (
+			o.role === "fluff" 
+			|| o.role === "powerup_food" 
+			|| o.hasState(horde.Object.states.DYING)
+			|| o.hasState(horde.Object.states.INVISIBLE)
+		) {
 			continue;
 		}
 		
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
-			if (o2.isDead() || o2.team === o.team || o2.role === "fluff" || o2.hasState(horde.Object.states.DYING)) {
+			if (
+				o2.isDead() 
+				|| o2.team === o.team 
+				|| o2.role === "fluff" 
+				|| o2.hasState(horde.Object.states.DYING)
+				|| o2.hasState(horde.Object.states.INVISIBLE)
+			) {
 				continue;
 			}
 			// Reduce the size of the bounding boxes a tad when evaluating object => object collision
@@ -1439,7 +1461,7 @@ horde.Engine.prototype.drawObjects = function (ctx) {
 		var o = this.objects[drawOrder[x].id];
 		var s = o.getSpriteXY();
 		
-		if (o.alpha <= 0) {
+		if (o.alpha <= 0 || o.hasState(horde.Object.states.INVISIBLE)) {
 			continue;
 		}
 		

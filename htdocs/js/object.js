@@ -52,7 +52,8 @@ horde.Object.states = {
 	ATTACKING: 2,
 	HURTING: 3,
 	DYING: 4,
-	INVINCIBLE: 5
+	INVINCIBLE: 5,
+	INVISIBLE: 6
 };
 
 var proto = horde.Object.prototype;
@@ -61,11 +62,7 @@ proto.updateStates = function () {
 	for (var x in this.states) {
 		var s = this.states[x];
 		if (s.timer.expired()) {
-			if (s.type === horde.Object.states.INVINCIBLE) {
-				this.alpha = 1;
-				this.alphaMod = -1;
-			}
-			delete(this.states[x]);
+			this.removeStateById(x);
 			continue;
 		}
 	}
@@ -90,6 +87,23 @@ proto.addState = function (state, ttl) {
 		type: state,
 		timer: t
 	});
+};
+
+proto.removeStateById = function (id) {
+	var s = this.states[id];
+	if (s.type === horde.Object.states.INVINCIBLE) {
+		this.alpha = 1;
+		this.alphaMod = -1;
+	}
+	delete(this.states[id]);
+};
+
+proto.removeState = function (state) {
+	for (var x in this.states) {
+		if (this.states[x].type === state) {
+			this.removeStateById(x);
+		}
+	}
 };
 
 /**

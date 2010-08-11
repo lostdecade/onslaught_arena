@@ -354,6 +354,121 @@ o.superclops = {
 
 };
 
+o.wizard = {
+	role: "monster",
+	team: 1,
+	speed: 100,
+	hitPoints: 20,
+	damage: 10,
+	worth: 50,
+	spriteSheet: "characters",
+	spriteY: 416,
+	animated: true,
+	gibletSize: "medium",
+	moveChangeElapsed: 0,
+	moveChangeDelay: 3000,
+	
+	weapons: [
+		{type: "e_energy_ball", count: null}
+	],
+
+	// TODO: Wizard sounds?
+	soundAttacks: "goblin_attacks",
+	soundDamage: "goblin_damage",
+	soundDies: "goblin_dies",
+	
+	phase: 0,
+	phaseInit: false,
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.moveToY = horde.randomRange(50, 75);
+	},
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			// Move out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseInit = true;
+				}
+				if (this.position.y >= this.moveToY) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			// Phase out
+			case 1:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.addState(horde.Object.states.INVINCIBLE);
+					this.phaseTimer.start(1000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			// Turn invisible and move around!
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 400;
+					this.addState(horde.Object.states.INVISIBLE);
+					this.phaseTimer.start(horde.randomRange(3000, 10000));
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			// Phase in
+			case 3:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.removeState(horde.Object.states.INVISIBLE);
+					this.phaseTimer.start(1000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			// Shoot the player!
+			case 4:
+				if (!this.phaseInit) {
+					this.speed = 0;
+					this.removeState(horde.Object.states.INVINCIBLE);
+					this.phaseTimer.start(horde.randomRange(2000, 3000));
+					this.phaseInit = true;
+					this.shotOnce = false;
+				}
+				var p = engine.getPlayerObject();
+				this.chase(p);
+				if (this.phaseTimer.expired()) {
+					this.phase = 1;
+					this.phaseInit = false;
+				}
+				if (!this.shotOnce) {
+					this.shotOnce = true;
+					return "shoot";
+				}
+				break;
+
+		}
+
+	}
+};
+
 o.dragon = {
 	role: "monster",
 	team: 1,
