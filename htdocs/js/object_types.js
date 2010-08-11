@@ -286,6 +286,28 @@ o.demoblin = {
 	}
 };
 
+o.spikes = {
+
+	role: "trap",
+	team: 1,
+	
+	speed: 0,
+	hitPoints: 9999,
+	damage: 5,
+	worth: 0,
+
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 256,
+
+	gibletSize: "medium",
+
+	onInit: function () {
+
+	}
+};
+
+
 o.cyclops = {
 	role: "monster",
 	team: 1,

@@ -243,6 +243,28 @@ proto.initSound = function horde_Engine_proto_initSound () {
 	
 };
 
+/**
+ * Initialize traps
+ * @return {void}
+ */
+proto.initTraps = function horde_Engine_proto_initTraps () {
+	
+	var spikeLocs = [
+		{x: 128, y: 128},
+		{x: 448, y: 256}
+	];
+	
+	var len = spikeLocs.length;
+	
+	for (var x = 0; x < len; x++) {
+		var pos = spikeLocs[x];
+		var s = horde.makeObject("spikes");
+		s.position = new horde.Vector2(pos.x, pos.y);
+		this.addObject(s);
+	}
+	
+};
+
 proto.initGame = function () {
 
 	this.konamiEntered = false;
@@ -258,6 +280,7 @@ proto.initGame = function () {
 	this.initWaves();
 	
 	this.initPlayer();
+	this.initTraps();
 
 	// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 	var player = this.getPlayerObject();
@@ -913,9 +936,6 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					}
 				}
 				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
-					if (o.hasState(horde.Object.states.INVINCIBLE) || o2.hasState(horde.Object.states.INVINCIBLE)) {
-						continue;
-					}
 					this.dealDamage(o2, o);
 					this.dealDamage(o, o2);
 				}
@@ -931,6 +951,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	if (
+		defender.hasState(horde.Object.states.INVINCIBLE) 
+		|| defender.role === "trap"
+	) {
+		// Defender is invincible; gtfo
+		return false;
+	}
 	if (defender.role === "hero") {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
