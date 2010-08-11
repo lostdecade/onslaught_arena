@@ -1342,7 +1342,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 		ctx.drawImage(
 			this.images.getImage("objects"),
-			0, 32, 32, 32, 260, 224, 32, 32
+			64, 32, 32, 32, 260, 224, 32, 32
 		);
 		ctx.textAlign = "left";
 		ctx.fillText(p.gold, 300, 250);
@@ -1581,7 +1581,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold coin
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		0, 32, 32, 32, 603, 443, 32, 32
+		64, 32, 32, 32, 603, 443, 32, 32
 	);
 	
 	// Draw Weapon Icon
