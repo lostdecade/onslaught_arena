@@ -1559,7 +1559,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		192 /* 256 is purple */, 192, 64, 64,
+		256, 192, 64, 64,
 		-32, -32, 64, 64
 	);
 	ctx.restore();
