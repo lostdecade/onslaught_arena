@@ -3,12 +3,13 @@
 var VERSION = 0.3;
 var DEMO = false;
 var DIFFICULTY_INCREMENT = 0.5;
-var NUM_GATES = 3;
-var SCREEN_WIDTH = 640;
-var SCREEN_HEIGHT = 480;
 var GATE_CUTOFF_Y = 64;
+var NUM_GATES = 3;
 var POINTER_Y_INC = 24;
 var POINTER_Y_START = 280;
+var SCREEN_WIDTH = 640;
+var SCREEN_HEIGHT = 480;
+var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
 
 /**
  * Creates a new Engine object
@@ -166,6 +167,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
+	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
 	
 	horde.on("blur", function () {
 		if (this.state != "running") return;
@@ -729,12 +731,6 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
 	
 	var begin = origin.clone().scale(1 / this.tileSize.width).floor();
 	var end = origin.clone().add(size).scale(1 / this.tileSize.width).floor();
-/*
-div.style.left = begin.x;
-div.style.top = begin.y;
-div.style.width = size.x;
-div.style.height = begin.y;
-*/
 	
 	for (var tx = begin.x; tx <= end.x; tx++) {
 		for (var ty = begin.y; ty <= end.y; ty++) {
@@ -1263,32 +1259,17 @@ proto.render = function horde_Engine_proto_render () {
 		
 		// Title Screen
 		case "title":
-/*
-			this.drawArena(ctx);
-			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
-*/
 			this.drawTitle(ctx);
 			break;
 
 		// How to Play
 		case "how_to_play":
-/*
-			this.drawArena(ctx);
-			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
-*/
 			this.drawTitle(ctx);
 			this.drawHowToPlay(ctx);
 			break;
 
 		// Credits
 		case "credits":
-/*
-			this.drawArena(ctx);
-			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
-*/
 			this.drawTitle(ctx);
 			this.drawCredits(ctx);
 			break;
@@ -1632,6 +1613,38 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 };
 
 /**
+ * Draws text, baby.
+ * @param {Object} ctx Canvas 2d context to draw on.
+ * @param {String} text The string to draw.
+ * @param {Number} x The x coordinate.
+ * @param {Number} y The y coordinate.
+ * @param {Object} params A key/value pair to pass to the drawing context (eg, {globalAlpha : 1}).
+ */
+proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) {
+
+	var buffer = this.canvases.buffer.getContext("2d");
+
+	buffer.save();
+	buffer.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	for (var key in params) {
+		buffer[key] = params[key];
+	}
+
+	buffer.fillText(text, 0, TEXT_HEIGHT);
+	buffer.restore();
+
+	ctx.drawImage(
+		this.canvases.buffer,
+		0, 0,
+		SCREEN_WIDTH, SCREEN_HEIGHT,
+		x, (y - TEXT_HEIGHT),
+		(SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2)
+	);
+
+};
+
+/**
  * Draws the title screen.
  * @param {object} Canvas 2d context to draw on.
  * @return {void}
@@ -1659,15 +1672,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	}
 
 	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
-	ctx.save();
-	ctx.globalAlpha = 1;
-	ctx.font = "Bold 16px Monospace";
-	ctx.textAlign = "right";
-	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillText(version, 632, 472);
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.fillText(version, 630, 470);
-	ctx.restore();
+	this.drawText(ctx, version, 172, 438, {
+		fillStyle : "rgb(0, 0, 0)",
+		font : "Bold 10px Monospace"
+	});
+
+	this.drawText(ctx, version, 174, 440, {
+		fillStyle : "rgb(255, 255, 255)",
+		font : "Bold 10px Monospace"
+	});
 
 	ctx.save();
 	ctx.globalAlpha = 0.75;
@@ -1680,20 +1693,25 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.font = "Bold 24px Monospace";
 	ctx.textAlign = "left";
 
-	var textX = 240;
-	var textY = POINTER_Y_START;
+	var params = {
+		fillStyle : "rgb(255, 255, 255)",
+		font : "Bold 10px Monospace",
+		textAlign : "left"
+	};
 
-	ctx.fillText("Play!", textX, textY);
-	ctx.fillText("How to play", textX, (textY + POINTER_Y_INC));
-	ctx.fillText("Credits", textX, (textY + POINTER_Y_INC*2));
+	var textX = 240;
+	var textY = (POINTER_Y_START - TEXT_HEIGHT);
+
+	this.drawText(ctx, "Play!", textX, textY, params);
+	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC), params);
+	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 2), params);
 	if (typeof(Titanium) != "undefined") {
-		ctx.fillText("Exit", textX, (textY + POINTER_Y_INC*3));
+		this.drawText(ctx, "Exit", textX, (textY + POINTER_Y_INC * 3), params);
 	}
 	ctx.restore();
 
 	// Sword pointer
 	ctx.save();
-	//ctx.globalAlpha = this.titleAlpha;
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		320, 192, 36, 26,
