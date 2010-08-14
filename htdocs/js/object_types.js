@@ -321,6 +321,101 @@ o.flaming_skull = {
 		
 };
 
+o.spike_sentry = {
+	
+	role: "trap",
+	team: 1,
+	
+	speed: 100,
+	hitPoints: 9999,
+	damage: 10,
+	worth: 0,
+	
+	spriteSheet: "objects",
+	spriteX: 64,
+	spriteY: 256,
+	
+	rotate: true,
+	rotateSpeed: 100,
+
+	phase: 0,
+	phaseInit: false,
+	
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			// Wait for player to get near X or Y axis
+			case 0:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.phaseInit = true;
+				}
+				var p = engine.getPlayerObject();
+				var diff = p.position.clone().subtract(this.position);
+				if (Math.abs(diff.y) < 32) {
+					// charge the player along the left/right axis
+					this.originalPos = this.position.clone();
+					var d = new horde.Vector2();
+					d.x = (diff.x < 0) ? -1: 1;
+					this.setDirection(d);
+					this.phase++;
+					this.phaseInit = false;
+				} else if (Math.abs(diff.x) < 32) {
+					this.originalPos = this.position.clone();
+					var d = new horde.Vector2();
+					d.y = (diff.y < 0) ? -1: 1;
+					this.setDirection(d);
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			// Charging the player
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 300;
+					this.rotateSpeed = 300;
+					this.phaseInit = true;
+				}
+				var diff = this.position.clone().subtract(this.originalPos).abs();
+				if (diff.x > 320 - 64) {
+					var d = this.direction.clone();
+					d.x *= -1;
+					this.setDirection(d);
+					this.phase++;
+					this.phaseInit = false;
+				} else if (diff.y > 240 - (4 *32) + 16) {
+					var d = this.direction.clone();
+					d.y *= -1;
+					this.setDirection(d);
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+			
+			// Reseting	
+			case 2:
+			 	if (!this.phaseInit) {
+					this.speed = 100;
+					this.rotateSpeed = 100;
+					this.phaseInit = true;
+				}
+				var diff = this.position.clone().subtract(this.originalPos).abs();
+				if (diff.x < 5 && diff.y < 5) {
+					this.stopMoving();
+					this.position = this.originalPos.clone();
+					this.phase = 0;
+					this.phaseInit = false;
+				}
+				break;
+
+		}
+
+	},
+	
+};
+
 o.spikes = {
 
 	role: "trap",

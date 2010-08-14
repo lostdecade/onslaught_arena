@@ -256,15 +256,17 @@ proto.initSound = function horde_Engine_proto_initSound () {
 proto.initTraps = function horde_Engine_proto_initTraps () {
 	
 	var spikeLocs = [
-		{x: 128, y: 128},
-		{x: 448, y: 256}
+		{x: 32, y: 64},
+		{x: 32, y: 352},
+		{x: 576, y: 64},
+		{x: 576, y: 352}
 	];
 	
 	var len = spikeLocs.length;
 	
 	for (var x = 0; x < len; x++) {
 		var pos = spikeLocs[x];
-		var s = horde.makeObject("spikes");
+		var s = horde.makeObject("spike_sentry");
 		s.position = new horde.Vector2(pos.x, pos.y);
 		this.addObject(s);
 	}
@@ -403,7 +405,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "flaming_skull", 1);
-	w.addObjects(1, "wizard", 2);
+	w.addObjects(1, "wizard", 1);
 	w.addObjects(2, "flaming_skull", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
