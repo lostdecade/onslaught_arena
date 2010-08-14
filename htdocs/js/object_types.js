@@ -286,6 +286,41 @@ o.demoblin = {
 	}
 };
 
+o.flaming_skull = {
+	
+	role: "monster",
+	team: 1,
+	
+	speed: 200,
+	hitPoints: 25,
+	damage: 10,
+	worth: 100,
+	
+	spriteSheet: "characters",
+	spriteY: 32,
+	animated: true,
+	
+	setDir: false,
+		
+	weapons: [
+		{type: "e_static_blue_fire", count: null}
+	],
+		
+	onUpdate: function (elapsed, engine) {
+		if (!this.setDir && this.position.y >= 50) {
+			var d = this.direction.clone();
+			d.x = Math.random();
+			if (Math.random() >= 0.5) {
+				d.x *= -1;
+			}
+			this.setDirection(d);
+			this.setDir = true;
+		}
+		return "shoot";
+	}
+		
+};
+
 o.spikes = {
 
 	role: "trap",
@@ -806,6 +841,19 @@ o.e_fireball_2 = {
 	ttl: 750
 };
 
+o.e_static_blue_fire = {
+	role: "projectile",
+	cooldown: 100,
+	speed: 0,
+	hitPoints: 1,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 32,
+	rotate: true,
+	rotateSpeed: 100,
+	ttl: 1000
+};
 
 // OTHER SHIT
 

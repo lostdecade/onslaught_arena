@@ -394,6 +394,16 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
 
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "flaming_skull", 3);
+	w.addObjects(1, "flaming_skull", 3);
+	w.addObjects(2, "flaming_skull", 3);
+	w.nextWaveTime = 60000;
+	this.waves.push(w);
+
 	// Wave #1
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);

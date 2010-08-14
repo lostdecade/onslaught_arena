@@ -316,7 +316,7 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
 			this.setDirection(d);
 			break;
 	}
-	this.execute("onWallCollide");
+	this.execute("onWallCollide", [axis]);
 };
 
 /**

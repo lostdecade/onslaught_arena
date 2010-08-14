@@ -34,7 +34,9 @@ proto.update = function horde_SpawnPoint_proto_update (elapsed) {
 		var o = horde.makeObject(type);
 		o.position.x = horde.randomRange(loc.left, loc.left + loc.width - o.size.width);
 		o.position.y = horde.randomRange(loc.top, loc.top + loc.height - o.size.height);
-		o.setDirection(new horde.Vector2(0, 1));
+		var d = o.direction.clone();
+		d.y = 1;
+		o.setDirection(d);
 		return o;
 	}
 	return false;
