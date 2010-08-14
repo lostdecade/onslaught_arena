@@ -212,38 +212,38 @@ proto.initSound = function horde_Engine_proto_initSound () {
 	
 		var s = horde.sound;
 		
-		s.create("normal_battle_music", "sound/music/normal_battle.mp3", true, 20);
-		s.create("final_battle_music", "sound/music/final_battle.mp3", true, 20);
+		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
+		s.create("final_battle_music", "sound/music/final_battle", true, 20);
 
-		s.create("move_pointer", "sound/effects/chest_damage.mp3");
-		s.create("eat_food", "sound/effects/chest_food.mp3");
-		s.create("coins", "sound/effects/chest_gold.mp3");
-		s.create("chest_opens", "sound/effects/chest_opens.mp3");
-		s.create("chest_weapon", "sound/effects/chest_weapon.mp3");
+		s.create("move_pointer", "sound/effects/chest_damage");
+		s.create("eat_food", "sound/effects/chest_food");
+		s.create("coins", "sound/effects/chest_gold");
+		s.create("chest_opens", "sound/effects/chest_opens");
+		s.create("chest_weapon", "sound/effects/chest_weapon");
 
-		s.create("gate_opens", "sound/effects/gate_opens.mp3");
-		s.create("gate_closes", "sound/effects/gate_closes.mp3");
+		s.create("gate_opens", "sound/effects/gate_opens");
+		s.create("gate_closes", "sound/effects/gate_closes");
 
-		s.create("hero_attacks", "sound/effects/char_attacks.mp3");
-		s.create("hero_damage", "sound/effects/char_damage_3.mp3");
-		s.create("hero_dies", "sound/effects/char_dies.mp3");
+		s.create("hero_attacks", "sound/effects/char_attacks");
+		s.create("hero_damage", "sound/effects/char_damage_3");
+		s.create("hero_dies", "sound/effects/char_dies");
 		
-		s.create("fire_attack", "sound/effects/char_attacks_fire.mp3");
+		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		
-		s.create("bat_damage", "sound/effects/bat_damage.mp3");
-		s.create("bat_dies", "sound/effects/bat_dies.mp3");
+		s.create("bat_damage", "sound/effects/bat_damage");
+		s.create("bat_dies", "sound/effects/bat_dies");
 		
-		s.create("goblin_attacks", "sound/effects/goblin_attacks.mp3");
-		s.create("goblin_damage", "sound/effects/goblin_damage.mp3");
-		s.create("goblin_dies", "sound/effects/goblin_dies.mp3");
+		s.create("goblin_attacks", "sound/effects/goblin_attacks");
+		s.create("goblin_damage", "sound/effects/goblin_damage");
+		s.create("goblin_dies", "sound/effects/goblin_dies");
 		
-		s.create("cyclops_attacks", "sound/effects/cyclops_attacks.mp3");
-		s.create("cyclops_damage", "sound/effects/cyclops_damage.mp3");
-		s.create("cyclops_dies", "sound/effects/cyclops_dies.mp3");
+		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
+		s.create("cyclops_damage", "sound/effects/cyclops_damage");
+		s.create("cyclops_dies", "sound/effects/cyclops_dies");
 
-		s.create("dragon_attacks", "sound/effects/dragon_attacks.mp3");
-		s.create("dragon_damage", "sound/effects/dragon_damage.mp3");
-		s.create("dragon_dies", "sound/effects/dragon_dies.mp3");
+		s.create("dragon_attacks", "sound/effects/dragon_attacks");
+		s.create("dragon_damage", "sound/effects/dragon_damage");
+		s.create("dragon_dies", "sound/effects/dragon_dies");
 		
 	});
 	

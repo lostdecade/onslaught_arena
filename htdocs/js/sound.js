@@ -2,34 +2,27 @@
 
 horde.sound = {};
 
-var api = "SoundManager2";
-var sounds = {};
+var api;
+var format = ".mp3";
 var muted = false;
+var sounds = {};
 
 horde.sound.init = function horde_sound_init (callback) {
 
-	if (typeof(Titanium) !== "undefined") {
-		api = "Titanium";
-	} else {
+	if (typeof(Titanium) == "undefined") {
 		var audio = document.createElement('audio');
 		if (audio.canPlayType) {
+			api = "html5";
 			//audio.canPlayType('audio/ogg; codecs="vorbis"');
-			if (audio.canPlayType("audio/mpeg;")) {
-				api = "html5";
+			if (!audio.canPlayType("audio/mpeg;")) {
+				format = ".ogg";
 			}
 		}
+	} else {
+		api = "Titanium";
 	}
 
 	switch (api) {
-		case "SoundManager2":
-			var sm = soundManager;
-			sm.useFastPolling = true;
-			sm.useHighPerformance = true;
-			sm.autoLoad = true;
-			sm.multiShot = true;
-			sm.volume = 100;
-			sm.onload = callback;
-			break;
 		case "html5": // Intentional fallthrough
 		case "Titanium":
 			callback();
@@ -39,25 +32,14 @@ horde.sound.init = function horde_sound_init (callback) {
 
 horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 
-	loops = loops || false;
-	if (!volume && volume !== 0) {
+	loops = !!loops;
+	url += format;
+
+	if (volume === undefined) {
 		volume = 100;
 	}
 
 	switch (api) {
-		case "SoundManager2":
-			var params = {
-				id: id,
-				url: url,
-				volume: volume
-			};
-			if (loops) {
-				params.onfinish = function () {
-					this.play();
-				};
-			}
-			soundManager.createSound(params);
-			break;
 		case "html5":
 			var audio = new Audio();
 			audio.preload = "auto";
@@ -98,9 +80,6 @@ horde.sound.play = function horde_sound_play (id) {
 		return false;
 	}
 	switch (api) {
-		case "SoundManager2":
-			soundManager.play(id);
-			break;
 		case "html5":
 			try {
 				sounds[id].pause();
@@ -119,9 +98,6 @@ horde.sound.play = function horde_sound_play (id) {
 
 horde.sound.stop = function horde_sound_stop (id) {
 	switch (api) {
-		case "SoundManager2":
-			soundManager.stop(id);
-			break;
 		case "html5":
 			sounds[id].pause();
 			sounds[id].currentTime = 0;
@@ -134,9 +110,6 @@ horde.sound.stop = function horde_sound_stop (id) {
 
 horde.sound.stopAll = function horde_sound_stopAll () {
 	switch (api) {
-		case "SoundManager2":
-			soundManager.stopAll();
-			break;
 		case "html5":
 			for (var id in sounds) {
 				sounds[id].pause();
@@ -153,9 +126,6 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 
 horde.sound.pauseAll = function horde_sound_pauseAll () {
 	switch (api) {
-		case "SoundManager2":
-			soundManager.pauseAll();
-			break;
 		case "html5":
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
@@ -175,9 +145,6 @@ horde.sound.pauseAll = function horde_sound_pauseAll () {
 
 horde.sound.resumeAll = function horde_sound_resumeAll () {
 	switch (api) {
-		case "SoundManager2":
-			soundManager.resumeAll();
-			break;
 		case "html5":
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
