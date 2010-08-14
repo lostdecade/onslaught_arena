@@ -4,6 +4,8 @@
  */
 horde = {};
 
+horde.canvasFallbackContent = "<div class=\"fallback\"><p>Your browser does not appear to support <a href=\"http://en.wikipedia.org/wiki/HTML5\">HTML5</a>.</p><p>Please try one of the following, more standards compliant browsers: <a href=\"http://www.google.com/chrome\">Chrome</a>, <a href=\"http://www.apple.com/safari/\">Safari</a>, <a href=\"http://www.mozilla.com/firefox/\">Firefox</a> or <a href=\"http://www.opera.com/\">Opera</a>.</p></div>";
+
 /**
  * Context corrected window.setInterval() wrapper
  * @param {number} when Milliseconds between intervals
@@ -79,6 +81,7 @@ horde.makeCanvas = function horde_makeCanvas (id, width, height, hidden) {
 	canvas.width = Number(width) || 0;
 	canvas.height = Number(height) || 0;
 	if (hidden !== true) {
+		canvas.innerHTML = horde.canvasFallbackContent;
 		document.body.appendChild(canvas);
 	}
 	return canvas;
