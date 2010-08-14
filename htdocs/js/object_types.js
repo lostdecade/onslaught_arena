@@ -526,7 +526,7 @@ o.wizard = {
 	moveChangeDelay: 3000,
 	
 	weapons: [
-		{type: "e_energy_ball", count: null}
+		{type: "e_shock_wave", count: null}
 	],
 
 	// TODO: Wizard sounds?
@@ -853,6 +853,18 @@ o.e_static_blue_fire = {
 	rotate: true,
 	rotateSpeed: 100,
 	ttl: 1000
+};
+
+o.e_shock_wave = {
+	role: "projectile",
+	cooldown: 1000,
+	speed: 200,
+	hitPoints: 9999,
+	damage: 10,
+	spriteSheet: "objects",
+	spriteX: 224,
+	spriteY: 32,
+	spriteAlign: true
 };
 
 // OTHER SHIT
