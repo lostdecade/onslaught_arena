@@ -2,7 +2,7 @@
 
 horde.sound = {};
 
-var api;
+var api = "html5";
 var format = ".mp3";
 var muted = false;
 var sounds = {};
@@ -12,7 +12,6 @@ horde.sound.init = function horde_sound_init (callback) {
 	if (typeof(Titanium) == "undefined") {
 		var audio = document.createElement('audio');
 		if (audio.canPlayType) {
-			api = "html5";
 			//audio.canPlayType('audio/ogg; codecs="vorbis"');
 			if (!audio.canPlayType("audio/mpeg;")) {
 				format = ".ogg";
