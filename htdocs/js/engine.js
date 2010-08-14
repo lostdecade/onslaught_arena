@@ -47,6 +47,10 @@ horde.Engine = function horde_Engine () {
 		rotateSpeed: 1,
 		position: new horde.Vector2()
 	};
+	
+	this.enableClouds = true;
+	this.cloudTimer = null;
+	
 };
 
 var proto = horde.Engine.prototype;
@@ -597,7 +601,8 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 			if (!this.paused) {
 				this.updateWaves(elapsed);
 				this.updateSpawnPoints(elapsed);
-				this.updateObjects(elapsed);
+				this.updateClouds(elapsed);
+				this.updateObjects(elapsed);	
 				this.updateFauxGates(elapsed);
 			}
 			this.render();
@@ -610,6 +615,50 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 	}
 
+};
+
+proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
+
+	if (this.enableClouds !== true) {
+		return;
+	}
+	
+	if (this.cloudTimer === null) {
+		this.cloudTimer = new horde.Timer();
+		this.cloudTimer.start(2000);
+	}
+	
+	var clouds = 0;
+	
+	// Kill off clouds that are past the screen
+	for (var id in this.objects) {
+		var o = this.objects[id];
+		if (o.type === "cloud") {
+			clouds++;
+			if (o.position.x < -(o.size.width)) {
+				o.die();
+			}
+		}
+	}
+
+	// Spawn new clouds
+	if (clouds < 10 && this.cloudTimer.expired()) {
+		if (horde.randomRange(1, 10) >= 1) {
+			var numClouds = horde.randomRange(1, 3);
+			for (var x = 0; x < numClouds; x++) {
+				var cloud = horde.makeObject("cloud");
+				cloud.position.x = SCREEN_WIDTH + horde.randomRange(1, 32);
+				cloud.position.y = horde.randomRange(
+					-(cloud.size.height / 2),
+					SCREEN_HEIGHT + (cloud.size.height / 2)
+				);
+				cloud.setDirection(new horde.Vector2(-1, 0));
+				this.addObject(cloud);
+			}
+		}
+		this.cloudTimer.reset();
+	}
+	
 };
 
 /**
@@ -784,7 +833,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	}
 	
 	var px = ((object.speed / 1000) * elapsed);
-	
+		
 	var axis = [];
 	var collisionX = false;
 	var collisionY = false;
@@ -793,14 +842,16 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	if (object.direction.x !== 0) {
 		// the object is moving along the "x" axis
 		object.position.x += (object.direction.x * px);
-		var tile = this.checkTileCollision(object);
-		if (tile !== false) {
-			axis.push("x");
-			collisionX = true;
-			if (object.direction.x > 0) { // moving right
-				object.position.x = tile.x * this.tileSize.width - object.size.width;
-			} else { // moving left
-				object.position.x = tile.x * this.tileSize.width + this.tileSize.width;
+		if (object.collidable) {
+			var tile = this.checkTileCollision(object);
+			if (tile !== false) {
+				axis.push("x");
+				collisionX = true;
+				if (object.direction.x > 0) { // moving right
+					object.position.x = tile.x * this.tileSize.width - object.size.width;
+				} else { // moving left
+					object.position.x = tile.x * this.tileSize.width + this.tileSize.width;
+				}
 			}
 		}
 	}
@@ -809,29 +860,35 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	if (object.direction.y !== 0) {
 		// the object is moving along the "y" axis
 		object.position.y += (object.direction.y * px);
-		var tile = this.checkTileCollision(object);
-		if (tile !== false) {
-			axis.push("y");
-			collisionY = true;
-			if (object.direction.y > 0) { // moving down
-				object.position.y = tile.y * this.tileSize.height - object.size.height;
-			} else { // moving up
-				object.position.y = tile.y * this.tileSize.height + this.tileSize.height;
+		if (object.collidable) {
+			var tile = this.checkTileCollision(object);
+			if (tile !== false) {
+				axis.push("y");
+				collisionY = true;
+				if (object.direction.y > 0) { // moving down
+					object.position.y = tile.y * this.tileSize.height - object.size.height;
+				} else { // moving up
+					object.position.y = tile.y * this.tileSize.height + this.tileSize.height;
+				}
 			}
 		}
 	}
 	
-	var yStop = ((this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y : 0);
+	if (object.collidable) {
+		
+		var yStop = ((this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y : 0);
 
-	if (object.direction.y < 0 && object.position.y < yStop) {
-		object.position.y = yStop;
-		axis.push("y");
+		if (object.direction.y < 0 && object.position.y < yStop) {
+			object.position.y = yStop;
+			axis.push("y");
+		}
+
+		if (axis.length > 0) {
+			object.wallCollide(axis);
+		}
+		
 	}
-
-	if (axis.length > 0) {
-		object.wallCollide(axis);
-	}
-
+	
 };
 
 proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {

@@ -44,6 +44,7 @@ horde.Object = function () {
 	this.states = [];
 	this.addState(horde.Object.states.IDLE);
 	this.currentWeaponIndex = 0;
+	this.collidable = true;
 };
 
 horde.Object.states = {

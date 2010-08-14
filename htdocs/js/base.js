@@ -118,6 +118,7 @@ horde.randomDirection = function horde_randomDirection () {
  */
 horde.makeObject = function horde_makeObject (type, supressInit) {
 	var obj = new horde.Object();
+	obj.type = type;
 	for (var x in horde.objectTypes[type]) {
 		obj[x] = horde.objectTypes[type][x];
 	}
