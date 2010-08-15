@@ -124,7 +124,7 @@ proto.getBarColor = function (max, current) {
 	} else if (percentage > 25) {
 		return "rgb(246, 139, 31)";
 	} else {
-		return "rgb(190, 22, 29)";
+		return "rgb(238, 28, 36)";
 	}
 
 };
@@ -1653,9 +1653,16 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.restore();
 
 	// Heart icon
+	var percentage = (((o.hitPoints - o.wounds) / o.hitPoints) * 100);
+	var spriteX = 352;
+	if (percentage > 50) {
+		spriteX = 224;
+	} else if (percentage > 25) {
+		spriteX = 288;
+	}
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		64, 192, 42, 42, 18, 424, 42, 42
+		spriteX, 64, 42, 42, 18, 424, 42, 42
 	);
 	
 	// Draw gold coin
