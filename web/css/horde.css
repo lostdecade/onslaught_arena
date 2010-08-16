@@ -1,0 +1,31 @@
+html, body {
+	background: #000;
+	margin: 0;
+	padding: 0;
+}
+
+h1, p {
+	display: none;
+}
+
+canvas {
+	cursor: none;
+	background: #000;
+	color: #fff;
+}
+
+.fallback {
+	background: #000;
+	color: #fff;
+	font-family: tahoma, arial, sans;
+	text-align: center;
+}
+
+.fallback p {
+	display: block;
+}
+
+.fallback a {
+	font-weight: bold;
+	color: #BE81F7;
+}

@@ -50,11 +50,10 @@ exec("cp -r {$root}htdocs/css {$root}titanium/Resources/");
 // Web
 file_put_contents("{$root}web/index.html", $web_tpl);
 exec("cp -r {$root}htdocs/img {$root}web/");
+exec("cp -r {$root}htdocs/css {$root}web/");
 exec("cp -r {$root}htdocs/sound {$root}web/");
-exec("cp -r {$root}htdocs/lib {$root}web/");
 exec("cp -r {$root}htdocs/favicon.ico {$root}web/");
 exec("cp -r {$root}htdocs/robots.txt {$root}web/");
-exec("cp -r {$root}htdocs/css {$root}web/");
 
 // Cleanup
 unlink("{$root}horde.js");
