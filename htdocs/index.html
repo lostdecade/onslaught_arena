@@ -1,45 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Onslaught! &bull; an HTML5 medieval fantasy shoot-em-up</title>
-	<meta name="description" content="Onslaught! is an HTML5 game made by Lost Decade Games. Fight off the horde with medieval weapons and powerups!">
-	<meta name="keywords" content="onslaught, html5, indie, browser-based, lost decade games, javascript, chiptunes, arcade, retro, oldschool, geoff blair, matt hackett, joshua morse">
-	<style>
-		html, body {
-			background: #000;
-			margin: 0;
-			padding: 0;
-		}
-		h1, p {
-			display: none;
-		}
-		canvas {
-			cursor: none;
-			background: #000;
-			color: #fff;
-		}
-		.fallback {
-			background: #000;
-			color: #fff;
-			font-family: tahoma, arial, sans;
-			text-align: center;
-		}
-		.fallback p {
-			display: block;
-		}
-		.fallback a {
-			font-weight: bold;
-			color: #BE81F7;
-		}
-	</style>
+	<title>Onslaught! DEBUG</title>
+	<link rel="stylesheet" href="css/horde.css">
 </head>
 <body>
-
-	<h1>Onslaught! by Lost Decade Games</h1>
-	<p>
-		<strong>Onslaught!</strong>
-		is an HTML5 game made by <a href="http://lostdecadegames.com/">Lost Decade Games</a>.
-	</p>
 
 	<script src="js/base.js"></script>
 	<script src="js/timer.js"></script>
@@ -56,24 +21,6 @@
 	<script src="js/spawn_point.js"></script>
 	<script src="js/spawn_wave.js"></script>
 	<script src="js/run_game.js"></script>
-
-	<script>
-
-		if (location.hostname == 'lostdecadegamesapp.appspot.com') {
-
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-16927444-3']);
-			_gaq.push(['_trackPageview']);
-
-			(function() {
-				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
-
-		}
-
-	</script>
 	
 </body>
 </html>
