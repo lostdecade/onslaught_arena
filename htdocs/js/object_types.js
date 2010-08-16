@@ -972,33 +972,30 @@ o.cloud = {
 	
 	onInit: function () {
 		
-		this.alpha = 0.2;
+		this.alpha = 0.25;
 		this.speed = horde.randomRange(5, 25);
+		this.size = new horde.Size(192, 128);
 		
 		switch (horde.randomRange(1, 4)) {
 			
 			case 1:
 				this.spriteX = 0;
 				this.spriteY = 288;
-				this.size = new horde.Size(192, 128);
 				break;
 
 			case 2:
 				this.spriteX = 192;
 				this.spriteY = 288;
-				this.size = new horde.Size(128, 96);
 				break;
 
 			case 3:
 				this.spriteX = 0;
 				this.spriteY = 416;
-				this.size = new horde.Size(192, 128);
 				break;
 				
 			case 4:
 				this.spriteX = 192;
 				this.spriteY = 416;
-				this.size = new horde.Size(160, 128);
 				break;
 		}
 		
