@@ -37,7 +37,7 @@ o.h_knife = {
 
 o.h_sword = {
 	role: "projectile",
-	cooldown: 500,
+	cooldown: 300,
 	speed: 250,
 	hitPoints: 1,
 	damage: 15,
@@ -51,8 +51,8 @@ o.h_spear = {
 	role: "projectile",
 	cooldown: 350,
 	speed: 500,
-	hitPoints: 100,
-	damage: 5,
+	hitPoints: 1,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 96,
 	spriteY: 0,
@@ -63,8 +63,8 @@ o.h_fireball = {
 	role: "projectile",
 	cooldown: 75,
 	speed: 400,
-	hitPoints: 25,
-	damage: 5,
+	hitPoints: 1,
+	damage: 3,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
@@ -73,16 +73,16 @@ o.h_fireball = {
 	ttl: 350
 };
 
-o.h_trident = {
+o.h_axe = {
 	role: "projectile",
-	cooldown: 800,
-	speed: 600,
-	hitPoints: 25,
-	damage: 50,
+	cooldown: 450,
+	speed: 350,
+	hitPoints: 1,
+	damage: 35,
 	spriteSheet: "objects",
-	spriteX: 160,
-	spriteY: 0,
-	spriteAlign: true
+	spriteX: 192,
+	spriteY: 32,
+	rotate: true
 };
 
 // ENEMIES
@@ -1161,7 +1161,7 @@ o.item_weapon = {
 	ttl: 5000,
 	onInit: function () {
 		// Note: all these fallthroughs are intentional.
-		switch (horde.randomRange(1, 10)) {
+		switch (horde.randomRange(1, 8)) {
 
 			case 1:
 			case 2:
@@ -1184,13 +1184,6 @@ o.item_weapon = {
 				this.wepType = "h_fireball";
 				this.wepCount = 200;
 				this.spriteX = 192;
-				break;
-				
-			case 9:
-			case 10:
-				this.wepType = "h_trident";
-				this.wepCount = 10;
-				this.spriteX = 160;
 				break;
 			
 		}

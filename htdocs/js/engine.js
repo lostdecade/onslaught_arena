@@ -1107,13 +1107,13 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state === "title") {
 
-		// ZOMG INFINITE TRIDENTS!!!111!!
+		// ZOMG INFINITE AXES!!!111!!
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			horde.sound.play("chest_opens");
 			this.konamiEntered = true;
 
 			var p = this.getPlayerObject();
-			p.addWeapon("h_trident", null);
+			p.addWeapon("h_axe", null);
 		}
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
