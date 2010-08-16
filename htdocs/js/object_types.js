@@ -344,7 +344,7 @@ o.spike_sentry = {
 	onDamage: function (defender, engine) {
 
 		if (defender.role === "hero") {
-			this.spriteX += 96;
+			this.spriteX = 160;
 		}
 		
 	},
