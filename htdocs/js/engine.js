@@ -1022,6 +1022,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	if (defender.role === "hero") {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
+	attacker.execute("onDamage", [defender, this]);
 	if (defender.wound(attacker.damage)) {
 		// defender has died; assign gold
 		if (attacker.ownerId === null) {

@@ -341,6 +341,14 @@ o.spike_sentry = {
 	phase: 0,
 	phaseInit: false,
 	
+	onDamage: function (defender, engine) {
+
+		if (defender.role === "hero") {
+			this.spriteX += 96;
+		}
+		
+	},
+	
 	onUpdate: function (elapsed, engine) {
 		
 		switch (this.phase) {
