@@ -6,10 +6,11 @@ var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
 var POINTER_Y_INC = 24;
-var POINTER_Y_START = 280;
+var POINTER_Y_START = 240;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
+var TITANIUM = (typeof(Titanium) != "undefined");
 
 /**
  * Creates a new Engine object
@@ -34,13 +35,8 @@ horde.Engine = function horde_Engine () {
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
 	this.gatesY = 0;
-	this.pointerY = POINTER_Y_START;
-
-	if (typeof(Titanium) == "undefined") {
-		this.maxPointerY = (this.pointerY + (POINTER_Y_INC * 2));
-	} else {
-		this.maxPointerY = (this.pointerY + (POINTER_Y_INC * 3));
-	}
+	this.titlePointerY = 0;
+	this.numTitleOptions = 4;
 	
 	this.targetReticle = {
 		angle: 0,
@@ -1121,19 +1117,19 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
-			switch (this.pointerY) {
-				case POINTER_Y_START:
+			switch (this.titlePointerY) {
+				case 0:
 					horde.sound.play("normal_battle_music");
 					this.state = "running";
 					break;
-				case (POINTER_Y_START + POINTER_Y_INC):
+				case 1:
 					this.state = "how_to_play";
 					break;
-				case (POINTER_Y_START + POINTER_Y_INC*2):
+				case 2:
 					this.state = "credits";
 					break;
-				case (POINTER_Y_START + POINTER_Y_INC*3):
-					if (typeof(Titanium) != "undefined") {
+				case 3:
+					if (TITANIUM) {
 						Titanium.App.exit();
 					}
 					break;
@@ -1147,8 +1143,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		) {
 			this.keyboard.keyStates[keys.W] = false;
 			this.keyboard.keyStates[keys.UP] = false;
-			this.pointerY -= POINTER_Y_INC;
-			if (this.pointerY < POINTER_Y_START) this.pointerY = this.maxPointerY;
+			this.titlePointerY--;
+			if (this.titlePointerY < 0) this.titlePointerY = this.numTitleOptions;
 			horde.sound.play("move_pointer");
 		}
 		if (
@@ -1157,8 +1153,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		) {
 			this.keyboard.keyStates[keys.S] = false;
 			this.keyboard.keyStates[keys.DOWN] = false;
-			this.pointerY += POINTER_Y_INC;
-			if (this.pointerY > this.maxPointerY) this.pointerY = POINTER_Y_START;
+			this.titlePointerY++;
+			if (this.titlePointerY > this.numTitleOptions) this.titlePointerY = 0;
 			horde.sound.play("move_pointer");
 		}
 
@@ -1367,21 +1363,25 @@ proto.render = function horde_Engine_proto_render () {
 	
 };
 
+/**
+ * Draws the game over screen.
+ * @param {object} Canvas 2d context to draw on.
+ */
 proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
-	if (!this.titleAlphaStep) {
-		this.titleAlphaStep = -0.025;
-		this.titleAlpha = 1;
+	if (this.goAlphaStep) {
+		this.goAlpha += this.goAlphaStep;
+		if (this.goAlpha <= 0) {
+			this.goAlpha = 0;
+			this.goAlphaStep = 0.025;
+		}
+		if (this.goAlpha >= 1) {
+			this.goAlpha = 1;
+			this.goAlphaStep = -0.025;
+		}
 	} else {
-		this.titleAlpha += this.titleAlphaStep;
-		if (this.titleAlpha <= 0) {
-			this.titleAlpha = 0;
-			this.titleAlphaStep = 0.025;
-		}
-		if (this.titleAlpha >= 1) {
-			this.titleAlpha = 1;
-			this.titleAlphaStep = -0.025;
-		}
+		this.goAlphaStep = -0.025;
+		this.goAlpha = 1;
 	}
 
 	if (!this.gameOverBg) {
@@ -1428,7 +1428,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		ctx.fillText(p.gold, 300, 250);
 
 		ctx.textAlign = "center";
-		ctx.globalAlpha = this.titleAlpha;
+		ctx.globalAlpha = this.goAlpha;
 		ctx.fillText("Press space to continue", 320, 300);
 
 		ctx.restore();
@@ -1732,19 +1732,19 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		0, 0
 	);
 	
-	if (!this.titleAlphaStep) {
-		this.titleAlphaStep = -0.025;
-		this.titleAlpha = 1;
-	} else {
+	if (this.titleAlphaStep) {
 		this.titleAlpha += this.titleAlphaStep;
-		if (this.titleAlpha <= 0) {
-			this.titleAlpha = 0;
+		if (this.titleAlpha <= 0.5) {
+			this.titleAlpha = 0.5;
 			this.titleAlphaStep = 0.025;
 		}
 		if (this.titleAlpha >= 1) {
 			this.titleAlpha = 1;
 			this.titleAlphaStep = -0.025;
 		}
+	} else {
+		this.titleAlphaStep = -0.025;
+		this.titleAlpha = 1;
 	}
 
 	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
@@ -1758,40 +1758,34 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		font : "Bold 10px Monospace"
 	});
 
-	ctx.save();
-	ctx.globalAlpha = 0.75;
-	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillRect(185, 245, 270, 105);
-	ctx.restore();
-	
-	ctx.save();
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.font = "Bold 24px Monospace";
-	ctx.textAlign = "left";
-
 	var params = {
-		fillStyle : "rgb(255, 255, 255)",
+		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace",
 		textAlign : "left"
 	};
 
-	var textX = 240;
+	var textX = 270;
 	var textY = (POINTER_Y_START - TEXT_HEIGHT);
 
+	ctx.save();
 	this.drawText(ctx, "Play!", textX, textY, params);
-	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC), params);
-	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 2), params);
-	if (typeof(Titanium) != "undefined") {
-		this.drawText(ctx, "Exit", textX, (textY + POINTER_Y_INC * 3), params);
+	this.drawText(ctx, "Controls", textX, (textY + POINTER_Y_INC), params);
+	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC * 2), params);
+	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 3), params);
+	if (TITANIUM) {
+		this.drawText(ctx, "Buy full version", textX, (textY + POINTER_Y_INC * 4), params);
+	} else {
+		this.drawText(ctx, "Exit", textX, (textY + POINTER_Y_INC * 4), params);
 	}
 	ctx.restore();
 
 	// Sword pointer
 	ctx.save();
+	ctx.globalAlpha = this.titleAlpha;
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		320, 192, 36, 26,
-		(textX - 48), (this.pointerY - 20),
+		(textX - 48), (POINTER_Y_START + (this.titlePointerY * POINTER_Y_INC) - 20),
 		36, 26
 	);
 	ctx.restore();
