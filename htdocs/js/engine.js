@@ -47,6 +47,10 @@ horde.Engine = function horde_Engine () {
 	this.enableClouds = true;
 	this.cloudTimer = null;
 	
+	this.introTimer = new horde.Timer();
+	this.introPhase = 0;
+	this.introPhaseInit = false;
+	
 };
 
 var proto = horde.Engine.prototype;
@@ -554,7 +558,124 @@ proto.updateLogo = function (elapsed) {
 	}
 };
 
-horde.Engine.prototype.update = function horde_Engine_proto_update () {
+proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (elapsed) {
+	
+	switch (this.introPhase) {
+		
+		// Fade out
+		case 0:
+			if (!this.introPhaseInit) {
+				this.introFadeAlpha = 0;
+				this.introPhaseInit = true;
+			}
+			this.introFadeAlpha += (1 / 1000) * elapsed;
+			if (this.introFadeAlpha >= 1) {
+				this.introFadeAlpha = 1;
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		// Fade in
+		case 1:
+			if (!this.introPhaseInit) {
+				this.introFadeAlpha = 1;
+				this.introPhaseInit = true;
+			}
+			this.introFadeAlpha -= (0.5 / 1000) * elapsed;
+			if (this.introFadeAlpha <= 0) {
+				this.introFadeAlpha = 0;
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		// Wait for a sec...
+		case 2:
+			if (!this.introPhaseInit) {
+				this.introTimer.start(1000);
+				this.introPhaseInit = true;
+			}
+			if (this.introTimer.expired()) {
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+			
+		// Open the gates
+		case 3:
+			if (!this.introPhaseInit) {
+				this.openGates();
+				this.introPhaseInit = true;
+			}
+			if (this.gateState === "up") {
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		// Move hero out
+		case 4:
+			if (!this.introPhaseInit) {
+				var h = horde.makeObject("hero");
+				h.position.x = 304;
+				h.position.y = -64;
+				h.collidable = false;
+				h.setDirection(new horde.Vector2(0, 1));
+				this.introHero = h;
+				this.introPhaseInit = true;
+			}
+			this.introHero.update(elapsed);
+			this.moveObject(this.introHero, elapsed);
+			if (this.introHero.position.y >= 222) {
+				this.introHero.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
+				this.introHero.stopMoving();
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		case 5:
+		case 6:
+		case 8:
+			if (!this.introPhaseInit) {
+				this.introTimer.start(500);
+				this.introPhaseInit = true;
+			}
+			if (this.introTimer.expired()) {
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		case 7:
+			if (!this.introPhaseInit) {
+				this.closeGates();
+				this.introPhaseInit = true;
+			}
+			if (this.gateState === "down") {
+				this.introPhase++;
+				this.introPhaseInit = false;
+			}
+			break;
+		
+		case 9:
+			if (!this.introPhaseInit) {
+				this.introTimer.start(1000);
+				this.introPhaseInit = true;
+			}
+			this.introHero.update(elapsed);
+			if (this.introTimer.expired()) {
+				horde.sound.play("normal_battle_music");
+				this.state = "running";
+			}
+			break;
+
+	}
+	
+};
+
+proto.update = function horde_Engine_proto_update () {
 
 	var now = horde.now();
 	var elapsed = (now - this.lastUpdate);
@@ -590,6 +711,12 @@ horde.Engine.prototype.update = function horde_Engine_proto_update () {
 
 		case "credits":
 			this.handleInput();
+			this.render();
+			break;
+			
+		case "intro_cinematic":
+			this.updateIntroCinematic(elapsed);
+			this.updateFauxGates(elapsed);
 			this.render();
 			break;
 			
@@ -1120,8 +1247,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 			switch (this.titlePointerY) {
 				case 0:
-					horde.sound.play("normal_battle_music");
-					this.state = "running";
+					//horde.sound.play("normal_battle_music");
+					this.state = "intro_cinematic";
 					break;
 				case 1:
 					this.state = "how_to_play";
@@ -1340,6 +1467,10 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawCredits(ctx);
 			break;
 
+		case "intro_cinematic":
+			this.drawIntroCinematic(ctx);
+			break;
+
 		// The game!
 		case "running":
 			this.drawFloor(ctx);
@@ -1447,11 +1578,13 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 	ctx.restore();
 		
 	// Draw the logo
-	ctx.save();
-	ctx.globalAlpha = this.logoAlpha;
-	ctx.drawImage(this.preloader.getImage("logo"), 0, 0);
-	ctx.restore();
-	
+	if (this.logoAlpha > 0) {
+		ctx.save();
+		ctx.globalAlpha = this.logoAlpha;
+		ctx.drawImage(this.preloader.getImage("logo"), 0, 0);
+		ctx.restore();
+	}
+
 };
 
 proto.drawFloor = function horde_Engine_proto_drawFloor (ctx) {
@@ -1533,68 +1666,70 @@ proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 	return drawOrder;
 };
 
-horde.Engine.prototype.drawObjects = function (ctx) {
-
-	var drawOrder = this.getObjectDrawOrder();
-
-	for (var x in drawOrder) {
+proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	
-		var o = this.objects[drawOrder[x].id];
-		var s = o.getSpriteXY();
-		
-		if (o.alpha <= 0 || o.hasState(horde.Object.states.INVISIBLE)) {
-			continue;
-		}
-		
-		ctx.save();
-		
-		ctx.translate(
-			o.position.x + o.size.width / 2,
-			o.position.y + o.size.height / 2
-		);
-		
-		if (o.angle !== 0) {
-			ctx.rotate(o.angle * Math.PI / 180);
-		}
-		
-		if (o.alpha !== 1) {
-			ctx.globalAlpha = o.alpha;
-		}
+	var s = o.getSpriteXY();
+	
+	if (o.alpha <= 0 || o.hasState(horde.Object.states.INVISIBLE)) {
+		return;
+	}
+	
+	ctx.save();
+	
+	ctx.translate(
+		o.position.x + o.size.width / 2,
+		o.position.y + o.size.height / 2
+	);
+	
+	if (o.angle !== 0) {
+		ctx.rotate(o.angle * Math.PI / 180);
+	}
+	
+	if (o.alpha !== 1) {
+		ctx.globalAlpha = o.alpha;
+	}
 
-		if (o.role === "powerup_weapon") {
-			ctx.fillStyle = "rgb(255, 0, 255)";
-			// Draw a scroll behind the weapon
-			ctx.drawImage(
-				this.images.getImage("objects"),
-				128, 192, 48, 48, -22, -20, 48, 48
-			);
-		}
-		
+	if (o.role === "powerup_weapon") {
+		ctx.fillStyle = "rgb(255, 0, 255)";
+		// Draw a scroll behind the weapon
 		ctx.drawImage(
-			this.images.getImage(o.spriteSheet),
-			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
-			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
+			this.images.getImage("objects"),
+			128, 192, 48, 48, -22, -20, 48, 48
 		);
+	}
+	
+	ctx.drawImage(
+		this.images.getImage(o.spriteSheet),
+		s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
+		-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
+	);
 
-		// HP bar
-		if (
-			(this.debug && (o.role === "monster"))
-			|| (o.badass && !o.hasState(horde.Object.states.DYING))
-		) {
-			var hpWidth = (o.size.width - 2);
-			var hpHeight = 8;
-			var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
+	// HP bar
+	if (
+		(this.debug && (o.role === "monster"))
+		|| (o.badass && !o.hasState(horde.Object.states.DYING))
+	) {
+		var hpWidth = (o.size.width - 2);
+		var hpHeight = 8;
+		var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
 
-			ctx.fillStyle = "rgb(255, 255, 255)";
-			ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
-			ctx.fillStyle = "rgb(0, 0, 0)";
-			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), (o.size.width - 2), (hpHeight - 2));
-			ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
-			ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), width, (hpHeight - 2));
-		}
+		ctx.fillStyle = "rgb(255, 255, 255)";
+		ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
+		ctx.fillStyle = "rgb(0, 0, 0)";
+		ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), (o.size.width - 2), (hpHeight - 2));
+		ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
+		ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), width, (hpHeight - 2));
+	}
 
-		ctx.restore();
+	ctx.restore();
+	
+};
 
+horde.Engine.prototype.drawObjects = function (ctx) {
+	var drawOrder = this.getObjectDrawOrder();
+	for (var x in drawOrder) {
+		var o = this.objects[drawOrder[x].id];
+		this.drawObject(ctx, o);
 	}
 };
 
@@ -1815,6 +1950,78 @@ proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 		38, 38, 564, 404
 	);
 	ctx.restore();
+};
+
+proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) {
+
+	switch (this.introPhase) {
+		
+		case 0:
+			if (!this.introFadeOutBg) {
+				this.introFadeOutBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
+				this.introFadeAlpha = 0;
+			}
+			ctx.fillStyle = "rgb(0,0,0)";
+			ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			ctx.save();
+			ctx.fillStyle = "rgb(0, 0, 255)";
+			ctx.fillRect(0, 0, this.view.width, this.view.height);
+			ctx.putImageData(this.introFadeOutBg, 0, 0);
+			ctx.restore();
+			if (this.introFadeAlpha > 0) {
+				ctx.save();
+				ctx.globalAlpha = this.introFadeAlpha;
+				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+				ctx.restore();
+			}
+			break;
+		
+		case 1:
+			this.drawArena(ctx);
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			if (this.introFadeAlpha > 0) {
+				ctx.save();
+				ctx.globalAlpha = this.introFadeAlpha;
+				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+				ctx.restore();
+			}
+			break;
+		
+		case 2:
+		case 3:
+			this.drawArena(ctx);
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			break;
+			
+		case 4:
+		case 5:
+		case 9:
+			this.drawArena(ctx);
+			if (this.introHero) {
+				this.drawObject(ctx, this.introHero);
+			}
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			break;
+			
+		case 6:
+		case 7:
+		case 8:
+			this.drawArena(ctx);
+			ctx.drawImage(this.images.getImage("characters"),
+				20 * 32, 0, 32, 32,
+				304, 224, 32, 32
+			);
+			this.drawFauxGates(ctx);
+			this.drawShadow(ctx);
+			break;
+	}
+
+	
 };
 
 /**
