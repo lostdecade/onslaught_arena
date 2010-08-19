@@ -7,7 +7,7 @@
 			"local_path": "index.html",
 			"container": "panel",
 			"width": 640,
-			"height": 506 // +26px to account for window chrome
+			"height": 506
 		}
 	},
 	"icons": {
