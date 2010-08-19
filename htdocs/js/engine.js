@@ -717,6 +717,7 @@ proto.update = function horde_Engine_proto_update () {
 			break;
 			
 		case "intro_cinematic":
+			this.handleInput();
 			this.updateIntroCinematic(elapsed);
 			this.updateFauxGates(elapsed);
 			this.render();
@@ -1317,6 +1318,15 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 			this.state = "title";
+		}
+	}
+
+	if (this.state === "intro_cinematic") {
+		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
+			this.state = "running";
+			horde.sound.play("normal_battle_music");
 		}
 	}
 
