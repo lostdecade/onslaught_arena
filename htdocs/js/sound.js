@@ -48,6 +48,11 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 					this.currentTime = 0;
 					this.play();
 				}, false);
+			} else {
+				audio.addEventListener('ended', function () {
+					this.pause();
+					this.currentTime = 0;
+				}, false);
 			}
 			audio.load();
 			audio.volume = volume / 100;

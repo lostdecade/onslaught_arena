@@ -75,6 +75,7 @@ proto.stop = function horde_Engine_proto_stop () {
 
 /**
  * Toggles pausing the engine
+ * Note: isMuted would be used by every instance since it's within the prototype chain. Ew!
  * @return {void}
  */
 proto.togglePause = (function horde_Engine_proto_togglePause () {
@@ -86,9 +87,11 @@ proto.togglePause = (function horde_Engine_proto_togglePause () {
 		if (this.paused) {
 			this.paused = false;
 			horde.sound.setMuted(isMuted);
+			horde.sound.play("unpause");
 		} else {
 			this.paused = true;
 			isMuted = horde.sound.isMuted();
+			horde.sound.play("pause");
 			horde.sound.setMuted(true);
 		}
 
@@ -244,6 +247,9 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("dragon_attacks", "sound/effects/dragon_attacks");
 		s.create("dragon_damage", "sound/effects/dragon_damage");
 		s.create("dragon_dies", "sound/effects/dragon_dies");
+
+		s.create("pause", "sound/effects/pause");
+		s.create("unpause", "sound/effects/unpause");
 		
 	});
 	
