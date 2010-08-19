@@ -5,8 +5,7 @@
  * @constructor
  */
 horde.Timer = function horde_Timer () {
-	this.startTime = 0;
-	this.endTime = null;
+	this.elapsed_ms = 0;
 	this.ttl = 0;
 };
 
@@ -30,7 +29,16 @@ proto.start = function horde_Timer_proto_start (ttl) {
 	if (ttl) {
 		this.ttl = Number(ttl);
 	}
-	this.startTime = Timer.now();
+	this.elapsed_ms = 0;
+};
+
+/**
+ * Updates the elapsed time of this timer
+ * @param {number} elapsed Elapsed milliseconds
+ * @return {void}
+ */
+proto.update = function horde_Timer_proto_update (elapsed) {
+	this.elapsed_ms += elapsed;
 };
 
 /**
@@ -42,25 +50,11 @@ proto.reset = function horde_Timer_proto_reset () {
 };
 
 /**
- * Stops the timer
- * @return {number} Elapsed time since start in milliseconds
- */
-proto.stop = function horde_Timer_proto_stop () {
-	this.endTime = Timer.now();
-	return this.elapsed();
-};
-
-/**
  * Returns the elapsed time since start (in milliseconds)
  * @return {number} Elapsed time since start (in milliseconds)
  */
 proto.elapsed = function horde_Timer_proto_elapsed () {
-	if (this.endTime !== null) {
-		return this.endTime - this.startTime;
-	} else {
-		var now = Timer.now();
-		return now - this.startTime;
-	}
+	return this.elapsed_ms;
 };
 
 /**
@@ -69,8 +63,7 @@ proto.elapsed = function horde_Timer_proto_elapsed () {
  */
 proto.expired = function horde_Timer_proto_expired () {
 	if (this.ttl > 0) {
-		var elapsed = this.elapsed();
-		return (elapsed > this.ttl);
+		return this.elapsed_ms > this.ttl;
 	}
 	return false;
 };

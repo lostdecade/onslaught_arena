@@ -59,9 +59,10 @@ horde.Object.states = {
 
 var proto = horde.Object.prototype;
 
-proto.updateStates = function () {
+proto.updateStates = function (elapsed) {
 	for (var x in this.states) {
 		var s = this.states[x];
+		s.timer.update(elapsed);
 		if (s.timer.expired()) {
 			this.removeStateById(x);
 			continue;
@@ -147,7 +148,11 @@ proto.isDead = function horde_Object_proto_isDead () {
  */
 proto.update = function horde_Object_proto_update (elapsed) {
 	
-	this.updateStates();
+	this.updateStates(elapsed);
+	
+	if (this.deathTimer) {
+		this.deathTimer.update(elapsed);
+	}
 	
 	if (this.hasState(horde.Object.states.DYING)) {
 		if (this.deathTimer.expired()) {
@@ -203,6 +208,10 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.cooldown = false;
 			this.cooldownElapsed = 0;
 		}
+	}
+	
+	if (this.phaseTimer) {
+		this.phaseTimer.update(elapsed);
 	}
 	
 	if (this.hasState(horde.Object.states.DYING)) {

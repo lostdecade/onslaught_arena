@@ -560,6 +560,8 @@ proto.updateLogo = function (elapsed) {
 
 proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (elapsed) {
 	
+	this.introTimer.update(elapsed);
+	
 	switch (this.introPhase) {
 		
 		// Fade out
@@ -753,6 +755,8 @@ proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
 		this.cloudTimer.start(2000);
 	}
 	
+	this.cloudTimer.update(elapsed);
+	
 	var clouds = 0;
 	
 	// Kill off clouds that are past the screen
@@ -819,6 +823,7 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
  * @return {void}
  */
 proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
+	this.waveTimer.update(elapsed);
 	var spawnsEmpty = true;
 	for (var x in this.spawnPoints) {
 		if (this.spawnPoints[x].queue.length > 0) {
@@ -1142,8 +1147,12 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	if (
 		defender.hasState(horde.Object.states.INVINCIBLE) 
 		|| defender.role === "trap"
+		|| defender.role === "projectile"
 	) {
-		// Defender is invincible; gtfo
+		// Defender is invincible
+		if (attacker.role === "projectile") {
+			attacker.die();
+		}
 		return false;
 	}
 	if (defender.role === "hero") {
@@ -1163,6 +1172,10 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		defender.execute("onKilled", [attacker, this]);
 		if (defender.role === "monster") {
 			this.spawnLoot(defender.position.clone());
+		}
+	} else {
+		if (attacker.role === "projectile") {
+			attacker.die();
 		}
 	}
 };
