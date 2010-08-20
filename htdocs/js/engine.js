@@ -176,6 +176,10 @@ proto.init = function horde_Engine_proto_init () {
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
 	
+	horde.on("contextmenu", function (e) {
+		horde.stopEvent(e);
+	}, document.body, this);
+	
 	horde.on("blur", function () {
 		if (this.state != "running") return;
 		this.keyboard.keyStates = {};
