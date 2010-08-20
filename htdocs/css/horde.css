@@ -9,7 +9,6 @@ h1, p {
 }
 
 canvas {
-	cursor: none;
 	background: #000;
 	color: #fff;
 }
