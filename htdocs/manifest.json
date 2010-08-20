@@ -11,7 +11,9 @@
 		}
 	},
 	"icons": {
-		"24": "img/icon_24.png",
-		"128": "img/icon_128.png"
+		"16": "img/icons/onslaught_16.png",
+		"24": "img/icons/onslaught_24.png",
+		"48": "img/icons/onslaught_48.png",
+		"128": "img/icons/onslaught_128.png"
 	}	
 }
