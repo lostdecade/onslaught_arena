@@ -528,7 +528,7 @@ o.imp = {
 	worth: 50,
 
 	spriteSheet: "characters",
-	spriteY: 448,
+	spriteY: 64,
 	animated: true,
 
 	gibletSize: "medium",
