@@ -414,9 +414,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "flaming_skull", 1);
-	w.addObjects(1, "wizard", 1);
-	w.addObjects(2, "demoblin", 1);
+	w.addObjects(0, "sandworm", 1);
+	w.addObjects(1, "sandworm", 1);
+	w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -973,7 +973,12 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		return false;
 	}
 	
-	var px = ((object.speed / 1000) * elapsed);
+	var speed = object.speed;
+	if (object.hasState(horde.Object.states.SLOWED)) {
+		speed *= 0.25;
+	}
+	
+	var px = ((speed / 1000) * elapsed);
 		
 	var axis = [];
 	var collisionX = false;
@@ -1139,9 +1144,18 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						horde.sound.play("chest_weapon");
 					}
 				}
-				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
-					this.dealDamage(o2, o);
-					this.dealDamage(o, o2);
+				if (
+					o.team !== null 
+					&& o2.team !== null 
+					&& o.team !== o2.team
+				) {
+					if (
+						!(o.role === "projectile" && o2.role === "trap")
+						&& !(o.role === "trap" && o2.role === "projectile")
+					) {
+						this.dealDamage(o2, o);
+						this.dealDamage(o, o2);
+					}
 				}
 			}
 		}
@@ -1166,7 +1180,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		}
 		return false;
 	}
-	if (defender.role === "hero") {
+	if (attacker.damage > 0 && defender.role === "hero") {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
 	attacker.execute("onDamage", [defender, this]);

@@ -759,10 +759,11 @@ o.sandworm = {
 	phaseInit: false,
 	
 	moveChangeElapsed: 0,
-	moveChangeDelay: 300,
+	moveChangeDelay: 1000,
 	
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
+		this.dirtTimer = new horde.Timer();
 	},
 	
 	onUpdate: function (elapsed, engine) {
@@ -770,10 +771,13 @@ o.sandworm = {
 							
 			case 0:
 				if (!this.phaseInit) {
-					//this.addState(horde.Object.states.INVISIBLE);
+					this.speed = 150;
+					this.addState(horde.Object.states.INVISIBLE);
 					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.dirtTimer.start(150);
 					this.phaseInit = true;
 				}
+				this.dirtTimer.update(elapsed);
 				if (this.position.y <= 50) {
 					this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 				} else {
@@ -783,23 +787,52 @@ o.sandworm = {
 					this.phase++;
 					this.phaseInit = false;
 				}
-				// TODO: lay sand piles
+				if (this.dirtTimer.expired()) {
+					engine.spawnObject(this, "e_dirt_pile");
+					this.dirtTimer.reset();
+				}
 				break;
 				
 			case 1:
+				// spawn!
 				if (!this.phaseInit) {
+					this.stopMoving();
 					this.removeState(horde.Object.states.INVISIBLE);
 					this.addState(horde.Object.states.SPAWNING);
+					this.spawnFrameIndex = 0;
 					this.phaseInit = true;
+				}
+				if (!this.hasState(horde.Object.states.SPAWNING)) {
+					this.phase++;
+					this.phaseInit = false;
 				}
 				break;
 				
 			case 2:
 				// fire globs of shit
+				if (!this.phaseInit) {
+					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				// TODO: Actually fire "globs of shit"
 				break;
 				
 			case 3:
-				// burrow
+				// burrow!
+				if (!this.phaseInit) {
+					this.addState(horde.Object.states.DESPAWNING);
+					this.spawnFrameIndex = 2;
+					this.phaseInit = true;
+				}
+				if (!this.hasState(horde.Object.states.DESPAWNING)) {
+					this.addState(horde.Object.states.INVISIBLE);
+					this.phase = 0;
+					this.phaseInit = false;
+				}
 				break;
 
 		}
@@ -1039,6 +1072,27 @@ o.e_static_blue_fire = {
 	rotateSpeed: 100,
 	ttl: 1000,
 	bounce: false
+};
+
+o.e_dirt_pile = {
+	role: "trap",
+	cooldown: 100,
+	speed: 0,
+	hitPoints: 9999,
+	damage: 0,
+	spriteSheet: "characters",
+	spriteX: 0,
+	spriteY: 448,
+	animated: true,
+	ttl: 3500,
+	bounce: false,
+	
+	onDamage: function (defender) {
+		if (defender.team !== this.team) {
+			defender.addState(horde.Object.states.SLOWED, 2000);
+		}
+	}
+	
 };
 
 o.e_shock_wave = {

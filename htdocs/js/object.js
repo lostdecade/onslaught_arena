@@ -25,6 +25,7 @@ horde.Object = function () {
 	this.animNumFrames = 2;
 	this.animDelay = 200; // Delay (in milliseconds) between animation frames
 	this.animElapsed = 0; // Elapsed time (in milliseconds) since last animation frame increment
+	this.spawnFrameIndex = 0;
 	this.angle = 0; // Angle to draw this object
 	this.rotateSpeed = 400; // Speed at which to rotate the object
 	this.rotate = false; // Enable/disable rotation of object
@@ -151,6 +152,12 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	
 	this.updateStates(elapsed);
 	
+	if (this.hasState(horde.Object.states.SLOWED)) {
+		this.animDelay = 400;
+	} else {
+		this.animDelay = 200;
+	}
+	
 	if (this.deathTimer) {
 		this.deathTimer.update(elapsed);
 	}
@@ -165,7 +172,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-	
+		
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -173,6 +180,18 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.animFrameIndex++;
 			if (this.animFrameIndex > (this.animNumFrames - 1)) {
 				this.animFrameIndex = 0;
+			}
+			if (this.hasState(horde.Object.states.SPAWNING)) {
+				this.spawnFrameIndex++;
+				if (this.spawnFrameIndex > 2) {
+					this.removeState(horde.Object.states.SPAWNING);
+				}
+			}
+			if (this.hasState(horde.Object.states.DESPAWNING)) {
+				this.spawnFrameIndex--;
+				if (this.spawnFrameIndex < 0) {
+					this.removeState(horde.Object.states.DESPAWNING);
+				}
 			}
 		}
 	}
@@ -242,6 +261,15 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 						(17 + this.deathFrameIndex) * this.size.width, this.spriteY
 					);
 				}
+				if (
+					this.hasState(horde.Object.states.SPAWNING)
+					|| this.hasState(horde.Object.states.DESPAWNING)
+				) {
+					return new horde.Vector2(
+						(17 + this.spawnFrameIndex) * this.size.width, 
+						this.spriteY - this.size.height
+					);
+				}
 				if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
 					return new horde.Vector2(
 						16 * this.size.width, this.spriteY
@@ -254,7 +282,7 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 				);
 				break;
 
-			case "projectile":
+			default:
 				return new horde.Vector2(
 					this.spriteX + (this.animFrameIndex * this.size.width),
 					this.spriteY
@@ -298,6 +326,9 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
  * @return {boolean} True if the object has died; otherwise false
  */
 proto.wound = function horde_Object_proto_wound (damage) {
+	if (damage < 1) {
+		return false;
+	}
 	this.wounds += damage;
 	if (this.role === "monster" || this.role === "hero") {
 		this.addState(horde.Object.states.HURTING, 300);
