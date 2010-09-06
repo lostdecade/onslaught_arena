@@ -223,8 +223,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("final_battle_music", "sound/music/final_battle", true, 20);
 
 		s.create("move_pointer", "sound/effects/chest_damage");
-		s.create("eat_food", "sound/effects/chest_food");
-		s.create("coins", "sound/effects/chest_gold");
+		s.create("eat_food", "sound/effects/chest_food", false, 20);
+		s.create("coins", "sound/effects/chest_gold", false, 10);
 		s.create("chest_opens", "sound/effects/chest_opens");
 		s.create("chest_weapon", "sound/effects/chest_weapon");
 
