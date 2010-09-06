@@ -54,7 +54,9 @@ horde.Object.states = {
 	HURTING: 3,
 	DYING: 4,
 	INVINCIBLE: 5,
-	INVISIBLE: 6
+	INVISIBLE: 6,
+	SPAWNING: 7,
+	DESPAWNING: 8
 };
 
 var proto = horde.Object.prototype;
@@ -412,11 +414,16 @@ proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
 			return true;
 		}
 	}
+	var newWeapon = horde.objectTypes[type];
+	var currentWeapon = horde.objectTypes[this.getWeaponInfo().type];
 	var len = this.weapons.push({
 		type: type,
 		count: count
 	});
-	this.currentWeaponIndex = (len - 1);
+	if (newWeapon.priority > currentWeapon.priority) {
+		// Swap to the new weapon if it's better than the currently selected weapon
+		this.currentWeaponIndex = (len - 1);
+	}
 };
 
 proto.cycleWeapon = function horde_Object_proto_cycleWeapon (reverse) {

@@ -23,18 +23,6 @@ o.hero = {
 
 // HERO WEAPONS
 
-o.h_knife = {
-	role: "projectile",
-	cooldown: 200,
-	speed: 350,
-	hitPoints: 1,
-	damage: 5,
-	spriteSheet: "objects",
-	spriteX: 32,
-	spriteY: 0,
-	spriteAlign: true
-};
-
 o.h_sword = {
 	role: "projectile",
 	cooldown: 300,
@@ -44,7 +32,21 @@ o.h_sword = {
 	spriteSheet: "objects",
 	spriteX: 64,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	priority: 0
+};
+
+o.h_knife = {
+	role: "projectile",
+	cooldown: 200,
+	speed: 350,
+	hitPoints: 1,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 0,
+	spriteAlign: true,
+	priority: 1
 };
 
 o.h_spear = {
@@ -56,7 +58,8 @@ o.h_spear = {
 	spriteSheet: "objects",
 	spriteX: 96,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	priority: 2
 };
 
 o.h_fireball = {
@@ -70,7 +73,8 @@ o.h_fireball = {
 	spriteY: 0,
 	rotate: true,
 	soundAttacks: "fire_attack",
-	ttl: 350
+	ttl: 350,
+	priority: 3
 };
 
 o.h_axe = {
@@ -82,7 +86,8 @@ o.h_axe = {
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
-	rotate: true
+	rotate: true,
+	priority: 4
 };
 
 // ENEMIES
@@ -729,6 +734,72 @@ o.wizard = {
 		}
 
 	}
+};
+
+o.sandworm = {
+	
+	role: "monster",
+	team: 1,
+	
+	animated: true,
+	spriteSheet: "characters",
+	spriteY: 480,
+	
+	damage: 25,
+	hitPoints: 25,
+	speed: 50,
+	worth: 50,
+	
+	phase: 0,
+	phaseInit: false,
+	
+	moveChangeElapsed: 0,
+	moveChangeDelay: 300,
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		switch (this.phase) {
+							
+			case 0:
+				if (!this.phaseInit) {
+					//this.addState(horde.Object.states.INVISIBLE);
+					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.phaseInit = true;
+				}
+				if (this.position.y <= 50) {
+					this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+				} else {
+					movementTypes.wander.apply(this, arguments);
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				// TODO: lay sand piles
+				break;
+				
+			case 1:
+				if (!this.phaseInit) {
+					this.removeState(horde.Object.states.INVISIBLE);
+					this.addState(horde.Object.states.SPAWNING);
+					this.phaseInit = true;
+				}
+				break;
+				
+			case 2:
+				// fire globs of shit
+				break;
+				
+			case 3:
+				// burrow
+				break;
+
+		}
+	}
+	
 };
 
 o.dragon = {
