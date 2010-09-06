@@ -1051,7 +1051,8 @@ o.e_shock_wave = {
 	spriteX: 224,
 	spriteY: 32,
 	spriteAlign: true,
-	bounce: false
+	bounce: false,
+	animated: true
 };
 
 // OTHER SHIT

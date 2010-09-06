@@ -22,6 +22,7 @@ horde.Object = function () {
 	this.spriteAlign = false; // Align sprite with facing
 	this.animated = false; // Animated or not
 	this.animFrameIndex = 0; // Current animation frame to display
+	this.animNumFrames = 2;
 	this.animDelay = 200; // Delay (in milliseconds) between animation frames
 	this.animElapsed = 0; // Elapsed time (in milliseconds) since last animation frame increment
 	this.angle = 0; // Angle to draw this object
@@ -170,7 +171,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 		if (this.animElapsed >= this.animDelay) {
 			this.animElapsed = 0;
 			this.animFrameIndex++;
-			if (this.animFrameIndex > 1) {
+			if (this.animFrameIndex > (this.animNumFrames - 1)) {
 				this.animFrameIndex = 0;
 			}
 		}
@@ -232,21 +233,36 @@ proto.update = function horde_Object_proto_update (elapsed) {
  */
 proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 	if (this.animated) {
-		if (this.hasState(horde.Object.states.DYING)) {
-			return new horde.Vector2(
-				(17 + this.deathFrameIndex) * this.size.width, this.spriteY
-			);
+		switch (this.role) {
+
+			case "hero":
+			case "monster":
+				if (this.hasState(horde.Object.states.DYING)) {
+					return new horde.Vector2(
+						(17 + this.deathFrameIndex) * this.size.width, this.spriteY
+					);
+				}
+				if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
+					return new horde.Vector2(
+						16 * this.size.width, this.spriteY
+					);
+				}
+				var offset = horde.directions.fromVector(this.facing.clone());
+				return new horde.Vector2(
+					((offset * 2) + this.animFrameIndex) * this.size.width,
+					this.spriteY
+				);
+				break;
+
+			case "projectile":
+				return new horde.Vector2(
+					this.spriteX + (this.animFrameIndex * this.size.width),
+					this.spriteY
+				);
+				break;
+			
 		}
-		if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
-			return new horde.Vector2(
-				16 * this.size.width, this.spriteY
-			);
-		}
-		var offset = horde.directions.fromVector(this.facing.clone());
-		return new horde.Vector2(
-			((offset * 2) + this.animFrameIndex) * this.size.width,
-			this.spriteY
-		);
+
 	} else {
 		return new horde.Vector2(this.spriteX, this.spriteY);
 	}
