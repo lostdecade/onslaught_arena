@@ -1411,6 +1411,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 proto.objectAttack = function (object, v) {
 
+	if (!v) {
+		v = object.facing;
+	}
+
 	var weaponType = object.fireWeapon();
 	if (weaponType === false) {
 		return;
