@@ -23,18 +23,6 @@ o.hero = {
 
 // HERO WEAPONS
 
-o.h_knife = {
-	role: "projectile",
-	cooldown: 200,
-	speed: 350,
-	hitPoints: 1,
-	damage: 5,
-	spriteSheet: "objects",
-	spriteX: 32,
-	spriteY: 0,
-	spriteAlign: true
-};
-
 o.h_sword = {
 	role: "projectile",
 	cooldown: 300,
@@ -44,7 +32,23 @@ o.h_sword = {
 	spriteSheet: "objects",
 	spriteX: 64,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	priority: 0,
+	bounce: false
+};
+
+o.h_knife = {
+	role: "projectile",
+	cooldown: 200,
+	speed: 350,
+	hitPoints: 1,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 0,
+	spriteAlign: true,
+	priority: 1,
+	bounce: false
 };
 
 o.h_spear = {
@@ -56,7 +60,9 @@ o.h_spear = {
 	spriteSheet: "objects",
 	spriteX: 96,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	priority: 2,
+	bounce: false
 };
 
 o.h_fireball = {
@@ -70,7 +76,9 @@ o.h_fireball = {
 	spriteY: 0,
 	rotate: true,
 	soundAttacks: "fire_attack",
-	ttl: 350
+	ttl: 350,
+	priority: 3,
+	bounce: false
 };
 
 o.h_axe = {
@@ -82,7 +90,9 @@ o.h_axe = {
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
-	rotate: true
+	rotate: true,
+	priority: 4,
+	ttl: 10000
 };
 
 // ENEMIES
@@ -731,6 +741,105 @@ o.wizard = {
 	}
 };
 
+o.sandworm = {
+	
+	role: "monster",
+	team: 1,
+	
+	animated: true,
+	spriteSheet: "characters",
+	spriteY: 480,
+	
+	damage: 25,
+	hitPoints: 25,
+	speed: 50,
+	worth: 50,
+	
+	phase: 0,
+	phaseInit: false,
+	
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+		this.dirtTimer = new horde.Timer();
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		switch (this.phase) {
+							
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 150;
+					this.addState(horde.Object.states.INVISIBLE);
+					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.dirtTimer.start(150);
+					this.phaseInit = true;
+				}
+				this.dirtTimer.update(elapsed);
+				if (this.position.y <= 50) {
+					this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+				} else {
+					movementTypes.wander.apply(this, arguments);
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				if (this.dirtTimer.expired()) {
+					engine.spawnObject(this, "e_dirt_pile");
+					this.dirtTimer.reset();
+				}
+				break;
+				
+			case 1:
+				// spawn!
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.removeState(horde.Object.states.INVISIBLE);
+					this.addState(horde.Object.states.SPAWNING);
+					this.spawnFrameIndex = 0;
+					this.phaseInit = true;
+				}
+				if (!this.hasState(horde.Object.states.SPAWNING)) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				break;
+				
+			case 2:
+				// fire globs of shit
+				if (!this.phaseInit) {
+					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.phase++;
+					this.phaseInit = false;
+				}
+				// TODO: Actually fire "globs of shit"
+				break;
+				
+			case 3:
+				// burrow!
+				if (!this.phaseInit) {
+					this.addState(horde.Object.states.DESPAWNING);
+					this.spawnFrameIndex = 2;
+					this.phaseInit = true;
+				}
+				if (!this.hasState(horde.Object.states.DESPAWNING)) {
+					this.addState(horde.Object.states.INVISIBLE);
+					this.phase = 0;
+					this.phaseInit = false;
+				}
+				break;
+
+		}
+	}
+	
+};
+
 o.dragon = {
 	role: "monster",
 	team: 1,
@@ -880,7 +989,8 @@ o.e_arrow = {
 	spriteSheet: "objects",
 	spriteX: 256,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false
 };
 
 o.e_trident = {
@@ -890,9 +1000,10 @@ o.e_trident = {
 	hitPoints: 1,
 	damage: 10,
 	spriteSheet: "objects",
-	spriteX: 288,
+	spriteX: 160,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false
 };
 
 o.e_boulder = {
@@ -904,7 +1015,8 @@ o.e_boulder = {
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_energy_ball = {
@@ -916,7 +1028,8 @@ o.e_energy_ball = {
 	spriteSheet: "objects",
 	spriteX: 320,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_fireball = {
@@ -928,7 +1041,8 @@ o.e_fireball = {
 	spriteSheet: "objects",
 	spriteX: 352,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_fireball_2 = {
@@ -941,7 +1055,8 @@ o.e_fireball_2 = {
 	spriteX: 352,
 	spriteY: 0,
 	rotate: true,
-	ttl: 750
+	ttl: 500,
+	bounce: false
 };
 
 o.e_static_blue_fire = {
@@ -955,7 +1070,29 @@ o.e_static_blue_fire = {
 	spriteY: 32,
 	rotate: true,
 	rotateSpeed: 100,
-	ttl: 1000
+	ttl: 1000,
+	bounce: false
+};
+
+o.e_dirt_pile = {
+	role: "trap",
+	cooldown: 100,
+	speed: 0,
+	hitPoints: 9999,
+	damage: 0,
+	spriteSheet: "characters",
+	spriteX: 0,
+	spriteY: 448,
+	animated: true,
+	ttl: 3500,
+	bounce: false,
+	
+	onDamage: function (defender) {
+		if (defender.team !== this.team) {
+			defender.addState(horde.Object.states.SLOWED, 2000);
+		}
+	}
+	
 };
 
 o.e_shock_wave = {
@@ -967,7 +1104,9 @@ o.e_shock_wave = {
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 32,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false,
+	animated: true
 };
 
 // OTHER SHIT

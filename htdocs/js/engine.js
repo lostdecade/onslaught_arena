@@ -223,8 +223,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("final_battle_music", "sound/music/final_battle", true, 20);
 
 		s.create("move_pointer", "sound/effects/chest_damage");
-		s.create("eat_food", "sound/effects/chest_food");
-		s.create("coins", "sound/effects/chest_gold");
+		s.create("eat_food", "sound/effects/chest_food", false, 20);
+		s.create("coins", "sound/effects/chest_gold", false, 10);
 		s.create("chest_opens", "sound/effects/chest_opens");
 		s.create("chest_weapon", "sound/effects/chest_weapon");
 
@@ -414,9 +414,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "flaming_skull", 1);
-	w.addObjects(1, "wizard", 1);
-	w.addObjects(2, "flaming_skull", 1);
+	w.addObjects(0, "sandworm", 1);
+	w.addObjects(1, "sandworm", 1);
+	w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -973,7 +973,12 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		return false;
 	}
 	
-	var px = ((object.speed / 1000) * elapsed);
+	var speed = object.speed;
+	if (object.hasState(horde.Object.states.SLOWED)) {
+		speed *= 0.25;
+	}
+	
+	var px = ((speed / 1000) * elapsed);
 		
 	var axis = [];
 	var collisionX = false;
@@ -1139,9 +1144,18 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						horde.sound.play("chest_weapon");
 					}
 				}
-				if (o.team !== null && o2.team !== null && o.team !== o2.team) {
-					this.dealDamage(o2, o);
-					this.dealDamage(o, o2);
+				if (
+					o.team !== null 
+					&& o2.team !== null 
+					&& o.team !== o2.team
+				) {
+					if (
+						!(o.role === "projectile" && o2.role === "trap")
+						&& !(o.role === "trap" && o2.role === "projectile")
+					) {
+						this.dealDamage(o2, o);
+						this.dealDamage(o, o2);
+					}
 				}
 			}
 		}
@@ -1166,7 +1180,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		}
 		return false;
 	}
-	if (defender.role === "hero") {
+	if (attacker.damage > 0 && defender.role === "hero") {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
 	attacker.execute("onDamage", [defender, this]);
@@ -1414,6 +1428,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 proto.objectAttack = function (object, v) {
 
+	if (!v) {
+		v = object.facing;
+	}
+
 	var weaponType = object.fireWeapon();
 	if (weaponType === false) {
 		return;
@@ -1422,19 +1440,8 @@ proto.objectAttack = function (object, v) {
 	var weaponDef = horde.objectTypes[weaponType];
 
 	switch (weaponType) {
-
-		// Shoot a fireball in each of the 8 directions
-		/*
-		case "h_fireball":
-			for (var d = 0; d < 8; d++) {
-				var dir = horde.directions.toVector(d);
-				this.spawnObject(object, weaponType, dir);
-			}
-			break;
-		*/
 		
-		// Shoot 3 knives in a spread pattern
-
+		// Shoot 2 knives in a spread pattern
 		case "h_knife":
 			var h = v.heading();
 			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
@@ -1445,9 +1452,20 @@ proto.objectAttack = function (object, v) {
 			));
 			break;
 
+		case "h_fireball":
+		case "e_fireball_2":
+			for (var x = -0.25; x <= 0.25; x += 0.25) {
+				var h = v.heading();
+				h += (x + (horde.randomRange(-1, 1) / 10));
+				this.spawnObject(
+					object, 
+					weaponType, 
+					horde.Vector2.fromHeading(h)
+				);
+			}
+			break;
 
-		// Shoot one instance of the weapon in the same
-		// direction as the object is currently facing
+		// Shoot one instance of the weapon
 		default:
 			this.spawnObject(object, weaponType, v);
 			break;

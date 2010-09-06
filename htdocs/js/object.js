@@ -22,8 +22,10 @@ horde.Object = function () {
 	this.spriteAlign = false; // Align sprite with facing
 	this.animated = false; // Animated or not
 	this.animFrameIndex = 0; // Current animation frame to display
+	this.animNumFrames = 2;
 	this.animDelay = 200; // Delay (in milliseconds) between animation frames
 	this.animElapsed = 0; // Elapsed time (in milliseconds) since last animation frame increment
+	this.spawnFrameIndex = 0;
 	this.angle = 0; // Angle to draw this object
 	this.rotateSpeed = 400; // Speed at which to rotate the object
 	this.rotate = false; // Enable/disable rotation of object
@@ -45,6 +47,7 @@ horde.Object = function () {
 	this.addState(horde.Object.states.IDLE);
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
+	this.bounce = true;
 };
 
 horde.Object.states = {
@@ -54,7 +57,9 @@ horde.Object.states = {
 	HURTING: 3,
 	DYING: 4,
 	INVINCIBLE: 5,
-	INVISIBLE: 6
+	INVISIBLE: 6,
+	SPAWNING: 7,
+	DESPAWNING: 8
 };
 
 var proto = horde.Object.prototype;
@@ -114,9 +119,6 @@ proto.removeState = function (state) {
  */
 proto.init = function horde_Object_proto_init () {
 	this.execute("onInit");
-	if (this.spriteAlign) {
-		this.angle = this.facing.angle();
-	}
 	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);
 	}
@@ -150,6 +152,12 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	
 	this.updateStates(elapsed);
 	
+	if (this.hasState(horde.Object.states.SLOWED)) {
+		this.animDelay = 400;
+	} else {
+		this.animDelay = 200;
+	}
+	
 	if (this.deathTimer) {
 		this.deathTimer.update(elapsed);
 	}
@@ -164,14 +172,26 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-	
+		
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
 			this.animElapsed = 0;
 			this.animFrameIndex++;
-			if (this.animFrameIndex > 1) {
+			if (this.animFrameIndex > (this.animNumFrames - 1)) {
 				this.animFrameIndex = 0;
+			}
+			if (this.hasState(horde.Object.states.SPAWNING)) {
+				this.spawnFrameIndex++;
+				if (this.spawnFrameIndex > 2) {
+					this.removeState(horde.Object.states.SPAWNING);
+				}
+			}
+			if (this.hasState(horde.Object.states.DESPAWNING)) {
+				this.spawnFrameIndex--;
+				if (this.spawnFrameIndex < 0) {
+					this.removeState(horde.Object.states.DESPAWNING);
+				}
 			}
 		}
 	}
@@ -186,6 +206,10 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.alpha = 0;
 			this.alphaMod = 1;
 		}
+	}
+	
+	if (this.spriteAlign) {
+		this.angle = this.facing.angle();
 	}
 	
 	if (this.rotate) {
@@ -228,21 +252,45 @@ proto.update = function horde_Object_proto_update (elapsed) {
  */
 proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 	if (this.animated) {
-		if (this.hasState(horde.Object.states.DYING)) {
-			return new horde.Vector2(
-				(17 + this.deathFrameIndex) * this.size.width, this.spriteY
-			);
+		switch (this.role) {
+
+			case "hero":
+			case "monster":
+				if (this.hasState(horde.Object.states.DYING)) {
+					return new horde.Vector2(
+						(17 + this.deathFrameIndex) * this.size.width, this.spriteY
+					);
+				}
+				if (
+					this.hasState(horde.Object.states.SPAWNING)
+					|| this.hasState(horde.Object.states.DESPAWNING)
+				) {
+					return new horde.Vector2(
+						(17 + this.spawnFrameIndex) * this.size.width, 
+						this.spriteY - this.size.height
+					);
+				}
+				if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
+					return new horde.Vector2(
+						16 * this.size.width, this.spriteY
+					);
+				}
+				var offset = horde.directions.fromVector(this.facing.clone());
+				return new horde.Vector2(
+					((offset * 2) + this.animFrameIndex) * this.size.width,
+					this.spriteY
+				);
+				break;
+
+			default:
+				return new horde.Vector2(
+					this.spriteX + (this.animFrameIndex * this.size.width),
+					this.spriteY
+				);
+				break;
+			
 		}
-		if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
-			return new horde.Vector2(
-				16 * this.size.width, this.spriteY
-			);
-		}
-		var offset = horde.directions.fromVector(this.facing.clone());
-		return new horde.Vector2(
-			((offset * 2) + this.animFrameIndex) * this.size.width,
-			this.spriteY
-		);
+
 	} else {
 		return new horde.Vector2(this.spriteX, this.spriteY);
 	}
@@ -278,6 +326,9 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
  * @return {boolean} True if the object has died; otherwise false
  */
 proto.wound = function horde_Object_proto_wound (damage) {
+	if (damage < 1) {
+		return false;
+	}
 	this.wounds += damage;
 	if (this.role === "monster" || this.role === "hero") {
 		this.addState(horde.Object.states.HURTING, 300);
@@ -312,19 +363,15 @@ proto.wound = function horde_Object_proto_wound (damage) {
  * @return {void}
  */
 proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
-	switch (this.role) {
-		case "projectile":
-			// Projectiles "die" when they hit walls
-			this.die();
-			break;
-		case "monster":
-			// reverse direction(s)
-			var d = this.direction.clone();
-			for (var i in axis) {
-				d[axis[i]] *= -1;
-			}
-			this.setDirection(d);
-			break;
+	if (this.bounce) {
+		// reverse direction(s)
+		var d = this.direction.clone();
+		for (var i in axis) {
+			d[axis[i]] *= -1;
+		}
+		this.setDirection(d);
+	} else {
+		this.die();
 	}
 	this.execute("onWallCollide", [axis]);
 };
@@ -412,11 +459,16 @@ proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
 			return true;
 		}
 	}
+	var newWeapon = horde.objectTypes[type];
+	var currentWeapon = horde.objectTypes[this.getWeaponInfo().type];
 	var len = this.weapons.push({
 		type: type,
 		count: count
 	});
-	this.currentWeaponIndex = (len - 1);
+	if (newWeapon.priority > currentWeapon.priority) {
+		// Swap to the new weapon if it's better than the currently selected weapon
+		this.currentWeaponIndex = (len - 1);
+	}
 };
 
 proto.cycleWeapon = function horde_Object_proto_cycleWeapon (reverse) {
