@@ -33,7 +33,8 @@ o.h_sword = {
 	spriteX: 64,
 	spriteY: 0,
 	spriteAlign: true,
-	priority: 0
+	priority: 0,
+	bounce: false
 };
 
 o.h_knife = {
@@ -46,7 +47,8 @@ o.h_knife = {
 	spriteX: 32,
 	spriteY: 0,
 	spriteAlign: true,
-	priority: 1
+	priority: 1,
+	bounce: false
 };
 
 o.h_spear = {
@@ -59,7 +61,8 @@ o.h_spear = {
 	spriteX: 96,
 	spriteY: 0,
 	spriteAlign: true,
-	priority: 2
+	priority: 2,
+	bounce: false
 };
 
 o.h_fireball = {
@@ -74,7 +77,8 @@ o.h_fireball = {
 	rotate: true,
 	soundAttacks: "fire_attack",
 	ttl: 350,
-	priority: 3
+	priority: 3,
+	bounce: false
 };
 
 o.h_axe = {
@@ -87,7 +91,8 @@ o.h_axe = {
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
-	priority: 4
+	priority: 4,
+	ttl: 10000
 };
 
 // ENEMIES
@@ -951,7 +956,8 @@ o.e_arrow = {
 	spriteSheet: "objects",
 	spriteX: 256,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false
 };
 
 o.e_trident = {
@@ -961,9 +967,10 @@ o.e_trident = {
 	hitPoints: 1,
 	damage: 10,
 	spriteSheet: "objects",
-	spriteX: 288,
+	spriteX: 160,
 	spriteY: 0,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false
 };
 
 o.e_boulder = {
@@ -975,7 +982,8 @@ o.e_boulder = {
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_energy_ball = {
@@ -987,7 +995,8 @@ o.e_energy_ball = {
 	spriteSheet: "objects",
 	spriteX: 320,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_fireball = {
@@ -999,7 +1008,8 @@ o.e_fireball = {
 	spriteSheet: "objects",
 	spriteX: 352,
 	spriteY: 0,
-	rotate: true
+	rotate: true,
+	bounce: false
 };
 
 o.e_fireball_2 = {
@@ -1012,7 +1022,8 @@ o.e_fireball_2 = {
 	spriteX: 352,
 	spriteY: 0,
 	rotate: true,
-	ttl: 500
+	ttl: 500,
+	bounce: false
 };
 
 o.e_static_blue_fire = {
@@ -1026,7 +1037,8 @@ o.e_static_blue_fire = {
 	spriteY: 32,
 	rotate: true,
 	rotateSpeed: 100,
-	ttl: 1000
+	ttl: 1000,
+	bounce: false
 };
 
 o.e_shock_wave = {
@@ -1038,7 +1050,8 @@ o.e_shock_wave = {
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 32,
-	spriteAlign: true
+	spriteAlign: true,
+	bounce: false
 };
 
 // OTHER SHIT

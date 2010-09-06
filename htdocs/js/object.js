@@ -45,6 +45,7 @@ horde.Object = function () {
 	this.addState(horde.Object.states.IDLE);
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
+	this.bounce = true;
 };
 
 horde.Object.states = {
@@ -116,9 +117,6 @@ proto.removeState = function (state) {
  */
 proto.init = function horde_Object_proto_init () {
 	this.execute("onInit");
-	if (this.spriteAlign) {
-		this.angle = this.facing.angle();
-	}
 	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);
 	}
@@ -188,6 +186,10 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.alpha = 0;
 			this.alphaMod = 1;
 		}
+	}
+	
+	if (this.spriteAlign) {
+		this.angle = this.facing.angle();
 	}
 	
 	if (this.rotate) {
@@ -314,19 +316,15 @@ proto.wound = function horde_Object_proto_wound (damage) {
  * @return {void}
  */
 proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
-	switch (this.role) {
-		case "projectile":
-			// Projectiles "die" when they hit walls
-			this.die();
-			break;
-		case "monster":
-			// reverse direction(s)
-			var d = this.direction.clone();
-			for (var i in axis) {
-				d[axis[i]] *= -1;
-			}
-			this.setDirection(d);
-			break;
+	if (this.bounce) {
+		// reverse direction(s)
+		var d = this.direction.clone();
+		for (var i in axis) {
+			d[axis[i]] *= -1;
+		}
+		this.setDirection(d);
+	} else {
+		this.die();
 	}
 	this.execute("onWallCollide", [axis]);
 };
