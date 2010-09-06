@@ -6,11 +6,10 @@ var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
 var POINTER_Y_INC = 24;
-var POINTER_Y_START = 240;
+var POINTER_Y_START = 265;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
-var TITANIUM = (typeof(Titanium) != "undefined");
 
 /**
  * Creates a new Engine object
@@ -36,7 +35,7 @@ horde.Engine = function horde_Engine () {
 	this.gatesX = 0;
 	this.gatesY = 0;
 	this.titlePointerY = 0;
-	this.numTitleOptions = 4;
+	this.numTitleOptions = 2; // 2 means 3 ... sigh ... ;)
 	
 	this.targetReticle = {
 		angle: 0,
@@ -70,12 +69,12 @@ proto.run = function horde_Engine_proto_run () {
  * @return {void}
  */
 proto.stop = function horde_Engine_proto_stop () {
-	window.clearInterval(this.interval);
+	clearInterval(this.interval);
 };
 
 /**
  * Toggles pausing the engine
- * Note: isMuted would be used by every instance since it's within the prototype chain. Ew!
+ * Note: isMuted would be used by every instance since it's within its own closure. Ew!
  * @return {void}
  */
 proto.togglePause = (function horde_Engine_proto_togglePause () {
@@ -198,6 +197,7 @@ proto.init = function horde_Engine_proto_init () {
 		"title_screen": "img/title_screen.png",
 		"how_to_play": "img/how_to_play.png",
 		"credits": "img/credits.png",
+		"paused": "img/paused.png",
 		"arena_floor": "img/arena_floor.png",
 		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
@@ -1244,6 +1244,14 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(80)) {
 			this.togglePause();
+			this.keyboard.clearKeys();
+			return;
+		}
+
+		// Press any key to unpause.
+		if (this.paused && this.keyboard.isAnyKeyPressed()) {
+			this.togglePause();
+			return;
 		}
 
 		// Toggle sound with "M" for "mute".
@@ -1279,11 +1287,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					break;
 				case 2:
 					this.state = "credits";
-					break;
-				case 3:
-					if (TITANIUM) {
-						Titanium.App.exit();
-					}
 					break;
 			}
 
@@ -1525,7 +1528,6 @@ proto.render = function horde_Engine_proto_render () {
 	if (this.debug === true) {
 		this.drawDebugInfo(ctx);
 	}
-draw(); // TEMPORARY
 	
 };
 
@@ -1651,24 +1653,15 @@ proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
 };
 
 proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
-	var margin = 50;
 
 	ctx.save();
-	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.globalAlpha = 0.75;
-	ctx.fillRect(
-		margin, margin,
-		(SCREEN_WIDTH - (margin * 2)), (SCREEN_HEIGHT - (margin * 2))
+	ctx.globalAlpha = 0.5;
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	ctx.globalAlpha = 1;
+	ctx.drawImage(
+		this.images.getImage("paused"),
+		38, 38, 564, 404
 	);
-	ctx.restore();
-
-	ctx.save();
-	ctx.textAlign = "left";
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.font = "Bold 32px Monospace";
-	this.centerText(ctx, "Paused", 210);
-	ctx.font = "20px Monospace";
-	this.centerText(ctx, 'Press "P" to resume.', 240);
 	ctx.restore();
 
 };
@@ -1939,14 +1932,8 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	ctx.save();
 	this.drawText(ctx, "Play!", textX, textY, params);
-	this.drawText(ctx, "Controls", textX, (textY + POINTER_Y_INC), params);
-	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC * 2), params);
-	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 3), params);
-	if (TITANIUM) {
-		this.drawText(ctx, "Buy full version", textX, (textY + POINTER_Y_INC * 4), params);
-	} else {
-		this.drawText(ctx, "Exit", textX, (textY + POINTER_Y_INC * 4), params);
-	}
+	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC), params);
+	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 2), params);
 	ctx.restore();
 
 	// Sword pointer
@@ -2095,482 +2082,3 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 };
 
 }());
-
-/*
-    File: resources/manipulation.js
-    
-    Abstract: Canvas Pixel Manipulation Demo - JavaScript
-    
-    Version: 1.0
-    
-    Disclaimer: IMPORTANT:  This Apple software is supplied to you by
-    Apple Inc. ("Apple") in consideration of your agreement to the
-    following terms, and your use, installation, modification or
-    redistribution of this Apple software constitutes acceptance of these
-    terms.  If you do not agree with these terms, please do not use,
-    install, modify or redistribute this Apple software.
-    
-    In consideration of your agreement to abide by the following terms, and
-    subject to these terms, Apple grants you a personal, non-exclusive
-    license, under Apple's copyrights in this original Apple software (the
-    "Apple Software"), to use, reproduce, modify and redistribute the Apple
-    Software, with or without modifications, in source and/or binary forms;
-    provided that if you redistribute the Apple Software in its entirety and
-    without modifications, you must retain this notice and the following
-    text and disclaimers in all such redistributions of the Apple Software.
-    Neither the name, trademarks, service marks or logos of Apple Inc.
-    may be used to endorse or promote products derived from the Apple
-    Software without specific prior written permission from Apple.  Except
-    as expressly stated in this notice, no other rights or licenses, express
-    or implied, are granted by Apple herein, including but not limited to
-    any patent rights that may be infringed by your derivative works or by
-    other works in which the Apple Software may be incorporated.
-    
-    The Apple Software is provided by Apple on an "AS IS" basis.  APPLE
-    MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION
-    THE IMPLIED WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS
-    FOR A PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND
-    OPERATION ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
-    
-    IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION,
-    MODIFICATION AND/OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED
-    AND WHETHER UNDER THEORY OF CONTRACT, TORT (INCLUDING NEGLIGENCE),
-    STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-    
-    Copyright (C) 2010 Apple Inc. All Rights Reserved.
-*/
-
-/*** Init, Initial Drawing, and Image Export ***/
-/*
-var baseImage = "resources/tubes.jpg" ;
-var canvas;
-var context;
-var image;
-
-function init() {     
-    image = new Image();
-    image.onload = draw;
-    image.src = baseImage;
-    window.resizeTo(980,595);
-}
-*/
-
-// canvas image manipulation 
-function draw() {
-    canvas = document.getElementById('display');
-    context = canvas.getContext('2d');
-/*
-    context.clearRect(0,0,546,420);
-    context.drawImage(image, 0, 0, 546, 420); 
-*/
-
-    var input = context.getImageData(0, 0, canvas.width, canvas.height);
-    var output = doMath(input);
-    context.putImageData(output, 0, 0);       
-}
-
-// toDataURL
-function exportImage() {
-    var mimeType = 'image/';
-    for (var c = 0; c < 4; ++c) {
-        if( document.effectChooser.exportChoice[c].checked )
-            mimeType += document.effectChooser.exportChoice[c].value;
-    }
-    window.open(canvas.toDataURL( mimeType ));
-}
-
-  
-  
-/*** Pixel Manipulation ***/
-
-function doMath(input) {
-
-		var grayScale = false;
-		var invert = false;
-		var watermark = false;
-		var edgeDetection = false;
-		var neonLines = false;
-		var colorBook = false;
-		var ripples = false;
-		var glassBox = false;
-		var bulge = false;
-    
-    if (grayScale)
-        input = doGrayScale(input);
-    if (invert)
-        input = doInvert(input);
-    if (watermark)
-        input = doWatermark(input);
-    if (edgeDetection)
-        input = doEdgeDetection(input);
-    if (neonLines)
-        input = doNeonLines(input);
-    if (colorBook)
-        input = doColorBook(input);
-    if (ripples)
-        input = doRipples(input);
-    if (glassBox)
-        input = doGlassBox(input);
-    if (bulge)
-        input = doBulge(input);
-    
-    return input;
-}
-
-function doGrayScale(input) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    for (var y = 1; y < h-1; y += 1) {
-        for (var x = 1; x < w-1; x += 1) {
-            var pixel = (y*w + x)*4;
-            var factor = ((inputData[pixel] *.3 + inputData[pixel+1]*.59 + inputData[pixel+2]*.11) );
-            outputData[pixel] = factor * 1;
-            outputData[pixel+1] = factor * 1;
-            outputData[pixel+2] = factor * 1;
-            outputData[pixel+ 3] = inputData[pixel+ 3];
-        }   
-    }
-    return output;
-}
-
-function doInvert(input) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    for (var y = 1; y < h-1; y += 1) {
-        for (var x = 1; x < w-1; x += 1) {
-            var pixel = (y*w + x)*4;
-            for (var c = 0; c < 3; c += 1) {         
-                outputData[pixel+c] = 255 - inputData[pixel+c];
-            }
-            outputData[pixel+ 3] = inputData[pixel+ 3];
-        }   
-    }
-    return output;
-    
-}
-
-function doWatermark(input) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    for (var y = 1; y < h-1; y += 1) {
-        for (var x = 1; x < w-1; x += 1) {
-            var pixel = (y*w + x)*4;
-            var factor = ((inputData[pixel] *.3 + inputData[pixel+1]*.59 + inputData[pixel+2]*.11) );
-            
-            outputData[pixel] = factor;
-            outputData[pixel+1] = factor;
-            outputData[pixel+2] = factor;
-            outputData[pixel+ 3] = 32;
-        }   
-    }
-    return output;
-    
-}
-
-function doTint(input) {
-    var red = parseInt(document.effectChooser.red.value);
-    var green = parseInt(document.effectChooser.green.value);
-    var blue = parseInt(document.effectChooser.blue.value);
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    for (var y = 1; y < h-1; y += 1) {
-        for (var x = 1; x < w-1; x += 1) {
-            var pixel = (y*w + x)*4;
-            outputData[pixel] = ((.7*red+.3*inputData[pixel])) | 0;
-            outputData[pixel+1] = ((.7*green+.3*inputData[pixel+1])) | 0;
-            outputData[pixel+2] = ((.7*blue+.3*inputData[pixel+2])) | 0;
-            outputData[pixel+ 3] = 255;
-        }   
-    }
-    return output;
-}
-function doEdgeDetection(input) {
-    return doEdgeDetectionAlgorithm(input,127, 0);
-}
-
-function doNeonLines(input) {
-    return doEdgeDetectionAlgorithm(input,0, 0);
-}
-
-function doEdgeDetectionAlgorithm(input, baseColor, grey) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    var bytesPerRow = w * 4;
-    var pixel = bytesPerRow + 4; // Start at (1,1)
-    var hm1 = h - 1;
-    var wm1 = w - 1;
-    var d = new Date;
-    for (var y = 1; y < hm1; ++y) {
-        // Prepare initial cached values for current row
-        var centerRow = pixel - 4;
-        var priorRow = centerRow - bytesPerRow;
-        var nextRow = centerRow + bytesPerRow;
-        var r1 = - inputData[priorRow]   - inputData[centerRow]   - inputData[nextRow];
-        var g1 = - inputData[++priorRow] - inputData[++centerRow] - inputData[++nextRow];
-        var b1 = - inputData[++priorRow] - inputData[++centerRow] - inputData[++nextRow];
-        var rp = inputData[priorRow += 2];
-        var rc = inputData[centerRow += 2];
-        var rn = inputData[nextRow += 2];
-        var r2 = - rp - rc - rn;
-        var gp = inputData[++priorRow];
-        var gc = inputData[++centerRow];
-        var gn = inputData[++nextRow];
-        var g2 = - gp - gc - gn;
-        var bp = inputData[++priorRow];
-        var bc = inputData[++centerRow];
-        var bn = inputData[++nextRow];
-        var b2 = - bp - bc - bn;
-        
-        // Main convolution loop
-        for (var x = 1; x < wm1; ++x) {
-            centerRow = pixel + 4;
-            priorRow = centerRow - bytesPerRow;
-            nextRow = centerRow + bytesPerRow;
-            var r = baseColor + r1 - rp - (rc * -8) - rn;
-            var g = baseColor + g1 - gp - (gc * -8) - gn;
-            var b = baseColor + b1 - bp - (bc * -8) - bn;
-            r1 = r2;
-            g1 = g2;
-            b1 = b2;
-            rp = inputData[priorRow];
-            rc = inputData[centerRow];
-            rn = inputData[nextRow];
-            r2 = - rp - rc - rn;
-            gp = inputData[++priorRow];
-            gc = inputData[++centerRow];
-            gn = inputData[++nextRow];
-            g2 = - gp - gc - gn;
-            bp = inputData[++priorRow];
-            bc = inputData[++centerRow];
-            bn = inputData[++nextRow];
-            b2 = - bp - bc - bn;
-            if( !grey ) {
-                outputData[pixel] = r + r2;
-                outputData[++pixel] = g + g2;
-                outputData[++pixel] = b + b2;
-            } else {
-                factor = .3* (r+r2) + .59*(g+g2) +.11*(b+b2);
-                outputData[pixel] = factor;
-                outputData[++pixel] = factor;
-                outputData[++pixel] = factor;
-            }
-            outputData[++pixel] = 255; // alpha
-            ++pixel;
-        }
-        pixel += 8;
-    }
-    //alert((new Date - d) / 1000);
-    return output;
-}
-
-function doBlackAndWhite (input) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    for (var y = 1; y < h-1; y += 1) {
-        for (var x = 1; x < w-1; x += 1) {
-            var pixel = (y*w + x)*4;
-            var factor = ((inputData[pixel] *.3 + inputData[pixel+1]*.59 + inputData[pixel+2]*.11) );
-            if( factor > 192 ) 
-                factor = 255;
-            else
-                factor = 0;
-            for (var c = 0; c < 3; c += 1) {         
-                outputData[pixel+c] = factor;
-            }
-            outputData[pixel+ 3] = inputData[pixel+ 3];
-        }   
-    }
-    return output;
-}
-
-function doColorBook(input) {
-    var w = input.width, h = input.height;
-    var output = doEdgeDetectionAlgorithm(input,255,1);
-    var outputData = output.data;
-    var pixel = 0;
-    for (var y = 0; y < h; ++y) {
-        for (var x = 0; x < w; ++x) {
-            if( outputData[pixel] < 240 ) {
-                outputData[pixel] = 0;
-                outputData[++pixel] = 0;
-                outputData[++pixel] = 0;
-            } else {
-                outputData[pixel] = 255;
-                outputData[++pixel] = 255;
-                outputData[++pixel] = 255;
-            }
-            outputData[++pixel] = 255;
-            ++pixel;
-        }
-    }
-    return output;
-}
-
-function doRipples(input) {
-    return doDisplacement(input, getRippleData(), .2, 1, 1, 128, 128);
-}
-
-function doGlass(input) {
-    return doPattern(input, document.getElementById('glassCanvas'), .002, 0, 0, 128, 128);
-}
-
-function doGlassBox(input) {
-    return doPattern(input, getGlassBoxData(), .6, 0, 1,160,160);
-}
-
-function doBulge(input) {
-    return doDisplacement(input, getBulgeData(), 1, 1, 0, 100, 100);
-}
-
-function doPattern(input, pattern, scale, xChannel, yChannel, yOffset, xOffset) {
-    var cv = document.createElement("canvas");
-    var width = document.getElementById('display').width;
-    var height = document.getElementById('display').height;
-    cv.width = width;
-    cv.height = height;
-    var cvctx = cv.getContext('2d');
-    var ptrn = cvctx.createPattern(pattern,'repeat');
-    cvctx.fillStyle = ptrn;
-    cvctx.fillRect(0,0,width,height);
-    
-    return doDisplacement(input, cvctx, scale, xChannel, yChannel, yOffset, xOffset);
-}
-
-function doDisplacement(input, displacementCanvas, scale, xChannel, yChannel, xOffset, yOffset) {
-    var output = context.createImageData(canvas.width, canvas.height);
-    var w = input.width, h = input.height;
-    var inputData = input.data;
-    var outputData = output.data;
-    var displacementMap = displacementCanvas.getImageData(0, 0, canvas.width, canvas.height);
-    var displacementMapData = displacementMap.data;
-    var d = new Date;
-    var bytesPerRow = w * 4;
-    var pixel = 0;
-    if( xChannel == yChannel && xOffset==yOffset ) {
-        for (var y = 0; y < h; ++y) {
-            for (var x = 0; x < w; ++x) {
-                var displacement = (scale * (displacementMapData[pixel + xChannel]-xOffset)) | 0;
-                var j = ((displacement + y) * w + x + displacement)*4;
-                outputData[pixel]   = inputData[j];
-                outputData[++pixel] = inputData[++j];
-                outputData[++pixel] = inputData[++j];
-                outputData[++pixel] = inputData[++j];
-                ++pixel;
-            }
-        }
-    } else {
-        for (var y = 0; y < h; ++y) {
-            for (var x = 0; x < w; ++x) {
-                var displacementx = (scale * (displacementMapData[pixel + xChannel]-xOffset)) | 0;
-                var displacementy = (scale * (displacementMapData[pixel + yChannel]-yOffset)) | 0;
-                var j = ((displacementx + y) * w + x + displacementy)*4;
-                outputData[pixel]   = inputData[j];
-                outputData[++pixel] = inputData[++j];
-                outputData[++pixel] = inputData[++j];
-                outputData[++pixel] = inputData[++j];
-                ++pixel;
-            }
-        }
-    }
-    return output;
-}
-
-function drawGlassPattern() {
-    var cv = document.getElementById('glassCanvas');
-    cv.height = 16;
-    cv.width = 16;
-    var cvctx = cv.getContext('2d');
-    cvctx.fillStyle = "rgba(32,32,0,.5)";
-    cvctx.fillRect(0,0,16,16);
-    cvctx.fillStyle = "rgba(255,0,0,1)";
-    cvctx.beginPath();
-    cvctx.arc(4, 4, 4, 0, 2* Math.PI, 0);
-    cvctx.fill();
-    cvctx.closePath();
-    cvctx.beginPath();
-    cvctx.arc(12, 12, 4, 0, 2*Math.PI, 0);
-    cvctx.fill();
-    cvctx.closePath();
-}
-var cv2;
-function getRippleData() {
-    cv2 = document.createElement("canvas");
-    var width = document.getElementById('display').width;
-    var height = document.getElementById('display').height;
-    cv2.height = height;
-    cv2.width = width;
-    var cvctx = cv2.getContext('2d');
-    
-    var radgrad = cvctx.createRadialGradient(182,182,1,256,256,384);
-    radgrad.addColorStop(0.0, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.05, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.1, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.15, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.2, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.25, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.3, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.35, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.4, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.45, 'rgba(255,0,0,1)');     
-    radgrad.addColorStop(0.5, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.55, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.6, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.65, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.7, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.75, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.8, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.85, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(0.9, 'rgba(255,255,0,1)');
-    radgrad.addColorStop(0.95, 'rgba(255,0,0,1)');
-    radgrad.addColorStop(1, 'rgba(255,255,0,1)');
-    
-    cvctx.fillStyle = radgrad;
-    cvctx.fillRect(0,0,width,height);
-    
-    return cvctx;
-}
-
-function getBulgeData() {
-    var cv3 = document.createElement("canvas");
-    var width = document.getElementById('display').width;
-    var height = document.getElementById('display').height;
-    cv3.width = width;
-    cv3.height = height;
-    var cvctx = cv3.getContext('2d');
-      
-    bulge = new Image();
-    bulge.src = "img/sphere.png";
-    
-    cvctx.drawImage(bulge, 0, 0, width, height);
-    return cvctx;
-}
-
-function getGlassBoxData() {
-    var cv4 = document.createElement("canvas");
-    var height = document.getElementById("glassBoxImage").height * 2;
-    var width = document.getElementById("glassBoxImage").width * 2;
-    cv4.height = height;
-    cv4.width = width;
-    
-    var cvctx = cv4.getContext('2d');
-    
-    bulge = document.getElementById("glassBoxImage");    
-    cvctx.drawImage(bulge, 0, 0, width, height);
-    return cv4;
-}

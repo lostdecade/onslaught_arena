@@ -84,8 +84,21 @@ proto.isKeyPressed = function (keyCode) {
 	return (this.isKeyDown(keyCode) && this.lastKeyStates[keyCode] !== true);
 };
 
+proto.isAnyKeyPressed = function (keyCode) {
+	for (var keyCode in this.keyStates) {
+		if (this.isKeyDown(keyCode) && this.lastKeyStates[keyCode] !== true) {
+			return true;
+		}
+	}
+	return false;
+};
+
 proto.clearKey = function (keyCode) {
 	this.keyStates[keyCode] = false;
+};
+
+proto.clearKeys = function (keyCode) {
+	this.keyStates = {};
 };
 
 proto.historyMatch = function (keys) {
