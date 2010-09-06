@@ -1012,7 +1012,7 @@ o.e_fireball_2 = {
 	spriteX: 352,
 	spriteY: 0,
 	rotate: true,
-	ttl: 750
+	ttl: 500
 };
 
 o.e_static_blue_fire = {
