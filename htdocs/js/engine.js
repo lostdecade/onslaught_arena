@@ -172,16 +172,6 @@ proto.preloadComplete = function () {
  */
 proto.init = function horde_Engine_proto_init () {
 
-/*
-TODO
-console.log('setting ...');
-this.putData('foo', 'bar');
-
-console.log('getting ...');
-var foo = this.getData('high_score');
-console.log(foo);
-*/
-
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
