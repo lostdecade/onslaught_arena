@@ -2,8 +2,10 @@
 
 var VERSION = 0.3;
 var DEMO = false;
+var DEFAULT_HIGH_SCORE = 10000;
 var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
+var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
 var POINTER_Y_INC = 24;
 var POINTER_Y_START = 265;
@@ -170,6 +172,16 @@ proto.preloadComplete = function () {
  */
 proto.init = function horde_Engine_proto_init () {
 
+/*
+TODO
+console.log('setting ...');
+this.putData('foo', 'bar');
+
+console.log('getting ...');
+var foo = this.getData('high_score');
+console.log(foo);
+*/
+
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
@@ -204,6 +216,11 @@ proto.init = function horde_Engine_proto_init () {
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png"
 	}, this.handleImagesLoaded, this);
+
+	var highScore = this.getData(HIGH_SCORE_KEY);
+	if (highScore === null) {
+		this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
+	}
 	
 	this.initSound();
 	
@@ -1082,6 +1099,11 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				this.gameOverAlpha = 0;
 				this.updateGameOver();
 				this.state = "game_over";
+
+				var highScore = Number(this.getData(HIGH_SCORE_KEY));
+				if (o.gold > highScore) {
+					this.putData(HIGH_SCORE_KEY, o.gold);
+				}
 				return;
 			}
 			delete(this.objects[o.id]);
@@ -1685,14 +1707,6 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 };
 
 /**
- * Draws text centered horizontally. Could have many more options.
- */
-proto.centerText = function (ctx, text, y) {
-	var width = ctx.measureText(text).width;
-	ctx.fillText(text, ((SCREEN_WIDTH / 2) - (width / 2)), y);
-};
-
-/**
  * Returns the draw order of objects based on their Y position + height
  * @return {array} Array of object IDs in the order that they should be drawn
  */
@@ -1928,12 +1942,21 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		this.titleAlpha = 1;
 	}
 
+	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
+	this.drawText(ctx, highScore, 196, 414, {
+		fillStyle : "rgb(0, 0, 0)",
+		font : "Bold 10px Monospace"
+	});
+	this.drawText(ctx, highScore, 198, 416, {
+		fillStyle : "rgb(255, 255, 255)",
+		font : "Bold 10px Monospace"
+	});
+
 	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
 	this.drawText(ctx, version, 172, 438, {
 		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace"
 	});
-
 	this.drawText(ctx, version, 174, 440, {
 		fillStyle : "rgb(255, 255, 255)",
 		font : "Bold 10px Monospace"
@@ -2097,6 +2120,29 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
 	ctx.restore();
 	
+};
+
+/**
+ * Fetches some persistent data
+ * @param {String} key The key of the data to fetch
+ * @return {String} The data (or undefined on failure)
+ */
+proto.getData = function horde_Engine_proto_getData (key, value) {
+	if (typeof localStorage == "object") {
+		return localStorage.getItem(key);
+	}
+	return undefined;
+};
+
+/**
+ * Saves some data persistently
+ * @param {String} key The key of the data to store
+ * @param {String} value The data to store
+ */
+proto.putData = function horde_Engine_proto_putData (key, value) {
+	if (typeof localStorage == "object") {
+		localStorage.setItem(key, value);
+	}
 };
 
 }());
