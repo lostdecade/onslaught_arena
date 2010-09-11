@@ -1867,6 +1867,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.textAlign = "right";
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 32px Monospace";
+
 	ctx.fillText(o.gold, 603, 469);
 	ctx.fillText(wCount, 603, 439);
 	ctx.restore();
@@ -1874,7 +1875,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 };
 
 /**
- * Draws text, baby.
+ * Draws text, baby. Scales it up 'n stuff.
  * @param {Object} ctx Canvas 2d context to draw on.
  * @param {String} text The string to draw.
  * @param {Number} x The x coordinate.
