@@ -421,9 +421,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "sandworm", 1);
-	w.addObjects(1, "sandworm", 1);
-	w.addObjects(2, "sandworm", 1);
+	//w.addObjects(0, "sandworm", 1);
+	w.addObjects(1, "superclops", 1);
+	//w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -1470,6 +1470,7 @@ proto.objectAttack = function (object, v) {
 			object.shotsFired += 2;
 			break;
 
+		// Spread fire shotgun style
 		case "h_fireball":
 		case "e_fireball_2":
 			for (var x = -0.25; x <= 0.25; x += 0.25) {
@@ -1482,6 +1483,19 @@ proto.objectAttack = function (object, v) {
 				);
 			}
 			object.shotsFired += 3;
+			break;
+
+		// Spawn in a circle around the object
+		case "e_bouncing_boulder":
+			var len = (Math.PI * 2);
+			var step = (len / 8);
+			for (var h = 0; h < len; h += step) {
+				this.spawnObject(
+					object,
+					weaponType,
+					horde.Vector2.fromHeading(h)
+				);
+			}
 			break;
 
 		// Shoot one instance of the weapon

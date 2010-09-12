@@ -516,11 +516,71 @@ o.superclops = {
 	weapons: [{type: "e_energy_ball", count: null}],
 
 	onInit: function () {
+		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 	},
 	onUpdate: function (elapsed, engine) {
-		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+		
+		switch (this.phase) {
+			
+			// Charge out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 100;
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 160) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Wiggle!
+			case 1:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.animDelay = 300;
+					this.phaseTimer.start(1500);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+					break;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				break;
+			
+			// Shoot bouncing boulders
+			case 2:
+				if (!this.phaseInit) {
+					this.cooldown = false;
+					this.weapons = [{type: "e_bouncing_boulder", count: null}];
+					this.phaseInit = true;
+				}
+				engine.objectAttack(this);
+				this.position.x += horde.randomRange(-1, 1);
+				this.nextPhase();
+				break;
+			
+			// Chase and shoot energy balls
+			case 3:
+				if (!this.phaseInit) {
+					this.speed = 25;
+					this.weapons = [{type: "e_energy_ball", count: null}];
+					this.cooldown = true;
+					this.phaseTimer.start(6000)
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.setPhase(1);
+				}
+				engine.objectAttack(this);
+				movementTypes.chase.apply(this, arguments);
+				break;
+
+		}
+		
 	}
 
 };
@@ -546,12 +606,6 @@ o.imp = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
 	
-	/*
-	weapons: [
-		{type: "e_energy_ball", count: null}
-	],
-	*/
-
 	// TODO: Imp sounds?
 	soundAttacks: "bat_attacks",
 	soundDamage: "bat_damage",
@@ -1008,7 +1062,7 @@ o.e_trident = {
 
 o.e_boulder = {
 	role: "projectile",
-	cooldown: 1500 ,
+	cooldown: 1500,
 	speed: 150,
 	hitPoints: 25,
 	damage: 20,
@@ -1017,6 +1071,20 @@ o.e_boulder = {
 	spriteY: 0,
 	rotate: true,
 	bounce: false
+};
+
+o.e_bouncing_boulder = {
+	role: "projectile",
+	cooldown: 1500,
+	speed: 100,
+	hitPoints: 25,
+	damage: 20,
+	spriteSheet: "objects",
+	spriteX: 224,
+	spriteY: 0,
+	rotate: true,
+	bounce: true,
+	ttl: 5000
 };
 
 o.e_energy_ball = {

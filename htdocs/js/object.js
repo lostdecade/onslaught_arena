@@ -56,6 +56,11 @@ horde.Object = function () {
 	this.shotsFired = 0;
 	this.shotsLanded = 0;
 	this.shotsPerWeapon = {};
+	
+	// Behavior phase stuff
+	this.phase = 0;
+	this.phaseInit = false;
+
 };
 
 horde.Object.states = {
@@ -71,6 +76,15 @@ horde.Object.states = {
 };
 
 var proto = horde.Object.prototype;
+
+proto.setPhase = function (phase) {
+	this.phase = phase;
+	this.phaseInit = false;
+}
+
+proto.nextPhase = function () {
+	this.setPhase(this.phase + 1);
+};
 
 proto.updateStates = function (elapsed) {
 	for (var x in this.states) {
