@@ -1458,6 +1458,18 @@ proto.objectAttack = function (object, v) {
 
 	switch (weaponType) {
 		
+		case "e_energy_ball":
+			var h = v.heading();
+			for (var x = -0.5; x <= 0.5; x += 0.5) {
+				this.spawnObject(
+					object, 
+					weaponType, 
+					horde.Vector2.fromHeading(h + x)
+				);
+			}
+			object.shotsFired += 3;
+			break;
+		
 		// Shoot 2 knives in a spread pattern
 		case "h_knife":
 			var h = v.heading();

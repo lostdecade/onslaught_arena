@@ -566,7 +566,7 @@ o.superclops = {
 			// Chase and shoot energy balls
 			case 3:
 				if (!this.phaseInit) {
-					this.speed = 25;
+					this.speed = 50;
 					this.weapons = [{type: "e_energy_ball", count: null}];
 					this.cooldown = true;
 					this.phaseTimer.start(6000)
@@ -1076,7 +1076,7 @@ o.e_boulder = {
 o.e_bouncing_boulder = {
 	role: "projectile",
 	cooldown: 1500,
-	speed: 100,
+	speed: 150,
 	hitPoints: 25,
 	damage: 20,
 	spriteSheet: "objects",
