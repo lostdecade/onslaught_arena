@@ -208,6 +208,12 @@ o.bat = {
 	moveChangeDelay: 500,
 	soundDamage: "bat_damage",
 	soundDies: "bat_dies",
+	
+	lootTable: [
+		{type: null, weight: 5},
+		{type: "item_coin", weight: 5}
+	],
+	
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -231,6 +237,12 @@ o.dire_bat = {
 	moveChangeDelay: 500,
 	soundDamage: "bat_damage",
 	soundDies: "bat_dies",
+	
+	lootTable: [
+		{type: null, weight: 3},
+		{type: "item_coin", weight: 7}
+	],
+	
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -258,6 +270,14 @@ o.goblin = {
 	soundAttacks: "goblin_attacks",
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
+	
+	lootTable: [
+		{type: null, weight: 2},
+		{type: "item_coin", weight: 4},
+		{type: "item_weapon_knife", weight: 2},
+		{type: "item_food", weight: 2}
+	],
+	
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
@@ -283,6 +303,14 @@ o.demoblin = {
 	weapons: [
 		{type: "e_trident", count: null}
 	],
+	
+	lootTable: [
+		{type: "item_coin", weight: 3},
+		{type: "item_weapon_spear", weight: 3},
+		{type: "item_chest", weight: 2},
+		{type: "item_food", weight: 2}
+	],
+	
 	soundAttacks: "goblin_attacks",
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
@@ -315,7 +343,14 @@ o.flaming_skull = {
 	weapons: [
 		{type: "e_static_blue_fire", count: null}
 	],
-		
+	
+	lootTable: [
+		{type: null, weight: 1},
+		{type: "item_coin", weight: 3},
+		{type: "item_weapon_fireball", weight: 3},
+		{type: "item_chest", weight: 3}
+	],
+	
 	onUpdate: function (elapsed, engine) {
 		if (!this.setDir && this.position.y >= 50) {
 			var d = this.direction.clone();
@@ -481,6 +516,13 @@ o.cyclops = {
 
 	weapons: [{type: "e_boulder", count: null}],
 
+	lootTable: [
+		{type: "item_chest", weight: 1},
+		{type: "item_weapon_knife", weight: 3},
+		{type: "item_weapon_spear", weight: 3},
+		{type: "item_food", weight: 3}
+	],
+
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
@@ -514,6 +556,11 @@ o.superclops = {
 	soundDies: "cyclops_dies",
 
 	weapons: [{type: "e_energy_ball", count: null}],
+
+	lootTable: [
+		{type: "item_chest", weight: 5},
+		{type: "item_gold_chest", weight: 5}
+	],
 
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
@@ -701,6 +748,13 @@ o.wizard = {
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
 	
+	lootTable: [
+		{type: null, weight: 4},
+		{type: "item_chest", weight: 2},
+		{type: "item_gold_chest", weight: 1},
+		{type: "item_weapon_fireball", weight: 4}
+	],
+	
 	phase: 0,
 	phaseInit: false,
 	
@@ -815,6 +869,12 @@ o.sandworm = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 	
+	lootTable: [
+		{type: null, weight: 4},
+		{type: "item_chest", weight: 2},
+		{type: "item_food", weight: 4}
+	],
+	
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.dirtTimer = new horde.Timer();
@@ -918,6 +978,10 @@ o.dragon = {
 	soundDies: "dragon_dies",
 
 	weapons: [{type: "e_fireball", count: null}],
+
+	lootTable: [
+		{type: "item_gold_chest", weight: 1}
+	],
 
 	phase: 0,
 	phaseInit: false,
@@ -1218,26 +1282,7 @@ o.cloud = {
 	
 };
 
-/*
-
-o.chest = {
-	role: "chest",
-	team: 1,
-	speed: 0,
-	spriteSheet: "characters",
-	spriteX: 0,
-	spriteY: 32,
-	damage: 0,
-	hitPoints: 25
-};
-
-o.gold_chest = {
-	
-};
-
-*/
-
-// GIBLETS
+// GATE
 
 o.gate = {
 	role: "fluff",
@@ -1248,83 +1293,7 @@ o.gate = {
 	size: new horde.Size(64, 64)
 };
 
-o.small_skull = {
-	role: "fluff",
-	speed: 25,
-	ttl: 1000,
-	spriteSheet: "objects",
-	spriteX: 64,
-	spriteY: 64,
-	rotate: true,
-	rotateSpeed: 50
-};
-
-o.small_giblet = {
-	role: "fluff",
-	speed: 50,
-	ttl: 1500,
-	spriteSheet: "objects",
-	spriteX: 0,
-	spriteY: 160,
-	rotate: true,
-	rotateSpeed: 50,
-	onInit: function () {
-		var offset = horde.randomRange(0, 6);
-		this.spriteX += (offset * this.size.width);
-	}
-};
-
-o.medium_skull = {
-	role: "fluff",
-	speed: 25,
-	ttl: 1000,
-	spriteSheet: "objects",
-	spriteX: 32,
-	spriteY: 64,
-	rotate: true,
-	rotateSpeed: 50
-};
-
-o.medium_giblet = {
-	role: "fluff",
-	speed: 50,
-	ttl: 1500,
-	spriteSheet: "objects",
-	spriteX: 0,
-	spriteY: 128,
-	rotate: true,
-	rotateSpeed: 50,
-	onInit: function () {
-		var offset = horde.randomRange(0, 6);
-		this.spriteX += (offset * this.size.width);
-	}
-};
-
-o.large_skull = {
-	role: "fluff",
-	speed: 25,
-	ttl: 1000,
-	spriteSheet: "objects",
-	spriteX: 0,
-	spriteY: 64,
-	rotate: true,
-	rotateSpeed: 50
-};
-
-o.large_giblet = {
-	role: "fluff",
-	speed: 50,
-	ttl: 1500,
-	spriteSheet: "objects",
-	spriteX: 0,
-	spriteY: 96,
-	rotate: true,
-	rotateSpeed: 50,
-	onInit: function () {
-		var offset = horde.randomRange(0, 6);
-		this.spriteX += (offset * this.size.width);
-	}
-};
+// FOOD (Eat Meat!)
 
 o.item_food = {
 	role: "powerup_food",
@@ -1336,70 +1305,96 @@ o.item_food = {
 	ttl: 8000
 };
 
+// GOLD (Collect Gold!)
+
 o.item_coin = {
 	role: "powerup_coin",
-	coinAmount: 10,
+	coinAmount: 1,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 64,
 	spriteY: 32,
-	ttl: 5000,
-	onInit: function () {
-		var rnd = horde.randomRange(1, 10);
-		if (rnd <= 5) {
-			this.coinAmount = 10;
-			this.spriteX = 64;
-			return;
-		}
-		if (rnd > 5 && rnd <= 9) {
-			this.coinAmount = 100;
-			this.spriteX = 32;			
-			return;
-		}
-		if (rnd === 10) {
-			this.coinAmount = 1000;
-			this.spriteX = 0;			
-			return;
-		}
-	}
+	ttl: 5000
 };
 
-o.item_weapon = {
+o.item_chest = {
+	role: "powerup_coin",
+	coinAmount: 100,
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 32,
+	ttl: 5000
+};
+
+o.item_gold_chest = {
+	role: "powerup_coin",
+	coinAmount: 1000,
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 32,
+	ttl: 5000
+};
+
+// WEAPON POWERUPS
+
+o.item_weapon_knife = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 0,
+	ttl: 5000,
+	wepType: "h_knife",
+	wepCount: 150
+};
+
+o.item_weapon_spear = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 0,
+	ttl: 5000,
+	wepType: "h_spear",
+	wepCount: 30
+};
+
+o.item_weapon_fireball = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 0,
+	ttl: 5000,
+	wepType: "h_fireball",
+	wepCount: 200
+};
+
+o.item_weapon_axe = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 32,
+	ttl: 5000,
+	wepType: "h_axe",
+	wepCount: 150
+};
+
+/*
+NOT YET
+o.item_weapon_fire_sword = {
 	role: "powerup_weapon",
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 0,
 	ttl: 5000,
-	onInit: function () {
-		// Note: all these fallthroughs are intentional.
-		switch (horde.randomRange(1, 8)) {
-
-			case 1:
-			case 2:
-			case 3:
-				this.wepType = "h_knife";
-				this.spriteX = 32;
-				this.wepCount = 150;
-				break;
-			
-			case 4:
-			case 5:
-			case 6:
-				this.wepType = "h_spear";
-				this.wepCount = 30;
-				this.spriteX = 96;
-				break;
-				
-			case 7:
-			case 8:
-				this.wepType = "h_fireball";
-				this.wepCount = 200;
-				this.spriteX = 192;
-				break;
-			
-		}
-	}
+	wepType: "h_fire_sword",
+	wepCount: 100
 };
+*/
 
 }());

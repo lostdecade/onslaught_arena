@@ -310,12 +310,12 @@ proto.initGame = function () {
 	// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 	var player = this.getPlayerObject();
 	
-	var wep = horde.makeObject("item_weapon");
+	var wep = horde.makeObject("item_weapon_knife");
 	wep.position = player.position.clone();
 	wep.position.x -= 128;
 	this.addObject(wep);
 
-	var wep = horde.makeObject("item_weapon");
+	var wep = horde.makeObject("item_weapon_spear");
 	wep.position = player.position.clone();
 	wep.position.x += 128;
 	this.addObject(wep);
@@ -976,7 +976,7 @@ proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (objec
 
 proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
-	if (object.hasState(horde.Object.states.HURTING)) {
+	if (!object.badass && object.hasState(horde.Object.states.HURTING)) {
 		return false;
 	}
 	
@@ -1044,28 +1044,29 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
 };
 
-proto.spawnLoot = function horde_Engine_proto_spawnLoot (position) {
+proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
+
+	var table = object.lootTable;
+	var len = table.length;
 	
-	// Random chance loot!
-	if (horde.randomRange(1, 10) > 6) {
-		var lootType = "item_coin";
-		switch (horde.randomRange(1, 4)) {
-			case 3:
-				var p = this.getPlayerObject();
-				if (p.wounds) {
-					lootType = "item_food";
-				}
-				break;
-			case 4:
-				lootType = "item_weapon";
-				break;
-		}				
-		var drop = horde.makeObject(lootType);
-		drop.position = position.clone();
+	var weightedTable = [];
+	for (var x = 0; x < len; x++) {
+		var entry = table[x];
+		for (var j = 0; j < entry.weight; j++) {
+			weightedTable.push(entry.type);
+		}
+	}
+	
+	var rand = horde.randomRange(0, weightedTable.length - 1);
+	var type = weightedTable[rand];
+
+	if (type !== null) {
+		var drop = horde.makeObject(type);
+		drop.position = object.position.clone();
 		drop.position.y -= 1;
 		this.addObject(drop);
 	}
-	
+
 };
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
@@ -1212,8 +1213,8 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		scorer.gold += defender.worth;
 		scorer.kills++;
 		defender.execute("onKilled", [attacker, this]);
-		if (defender.role === "monster") {
-			this.spawnLoot(defender.position.clone());
+		if (defender.lootTable.length > 0) {
+			this.spawnLoot(defender);
 		}
 	} else {
 		if (attacker.role === "projectile") {
