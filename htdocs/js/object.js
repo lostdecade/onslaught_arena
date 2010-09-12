@@ -60,6 +60,17 @@ horde.Object = function () {
 	// Behavior phase stuff
 	this.phase = 0;
 	this.phaseInit = false;
+	
+	// Loot tables for enemies
+	this.lootTable = [];
+	
+	/*
+	this.lootTable = [
+		{type: "item_coin", weight: 1},
+		{type: "item_food", weight: 2},
+		{type: null, weight: 7}
+	];
+	*/
 
 };
 
