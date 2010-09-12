@@ -48,6 +48,14 @@ horde.Object = function () {
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
 	this.bounce = true;
+	
+	// Stats!
+	this.kills = 0;
+	this.timesWounded = 0;
+	this.totalDamageTaken = 0;
+	this.shotsFired = 0;
+	this.shotsLanded = 0;
+	this.shotsPerWeapon = {};
 };
 
 horde.Object.states = {
@@ -330,6 +338,8 @@ proto.wound = function horde_Object_proto_wound (damage) {
 		return false;
 	}
 	this.wounds += damage;
+	this.totalDamageTaken += damage;
+	this.timesWounded++;
 	if (this.role === "monster" || this.role === "hero") {
 		this.addState(horde.Object.states.HURTING, 300);
 	}

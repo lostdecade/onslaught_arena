@@ -1085,6 +1085,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		
 		if (o.isDead()) {
 			if (o.role === "hero") {
+
 				this.gameOverReady = false;
 				this.gameOverAlpha = 0;
 				this.updateGameOver();
@@ -1196,16 +1197,20 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
 	attacker.execute("onDamage", [defender, this]);
-	if (defender.wound(attacker.damage)) {
-		// defender has died; assign gold
-		if (attacker.ownerId === null) {
-			attacker.gold += defender.worth;
-		} else {
-			var owner = this.objects[attacker.ownerId];
-			if (owner) {
-				owner.gold += defender.worth;
-			}
+	scorer = attacker;
+	if (scorer.ownerId !== null) {
+		var owner = this.objects[scorer.ownerId];
+		if (owner) {
+			scorer = owner;
 		}
+	}
+	if (attacker.role === "projectile") {
+		scorer.shotsLanded++;
+	}
+	if (defender.wound(attacker.damage)) {
+		// defender has died; assign gold/kills etc
+		scorer.gold += defender.worth;
+		scorer.kills++;
 		defender.execute("onKilled", [attacker, this]);
 		if (defender.role === "monster") {
 			this.spawnLoot(defender.position.clone());
@@ -1462,6 +1467,7 @@ proto.objectAttack = function (object, v) {
 			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
 				h + 0.1
 			));
+			object.shotsFired += 2;
 			break;
 
 		case "h_fireball":
@@ -1475,14 +1481,22 @@ proto.objectAttack = function (object, v) {
 					horde.Vector2.fromHeading(h)
 				);
 			}
+			object.shotsFired += 3;
 			break;
 
 		// Shoot one instance of the weapon
 		default:
 			this.spawnObject(object, weaponType, v);
+			this.shotsFired++;
 			break;
 			
 	}
+
+	// Increment shots per weapon counter
+	if (!object.shotsPerWeapon[weaponType]) {
+		object.shotsPerWeapon[weaponType] = 0;
+	}
+	object.shotsPerWeapon[weaponType]++;
 
 	// Determine what sound (if any) to play
 	// Attacking sound on weapon type > attacking sound on object performing attack
