@@ -48,6 +48,7 @@ horde.Object = function () {
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
 	this.bounce = true;
+	this.weapons = [];
 	
 	// Stats!
 	this.kills = 0;
@@ -127,13 +128,24 @@ proto.addState = function (state, ttl) {
 		type: state,
 		timer: t
 	});
+	switch (state) {
+		case horde.Object.states.SLOWED:
+			this.oldAnimDelay = this.animDelay;
+			this.animDelay *= 2;
+			break;
+	}
 };
 
 proto.removeStateById = function (id) {
 	var s = this.states[id];
-	if (s.type === horde.Object.states.INVINCIBLE) {
-		this.alpha = 1;
-		this.alphaMod = -1;
+	switch (s.type) {
+		case horde.Object.states.INVINCIBLE:
+			this.alpha = 1;
+			this.alphaMod = -1;
+			break;
+		case horde.Object.states.SLOWED:
+			this.animDelay = this.oldAnimDelay;
+			break;
 	}
 	delete(this.states[id]);
 };
@@ -184,13 +196,7 @@ proto.isDead = function horde_Object_proto_isDead () {
 proto.update = function horde_Object_proto_update (elapsed) {
 	
 	this.updateStates(elapsed);
-	
-	if (this.hasState(horde.Object.states.SLOWED)) {
-		this.animDelay = 400;
-	} else {
-		this.animDelay = 200;
-	}
-	
+
 	if (this.deathTimer) {
 		this.deathTimer.update(elapsed);
 	}

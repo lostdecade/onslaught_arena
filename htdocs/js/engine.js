@@ -422,7 +422,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
 	//w.addObjects(0, "sandworm", 1);
-	w.addObjects(1, "superclops", 1);
+	w.addObjects(1, "cube", 1);
 	//w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
