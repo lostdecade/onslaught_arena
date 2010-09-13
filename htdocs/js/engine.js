@@ -262,6 +262,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
+		s.create("spike_attack", "sound/effects/spike_attack");
+		
 	});
 	
 };

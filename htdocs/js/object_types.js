@@ -414,6 +414,7 @@ o.spike_sentry = {
 					this.setDirection(d);
 					this.phase++;
 					this.phaseInit = false;
+					horde.sound.play("spike_attack");
 				} else if (Math.abs(diff.x) < 32) {
 					this.originalPos = this.position.clone();
 					var d = new horde.Vector2();
@@ -421,6 +422,7 @@ o.spike_sentry = {
 					this.setDirection(d);
 					this.phase++;
 					this.phaseInit = false;
+					horde.sound.play("spike_attack");
 				}
 				break;
 				
@@ -549,8 +551,8 @@ o.cube = {
 
 	damage: 25,
 	hitPoints: 1000,
-	speed: 25,
-	worth: 100,
+	speed: 15,
+	worth: 10000,
 
 	// TODO: Cube sounds?
 	soundAttacks: "cyclops_attacks",
