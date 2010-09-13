@@ -8,7 +8,7 @@ var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
 var POINTER_Y_INC = 24;
-var POINTER_Y_START = 265;
+var POINTER_Y_START = 300;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
@@ -562,9 +562,8 @@ proto.updateLogo = function (elapsed) {
 	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 
-	if (kb.isKeyDown(keys.ENTER) || kb.isKeyDown(keys.SPACE)) {
-		kb.clearKey(keys.ENTER);
-		kb.clearKey(keys.SPACE);
+	if (this.keyboard.isAnyKeyPressed()) {
+		kb.clearKeys();
 		this.initGame();
 	}
 
@@ -1363,25 +1362,22 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "how_to_play") {
-		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
-			kb.clearKey(keys.ENTER);
-			kb.clearKey(keys.SPACE);
+		if (this.keyboard.isAnyKeyPressed()) {
+			kb.clearKeys();
 			this.state = "title";
 		}
 	}
 
 	if (this.state === "credits") {
-		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
-			kb.clearKey(keys.ENTER);
-			kb.clearKey(keys.SPACE);
+		if (this.keyboard.isAnyKeyPressed()) {
+			kb.clearKeys();
 			this.state = "title";
 		}
 	}
 
 	if (this.state === "intro_cinematic") {
-		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
-			kb.clearKey(keys.ENTER);
-			kb.clearKey(keys.SPACE);
+		if (this.keyboard.isAnyKeyPressed()) {
+			kb.clearKeys();
 			this.state = "running";
 			horde.sound.play("normal_battle_music");
 		}
@@ -1987,21 +1983,21 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	}
 
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
-	this.drawText(ctx, highScore, 196, 414, {
+	this.drawText(ctx, highScore, 196, 424, {
 		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace"
 	});
-	this.drawText(ctx, highScore, 198, 416, {
+	this.drawText(ctx, highScore, 198, 426, {
 		fillStyle : "rgb(255, 255, 255)",
 		font : "Bold 10px Monospace"
 	});
 
 	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
-	this.drawText(ctx, version, 172, 438, {
+	this.drawText(ctx, version, 172, 448, {
 		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace"
 	});
-	this.drawText(ctx, version, 174, 440, {
+	this.drawText(ctx, version, 174, 450, {
 		fillStyle : "rgb(255, 255, 255)",
 		font : "Bold 10px Monospace"
 	});
@@ -2012,7 +2008,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		textAlign : "left"
 	};
 
-	var textX = 270;
+	var textX = 280;
 	var textY = (POINTER_Y_START - TEXT_HEIGHT);
 
 	ctx.save();
