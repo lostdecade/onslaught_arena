@@ -605,6 +605,7 @@ o.cube = {
 				this.position.x += horde.randomRange(-1, 1);
 				if (this.gelTimer.expired()) {
 					engine.spawnObject(this, "gel");
+					horde.sound.play(this.soundAttacks);
 					this.gelTimer.reset();
 				}
 				break;
