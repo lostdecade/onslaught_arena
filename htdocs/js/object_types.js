@@ -339,7 +339,7 @@ o.flaming_skull = {
 	animated: true,
 	
 	setDir: false,
-		
+	
 	weapons: [
 		{type: "e_static_blue_fire", count: null}
 	],
@@ -363,7 +363,7 @@ o.flaming_skull = {
 		}
 		return "shoot";
 	}
-		
+	
 };
 
 o.spike_sentry = {
@@ -449,7 +449,7 @@ o.spike_sentry = {
 				}
 				break;
 			
-			// Reseting	
+			// Reseting
 			case 2:
 			 	if (!this.phaseInit) {
 					this.speed = 100;
@@ -468,7 +468,7 @@ o.spike_sentry = {
 		}
 
 	}
-	
+
 };
 
 o.spikes = {
@@ -491,7 +491,6 @@ o.spikes = {
 
 	}
 };
-
 
 o.cyclops = {
 	role: "monster",
@@ -668,7 +667,6 @@ o.gel = {
 	
 };
 
-
 o.superclops = {
 	role: "monster",
 	team: 1,
@@ -790,10 +788,9 @@ o.imp = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
 	
-	// TODO: Imp sounds?
-	soundAttacks: "bat_attacks",
-	soundDamage: "bat_damage",
-	soundDies: "bat_dies",
+	soundAttacks: "imp_attacks",
+	soundDamage: "imp_damage",
+	soundDies: "imp_dies",
 	
 	phase: 0,
 	phaseInit: false,

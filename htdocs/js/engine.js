@@ -31,7 +31,7 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
-		
+	
 	this.gateDirection = ""; // Set to "up" or "down"
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
@@ -250,6 +250,10 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("goblin_attacks", "sound/effects/goblin_attacks");
 		s.create("goblin_damage", "sound/effects/goblin_damage");
 		s.create("goblin_dies", "sound/effects/goblin_dies");
+
+		s.create("imp_attacks", "sound/effects/imp_attacks");
+		s.create("imp_damage", "sound/effects/imp_damage");
+		s.create("imp_dies", "sound/effects/imp_dies");
 		
 		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
 		s.create("cyclops_damage", "sound/effects/cyclops_damage");
@@ -259,14 +263,14 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("dragon_damage", "sound/effects/dragon_damage");
 		s.create("dragon_dies", "sound/effects/dragon_dies");
 
-		s.create("cube_attacks", "sound/effects/cube_attack");
+		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_death");
 
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
-		s.create("spike_attack", "sound/effects/spike_attack");
+		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 	});
 	
@@ -427,7 +431,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	//w.addObjects(0, "sandworm", 1);
+	w.addObjects(0, "imp", 1);
 	w.addObjects(1, "cube", 1);
 	//w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
@@ -753,7 +757,7 @@ proto.update = function horde_Engine_proto_update () {
 				this.updateWaves(elapsed);
 				this.updateSpawnPoints(elapsed);
 				this.updateClouds(elapsed);
-				this.updateObjects(elapsed);	
+				this.updateObjects(elapsed);
 				this.updateFauxGates(elapsed);
 			}
 			this.render();
@@ -1127,8 +1131,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		}
 
 		if (
-			o.role === "fluff" 
-			|| o.role === "powerup_food" 
+			o.role === "fluff"
+			|| o.role === "powerup_food"
 			|| o.hasState(horde.Object.states.DYING)
 			|| o.hasState(horde.Object.states.INVISIBLE)
 		) {
@@ -1138,9 +1142,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
 			if (
-				o2.isDead() 
-				|| o2.team === o.team 
-				|| o2.role === "fluff" 
+				o2.isDead()
+				|| o2.team === o.team
+				|| o2.role === "fluff"
 				|| o2.hasState(horde.Object.states.DYING)
 				|| o2.hasState(horde.Object.states.INVISIBLE)
 			) {
@@ -1165,8 +1169,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					}
 				}
 				if (
-					o.team !== null 
-					&& o2.team !== null 
+					o.team !== null
+					&& o2.team !== null
 					&& o.team !== o2.team
 				) {
 					if (
@@ -1191,7 +1195,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	var nullify = defender.execute("onThreat", [attacker, this]);
 	if (
-		defender.hasState(horde.Object.states.INVINCIBLE) 
+		defender.hasState(horde.Object.states.INVINCIBLE)
 		|| defender.role === "trap"
 		|| defender.role === "projectile"
 		|| nullify === true
@@ -1471,8 +1475,8 @@ proto.objectAttack = function (object, v) {
 			var h = v.heading();
 			for (var x = -0.5; x <= 0.5; x += 0.5) {
 				this.spawnObject(
-					object, 
-					weaponType, 
+					object,
+					weaponType,
 					horde.Vector2.fromHeading(h + x)
 				);
 			}
@@ -1498,8 +1502,8 @@ proto.objectAttack = function (object, v) {
 				var h = v.heading();
 				h += (x + (horde.randomRange(-1, 1) / 10));
 				this.spawnObject(
-					object, 
-					weaponType, 
+					object,
+					weaponType,
 					horde.Vector2.fromHeading(h)
 				);
 			}
