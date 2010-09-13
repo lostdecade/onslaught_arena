@@ -259,6 +259,10 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("dragon_damage", "sound/effects/dragon_damage");
 		s.create("dragon_dies", "sound/effects/dragon_dies");
 
+		s.create("cube_attacks", "sound/effects/cube_attack");
+		s.create("cube_damage", "sound/effects/cube_damage");
+		s.create("cube_dies", "sound/effects/cube_death");
+
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
@@ -1185,10 +1189,12 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	var nullify = defender.execute("onThreat", [attacker, this]);
 	if (
 		defender.hasState(horde.Object.states.INVINCIBLE) 
 		|| defender.role === "trap"
 		|| defender.role === "projectile"
+		|| nullify === true
 	) {
 		// Defender is invincible
 		if (attacker.role === "projectile") {

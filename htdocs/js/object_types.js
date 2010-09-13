@@ -553,11 +553,10 @@ o.cube = {
 	hitPoints: 1000,
 	speed: 15,
 	worth: 10000,
-
-	// TODO: Cube sounds?
-	soundAttacks: "cyclops_attacks",
-	soundDamage: "cyclops_damage",
-	soundDies: "cyclops_dies",
+	
+	soundAttacks: "cube_attacks",
+	soundDamage: "cube_damage",
+	soundDies: "cube_dies",
 
 	lootTable: [
 		{type: "item_chest", weight: 1},
@@ -569,11 +568,106 @@ o.cube = {
 	onInit: function () {
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+		this.phaseTimer = new horde.Timer();
+		this.gelTimer = new horde.Timer();
 	},
 	onUpdate: function (elapsed, engine) {
-		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+		
+		this.gelTimer.update(elapsed);
+		
+		switch (this.phase) {
+			
+			// "Charge" out of gate
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 100;
+					this.animDelay = 200;
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 150) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Spawn a bunch of gels!
+			case 1:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.speed = 15;
+					this.animDelay = 400;
+					this.phaseTimer.start(4000);
+					this.gelTimer.start(200);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+					break;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				if (this.gelTimer.expired()) {
+					engine.spawnObject(this, "gel");
+					this.gelTimer.reset();
+				}
+				break;
+			
+			case 2:
+				if (!this.phaseInit) {
+					this.phaseTimer.start(5000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.setPhase(1);
+					break;
+				}
+				movementTypes.chase.apply(this, arguments);
+				break;
+			
+		}
+		
 	}
 };
+
+o.gel = {
+	role: "monster",
+	team: 1,
+
+	animated: true,
+	animDelay: 400,
+	
+	spriteSheet: "characters",
+	spriteY: 640,
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+
+	damage: 25,
+	hitPoints: 10,
+	speed: 200,
+	worth: 10,
+
+	// TODO: gel sounds
+	soundAttacks: "cube_attacks",
+	soundDamage: "cube_damage",
+	soundDies: "cube_dies",
+
+	onInit: function () {
+		this.setDirection(horde.randomDirection());
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		// Randomize sprite
+		switch (horde.randomRange(1, 4)) {
+			case 1: this.spriteY = 640; break;
+			case 2: this.spriteY = 672; break;
+			case 3: this.spriteY = 704; break;
+			case 4: this.spriteY = 736; break;
+		}
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		movementTypes.wander.apply(this, arguments);
+	}
+	
+};
+
 
 o.superclops = {
 	role: "monster",
