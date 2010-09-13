@@ -414,6 +414,7 @@ o.spike_sentry = {
 					this.setDirection(d);
 					this.phase++;
 					this.phaseInit = false;
+					horde.sound.play("spike_attack");
 				} else if (Math.abs(diff.x) < 32) {
 					this.originalPos = this.position.clone();
 					var d = new horde.Vector2();
@@ -421,6 +422,7 @@ o.spike_sentry = {
 					this.setDirection(d);
 					this.phase++;
 					this.phaseInit = false;
+					horde.sound.play("spike_attack");
 				}
 				break;
 				
@@ -515,6 +517,47 @@ o.cyclops = {
 	soundDies: "cyclops_dies",
 
 	weapons: [{type: "e_boulder", count: null}],
+
+	lootTable: [
+		{type: "item_chest", weight: 1},
+		{type: "item_weapon_knife", weight: 3},
+		{type: "item_weapon_spear", weight: 3},
+		{type: "item_food", weight: 3}
+	],
+
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+	},
+	onUpdate: function (elapsed, engine) {
+		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+	}
+};
+
+o.cube = {
+	role: "monster",
+	team: 1,
+	badass: true,
+
+	animated: true,
+	animDelay: 400,
+	gibletSize: "large",
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 576,
+
+	moveChangeElapsed: 0,
+	moveChangeDelay: 1000,
+
+	damage: 25,
+	hitPoints: 1000,
+	speed: 15,
+	worth: 10000,
+
+	// TODO: Cube sounds?
+	soundAttacks: "cyclops_attacks",
+	soundDamage: "cyclops_damage",
+	soundDies: "cyclops_dies",
 
 	lootTable: [
 		{type: "item_chest", weight: 1},
