@@ -549,7 +549,7 @@ o.cube = {
 	moveChangeDelay: 1000,
 
 	damage: 25,
-	hitPoints: 1000,
+	hitPoints: 500,
 	speed: 15,
 	worth: 10000,
 	
@@ -647,7 +647,7 @@ o.gel = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 25,
+	damage: 5,
 	hitPoints: 10,
 	speed: 200,
 	worth: 10,
@@ -690,7 +690,7 @@ o.superclops = {
 	moveChangeDelay: 1000,
 
 	damage: 35,
-	hitPoints: 200,
+	hitPoints: 600,
 	speed: 25,
 	worth: 1000,
 
