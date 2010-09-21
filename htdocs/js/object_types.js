@@ -570,6 +570,13 @@ o.cube = {
 		this.phaseTimer = new horde.Timer();
 		this.gelTimer = new horde.Timer();
 	},
+	
+	onThreat: function (attacker, engine) {
+		if (attacker.type !== "h_fireball") {
+			return true;
+		}
+	},
+	
 	onUpdate: function (elapsed, engine) {
 		
 		this.gelTimer.update(elapsed);

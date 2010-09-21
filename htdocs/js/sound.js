@@ -2,7 +2,7 @@
 
 horde.sound = {};
 
-var api = "html5";
+var api = "sm2";
 var format = ".mp3";
 var muted = false;
 var sounds = {};
@@ -22,6 +22,15 @@ horde.sound.init = function horde_sound_init (callback) {
 	}
 
 	switch (api) {
+		case "sm2":
+			soundManager.useFastPolling = true;
+			soundManager.useHighPerformace = true;
+			soundManager.autoLoad = true;
+			soundManager.multishot = true;
+			soundManager.volume = 100;
+			soundManager.onload = callback;
+			soundManager.useHTML5Audio = false;
+			break;
 		case "html5": // Intentional fallthrough
 		case "Titanium":
 			callback();
@@ -39,6 +48,19 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 	}
 
 	switch (api) {
+		case "sm2":
+			var params = {
+				id: id,
+				url: url,
+				volume: volume
+			};
+			if (loops) {
+				params.onfinish = function () {
+					this.play();
+				};
+			}
+			soundManager.createSound(params);
+			break;
 		case "html5":
 			var audio = new Audio();
 			audio.preload = "auto";
@@ -83,7 +105,12 @@ horde.sound.play = function horde_sound_play (id) {
 	if (muted) {
 		return false;
 	}
+	console.log(api);
+	
 	switch (api) {
+		case "sm2":
+			soundManager.play(id);
+			break;
 		case "html5":
 			try {
 				sounds[id].pause();
@@ -102,6 +129,9 @@ horde.sound.play = function horde_sound_play (id) {
 
 horde.sound.stop = function horde_sound_stop (id) {
 	switch (api) {
+		case "sm2":
+			soundManager.stop(id);
+			break;
 		case "html5":
 			sounds[id].pause();
 			sounds[id].currentTime = 0;
@@ -114,6 +144,9 @@ horde.sound.stop = function horde_sound_stop (id) {
 
 horde.sound.stopAll = function horde_sound_stopAll () {
 	switch (api) {
+		case "sm2":
+			soundManager.stopAll();
+			break;
 		case "html5":
 			for (var id in sounds) {
 				sounds[id].pause();
@@ -130,6 +163,9 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 
 horde.sound.pauseAll = function horde_sound_pauseAll () {
 	switch (api) {
+		case "sm2":
+			soundManager.pauseAll();
+			break;
 		case "html5":
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
@@ -149,6 +185,9 @@ horde.sound.pauseAll = function horde_sound_pauseAll () {
 
 horde.sound.resumeAll = function horde_sound_resumeAll () {
 	switch (api) {
+		case "sm2":
+			soundManager.resumeAll();
+			break;
 		case "html5":
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {

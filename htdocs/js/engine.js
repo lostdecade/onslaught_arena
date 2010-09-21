@@ -325,7 +325,7 @@ proto.initGame = function () {
 	wep.position.x -= 128;
 	this.addObject(wep);
 
-	var wep = horde.makeObject("item_weapon_spear");
+	var wep = horde.makeObject("item_weapon_fireball");
 	wep.position = player.position.clone();
 	wep.position.x += 128;
 	this.addObject(wep);
