@@ -159,6 +159,17 @@ proto.getPlayerObject = function horde_Engine_proto_getPlayerObject () {
 	return this.objects[this.playerObjectId];
 };
 
+proto.getObjectCountByType = function horde_Engine_proto_getObjectCountByType (type) {
+	var count = 0;
+	for (var id in this.objects) {
+		var obj = this.objects[id];
+		if (obj.type === type) {
+			count++;
+		}
+	}
+	return count;
+};
+
 proto.preloadComplete = function () {
 	this.state = "intro";
 	this.logoAlpha = 0;
@@ -1053,6 +1064,13 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
 };
 
+proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
+	var drop = horde.makeObject(type);
+	drop.position = object.position.clone();
+	drop.position.y -= 1;
+	this.addObject(drop);
+};
+
 proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 
 	var table = object.lootTable;
@@ -1070,10 +1088,7 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 	var type = weightedTable[rand];
 
 	if (type !== null) {
-		var drop = horde.makeObject(type);
-		drop.position = object.position.clone();
-		drop.position.y -= 1;
-		this.addObject(drop);
+		this.dropObject(object, type);
 	}
 
 };

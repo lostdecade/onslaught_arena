@@ -671,6 +671,18 @@ o.gel = {
 	
 	onUpdate: function (elapsed, engine) {
 		movementTypes.wander.apply(this, arguments);
+	},
+	
+	onKilled: function (attacker, engine) {
+		var player = engine.getPlayerObject();
+		// Spawn a fireball scroll if the player is out
+		// AND there aren't any on the screen
+		if (
+			!player.hasWeapon("h_fireball") 
+			&& engine.getObjectCountByType("item_weapon_fireball") === 0
+		) {
+			engine.dropObject(this, "item_weapon_fireball");
+		}
 	}
 	
 };

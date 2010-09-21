@@ -105,8 +105,6 @@ horde.sound.play = function horde_sound_play (id) {
 	if (muted) {
 		return false;
 	}
-	console.log(api);
-	
 	switch (api) {
 		case "sm2":
 			soundManager.play(id);

@@ -547,4 +547,20 @@ proto.fireWeapon = function horde_Object_proto_fireWeapon () {
 	return currentWeapon.type;
 };
 
+/**
+ * Returns whether or not this object has a given weapon type
+ * @param {string} type Weapon type
+ * @return {boolean}
+ */
+proto.hasWeapon = function horde_Object_proto_hasWeapon (type) {
+	var len = this.weapons.length;
+	for (var x = 0; x < len; ++x) {
+		var weapon = this.weapons[x];
+		if (weapon.type === type) {
+			return true;
+		}
+	}
+	return false;
+};
+
 }());
