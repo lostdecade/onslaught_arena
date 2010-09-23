@@ -142,7 +142,11 @@ proto.getBarColor = function (max, current) {
 proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facing) {
 	var f = facing || parent.facing;
 	var o = horde.makeObject(type, true);
-	o.ownerId = parent.id;
+	var owner = parent;
+	while (owner.ownerId !== null) {
+		owner = this.objects[owner.ownerId];
+	}
+	o.ownerId = owner.id;
 	o.team = parent.team;
 	o.centerOn(parent.boundingBox().center());
 	o.setDirection(f);
@@ -336,7 +340,7 @@ proto.initGame = function () {
 	wep.position.x -= 128;
 	this.addObject(wep);
 
-	var wep = horde.makeObject("item_weapon_fireball");
+	var wep = horde.makeObject("item_weapon_fire_sword");
 	wep.position = player.position.clone();
 	wep.position.x += 128;
 	this.addObject(wep);

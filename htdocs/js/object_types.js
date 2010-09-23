@@ -95,6 +95,48 @@ o.h_axe = {
 	ttl: 10000
 };
 
+o.h_fire_sword = {
+	role: "projectile",
+	cooldown: 450,
+	speed: 350,
+	hitPoints: 1,
+	damage: 50,
+	spriteSheet: "objects",
+	spriteX: 384,
+	spriteY: 0,
+	priority: 5,
+	bounce: false,
+	spriteAlign: true,
+	
+	onInit: function () {
+		this.spawnTimer = new horde.Timer();
+		this.spawnTimer.start(50);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.spawnTimer.update(elapsed);
+		if (this.spawnTimer.expired()) {
+			engine.spawnObject(this, "fire_sword_trail");
+			this.spawnTimer.reset();
+		}
+	}
+	
+};
+
+o.fire_sword_trail = {
+	role: "projectile",
+	speed: 0,
+	hitPoints: 1,
+	damage: 3,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 0,
+	rotate: true,
+	soundAttacks: "fire_attack",
+	ttl: 500,
+	bounce: false
+};
+
 // ENEMIES
 
 var movementTypes = {
@@ -1537,18 +1579,15 @@ o.item_weapon_axe = {
 	wepCount: 150
 };
 
-/*
-NOT YET
 o.item_weapon_fire_sword = {
 	role: "powerup_weapon",
 	speed: 0,
 	spriteSheet: "objects",
-	spriteX: 0,
+	spriteX: 384,
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fire_sword",
-	wepCount: 100
+	wepCount: 25
 };
-*/
 
 }());
