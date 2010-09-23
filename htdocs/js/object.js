@@ -404,7 +404,10 @@ proto.wound = function horde_Object_proto_wound (damage) {
  * @return {void}
  */
 proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
-	if (this.bounce) {
+	if (this.role === "hero") {
+		return;
+	}
+ 	if (this.bounce) {
 		// reverse direction(s)
 		var d = this.direction.clone();
 		for (var i in axis) {

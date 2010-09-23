@@ -1049,8 +1049,15 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
 	if (object.collidable) {
 		
-		var yStop = ((this.gateState === "down" || object.role === "monster") ? GATE_CUTOFF_Y : 0);
-
+		var yStop = 0;
+		if (
+			this.gateState === "down"
+			|| object.role === "monster"
+			|| object.role === "hero"
+		) {
+			yStop = GATE_CUTOFF_Y;
+		}
+		
 		if (object.direction.y < 0 && object.position.y < yStop) {
 			object.position.y = yStop;
 			axis.push("y");
