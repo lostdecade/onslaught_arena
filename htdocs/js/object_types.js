@@ -134,7 +134,8 @@ o.fire_sword_trail = {
 	rotate: true,
 	soundAttacks: "fire_attack",
 	ttl: 500,
-	bounce: false
+	bounce: false,
+	drawIndex: 0
 };
 
 // ENEMIES
@@ -1064,7 +1065,7 @@ o.sandworm = {
 	
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
-	
+
 	lootTable: [
 		{type: null, weight: 4},
 		{type: "item_chest", weight: 2},
@@ -1074,6 +1075,7 @@ o.sandworm = {
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.dirtTimer = new horde.Timer();
+		this.attackTimer = new horde.Timer();
 	},
 	
 	onUpdate: function (elapsed, engine) {
@@ -1107,6 +1109,7 @@ o.sandworm = {
 				// spawn!
 				if (!this.phaseInit) {
 					this.stopMoving();
+					this.speed = 0;
 					this.removeState(horde.Object.states.INVISIBLE);
 					this.addState(horde.Object.states.SPAWNING);
 					this.spawnFrameIndex = 0;
@@ -1121,14 +1124,24 @@ o.sandworm = {
 			case 2:
 				// fire globs of shit
 				if (!this.phaseInit) {
-					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.phaseAttacks = 0;
 					this.phaseInit = true;
+					this.attackTimer.start(200);
 				}
-				if (this.phaseTimer.expired()) {
+				this.attackTimer.update(elapsed);
+				if (this.phaseAttacks < 3 && this.attackTimer.expired()) {
+					this.phaseAttacks++;
+					this.setDirection(horde.randomDirection());
+					engine.spawnObject(this, "e_worm_spit");
+					this.attackTimer.reset();
+					if (this.phaseAttacks === 3) {
+						this.phaseTimer.start(2000);
+					}
+				}
+				if (this.phaseAttacks >= 3 && this.phaseTimer.expired()) {
 					this.phase++;
 					this.phaseInit = false;
 				}
-				// TODO: Actually fire "globs of shit"
 				break;
 				
 			case 3:
@@ -1399,7 +1412,8 @@ o.e_static_blue_fire = {
 	rotate: true,
 	rotateSpeed: 100,
 	ttl: 1000,
-	bounce: false
+	bounce: false,
+	drawIndex: 0
 };
 
 o.e_dirt_pile = {
@@ -1414,6 +1428,30 @@ o.e_dirt_pile = {
 	animated: true,
 	ttl: 3500,
 	bounce: false,
+	drawIndex: -2,
+	
+	onDamage: function (defender) {
+		if (defender.team !== this.team) {
+			defender.addState(horde.Object.states.SLOWED, 2000);
+		}
+	}
+	
+};
+
+o.e_spit_pool = {
+	role: "trap",
+	cooldown: 100,
+	speed: 0,
+	hitPoints: 9999,
+	damage: 5,
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteX: 896,
+	spriteY: 416,
+	animated: true,
+	ttl: 15000,
+	bounce: false,
+	drawIndex: -1,
 	
 	onDamage: function (defender) {
 		if (defender.team !== this.team) {
@@ -1437,6 +1475,26 @@ o.e_shock_wave = {
 	animated: true
 };
 
+o.e_worm_spit = {
+	role: "projectile",
+	cooldown: 1000,
+	speed: 200,
+	hitPoints: 1,
+	damage: 10,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 64,
+	spriteAlign: true,
+	bounce: false,
+	animated: true,
+	ttl: 600,
+	
+	onDelete: function (engine) {
+		engine.spawnObject(this, "e_spit_pool");
+	}
+	
+};
+
 // OTHER SHIT
 
 o.cloud = {
@@ -1444,6 +1502,8 @@ o.cloud = {
 	role: "fluff",
 	spriteSheet: "objects",
 	collidable: false,
+	
+	drawIndex: 10,
 	
 	onInit: function () {
 		

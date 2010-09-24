@@ -446,11 +446,32 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "imp", 1);
-	w.addObjects(1, "cube", 1);
-	//w.addObjects(2, "sandworm", 1);
+	w.addObjects(0, "sandworm", 1);
+	w.addObjects(1, "sandworm", 1);
+	w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
+
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "flaming_skull", 1);
+	w.addObjects(1, "flaming_skull", 1);
+	w.addObjects(2, "flaming_skull", 1);
+	w.nextWaveTime = 60000;
+	this.waves.push(w);
+	
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	//w.addObjects(0, "flaming_skull", 1);
+	w.addObjects(1, "cube", 1);
+	//w.addObjects(2, "flaming_skull", 1);
+	w.nextWaveTime = 60000;
+	this.waves.push(w);
+
 
 	// Wave #1
 	var w = new horde.SpawnWave();
@@ -1133,6 +1154,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 				}
 				return;
 			}
+			o.execute("onDelete", [this]);
 			delete(this.objects[o.id]);
 			continue;
 		}
@@ -1781,11 +1803,16 @@ proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 		var obj = this.objects[id];
 		drawOrder.push({
 			id: obj.id,
+			drawIndex: obj.drawIndex,
 			y: obj.position.y + obj.size.height
 		});
 	}
 	drawOrder.sort(function (a, b) {
-		return a.y - b.y;
+		if (a.drawIndex === b.drawIndex) {
+			return (a.y - b.y);
+		} else {
+			return (a.drawIndex - b.drawIndex);
+		}
 	});
 	return drawOrder;
 };

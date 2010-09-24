@@ -50,6 +50,8 @@ horde.Object = function () {
 	this.bounce = true;
 	this.weapons = [];
 	
+	this.drawIndex = 1; // Controls what order objects are drawn, lower is first
+	
 	// Stats!
 	this.kills = 0;
 	this.timesWounded = 0;
