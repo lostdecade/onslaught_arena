@@ -1257,7 +1257,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		defender.addState(horde.Object.states.INVINCIBLE, 2500);
 	}
 	attacker.execute("onDamage", [defender, this]);
-	scorer = attacker;
+	var scorer = attacker;
 	if (scorer.ownerId !== null) {
 		var owner = this.objects[scorer.ownerId];
 		if (owner) {
