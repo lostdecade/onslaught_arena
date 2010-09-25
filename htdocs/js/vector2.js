@@ -85,7 +85,12 @@ proto.magnitude = function horde_Vector2_proto_magnitude () {
 };
 
 proto.normalize = function horde_Vector2_proto_normalize () {
-	return this.scale(1 / this.magnitude());
+	var mag = this.magnitude();
+	if (mag === 0) {
+		return this;
+	} else {
+		return this.scale(1 / mag);
+	}
 };
 
 proto.toString = function horde_Vector2_proto_toString () {
