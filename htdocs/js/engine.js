@@ -219,7 +219,8 @@ proto.init = function horde_Engine_proto_init () {
 		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
-		"objects": "img/sheet_objects.png"
+		"objects": "img/sheet_objects.png",
+		"beholder": "img/sheet_beholder.png"
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -441,6 +442,16 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveTimer.start(1);
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
+
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	//w.addObjects(0, "sandworm", 1);
+	w.addObjects(1, "eyelet", 10);
+	//w.addObjects(2, "sandworm", 1);
+	w.nextWaveTime = 60000;
+	this.waves.push(w);
 
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);

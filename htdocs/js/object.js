@@ -52,6 +52,10 @@ horde.Object = function () {
 	
 	this.drawIndex = 1; // Controls what order objects are drawn, lower is first
 	
+	// AI stuff
+	this.moveChangeElapsed = 0;
+	this.moveChangeDelay = 500;
+	
 	// Stats!
 	this.kills = 0;
 	this.timesWounded = 0;

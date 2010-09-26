@@ -576,6 +576,35 @@ o.cyclops = {
 	}
 };
 
+// Beholder eyelets
+o.eyelet = {
+	role: "monster",
+	team: 1,
+	
+	animated: true,
+	spriteSheet: "characters",
+	spriteY: 512,
+	
+	damage: 10,
+	hitPoints: 100,
+	speed: 100,
+	worth: 10,
+	
+	onInit: function () {
+		if (horde.randomRange(1, 10) > 5) {
+			this.spriteY += 32;
+		}
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		// TODO: better behavior
+		if (this.position.y >= 50) {
+			this.onUpdate = movementTypes.wander;
+		}
+	}
+	
+};
+
 o.cube = {
 	role: "monster",
 	team: 1,
