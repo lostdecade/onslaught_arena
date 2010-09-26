@@ -1699,10 +1699,6 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	}
 	
 	ctx.save();
-	/*
-	ctx.fillStyle = "rgb(0, 0, 255)";
-	ctx.fillRect(0, 0, this.view.width, this.view.height);
-	*/
 	ctx.putImageData(this.gameOverBg, 0, 0);
 	ctx.restore();
 
@@ -1714,13 +1710,11 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	if (this.gameOverReady === true) {
 		
-		/*
-		if (this.keyboard.isKeyDown(horde.Keyboard.Keys.SPACE)) {
-			this.keyboard.clearKey(horde.Keyboard.Keys.SPACE);
+		if (this.keyboard.isAnyKeyPressed()) {
+			this.keyboard.clearKeys();
 			this.initGame();
 			return;
 		}
-		*/
 
 		ctx.drawImage(
 			this.images.getImage("stats_defeat"),
@@ -1728,31 +1722,6 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		);
 		
 		this.drawObjectStats(this.getPlayerObject(), ctx);
-		
-		/*
-		ctx.save();
-
-		ctx.fillStyle = "rgb(255, 255, 255)";
-		ctx.font = "Bold 35px Monospace";
-		ctx.globalAlpha = 1;
-
-		ctx.textAlign = "center";
-		ctx.fillText("Game Over", 320, 200);
-
-		ctx.drawImage(
-			this.images.getImage("objects"),
-			64, 32, 32, 32, 260, 224, 32, 32
-		);
-		ctx.textAlign = "left";
-		ctx.fillText(p.gold, 300, 250);
-
-		ctx.textAlign = "center";
-		ctx.globalAlpha = this.goAlpha;
-		ctx.fillText("Press space to continue", 320, 300);
-
-		ctx.restore();
-		
-		*/
 		
 	}
 	
