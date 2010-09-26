@@ -1685,14 +1685,16 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	}
 	
 	ctx.save();
+	/*
 	ctx.fillStyle = "rgb(0, 0, 255)";
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
+	*/
 	ctx.putImageData(this.gameOverBg, 0, 0);
 	ctx.restore();
 
 	ctx.save();
 	ctx.globalAlpha = this.gameOverAlpha;
-	ctx.fillStyle = "rgb(200, 0, 0)";
+	ctx.fillStyle = "rgb(215, 25, 32)";
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
 
