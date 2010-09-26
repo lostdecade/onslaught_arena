@@ -594,7 +594,6 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	player.weapons = [
 		{type: "h_sword", count: null}
 	];
-	player.hitPoints = 1;
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
 };
