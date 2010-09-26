@@ -1748,13 +1748,19 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 35px Monospace";
 	ctx.textAlign = "center";
-	
+
+	ctx.fillStyle = "rgb(237, 28, 36)";
 	ctx.fillText(object.kills, 175, 225);
+	ctx.fillStyle = "rgb(255, 245, 121)";
 	ctx.fillText(object.gold, 175, 305);
+	ctx.fillStyle = "rgb(108, 192, 113)";
 	ctx.fillText(object.meatEaten, 175, 385);
 	
+	ctx.fillStyle = "rgb(199, 234, 251)";
 	ctx.fillText(object.shotsFired, 450, 225);
+	ctx.fillStyle = "rgb(207, 18, 140)";
 	ctx.fillText(accuracy, 450, 305);
+	ctx.fillStyle = "rgb(250, 166, 26)";
 	ctx.fillText(favoredType, 450, 385);
 	
 	ctx.restore();
