@@ -220,7 +220,9 @@ proto.init = function horde_Engine_proto_init () {
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png",
-		"beholder": "img/sheet_beholder.png"
+		"beholder": "img/sheet_beholder.png",
+		"stats_defeat": "img/stats_defeat.png",
+		"stats_victory": "img/stats_victory.png"
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -592,6 +594,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	player.weapons = [
 		{type: "h_sword", count: null}
 	];
+	player.hitPoints = 1;
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
 };
@@ -1582,7 +1585,7 @@ proto.objectAttack = function (object, v) {
 		// Shoot one instance of the weapon
 		default:
 			this.spawnObject(object, weaponType, v);
-			this.shotsFired++;
+			object.shotsFired++;
 			break;
 			
 	}
@@ -1711,15 +1714,23 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	ctx.restore();
 
 	if (this.gameOverReady === true) {
-
+		
+		/*
 		if (this.keyboard.isKeyDown(horde.Keyboard.Keys.SPACE)) {
 			this.keyboard.clearKey(horde.Keyboard.Keys.SPACE);
 			this.initGame();
 			return;
 		}
+		*/
 
-		var p = this.getPlayerObject();
+		ctx.drawImage(
+			this.images.getImage("stats_defeat"),
+			38, 38, 564, 404
+		);
 		
+		this.drawObjectStats(this.getPlayerObject(), ctx);
+		
+		/*
 		ctx.save();
 
 		ctx.fillStyle = "rgb(255, 255, 255)";
@@ -1742,7 +1753,43 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 		ctx.restore();
 		
+		*/
+		
 	}
+	
+};
+
+proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx) {
+	
+	// Calculate weapon accuracy
+	var accuracy = ((object.shotsLanded / object.shotsFired) * 100).toFixed(0) + "%";
+	
+	// Determine favorite weapon
+	var high = 0;
+	var favoredType = null;
+	for (var x in object.shotsPerWeapon) {
+		if (object.shotsPerWeapon[x] > high) {
+			high = object.shotsPerWeapon[x];
+			favoredType = x;
+		} 
+	}
+	favoredType = horde.objectTypes[favoredType].name;
+	
+	ctx.save();
+	
+	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.font = "Bold 35px Monospace";
+	ctx.textAlign = "center";
+	
+	ctx.fillText(object.kills, 175, 225);
+	ctx.fillText(object.gold, 175, 305);
+	ctx.fillText(object.meatEaten, 175, 385);
+	
+	ctx.fillText(object.shotsFired, 450, 225);
+	ctx.fillText(accuracy, 450, 305);
+	ctx.fillText(favoredType, 450, 385);
+	
+	ctx.restore();
 	
 };
 

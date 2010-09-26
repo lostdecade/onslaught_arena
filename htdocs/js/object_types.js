@@ -24,6 +24,7 @@ o.hero = {
 // HERO WEAPONS
 
 o.h_sword = {
+	name: "Sword",
 	role: "projectile",
 	cooldown: 300,
 	speed: 250,
@@ -38,6 +39,7 @@ o.h_sword = {
 };
 
 o.h_knife = {
+	name: "Knife",
 	role: "projectile",
 	cooldown: 200,
 	speed: 350,
@@ -52,6 +54,7 @@ o.h_knife = {
 };
 
 o.h_spear = {
+	name: "Spear",
 	role: "projectile",
 	cooldown: 350,
 	speed: 500,
@@ -66,6 +69,7 @@ o.h_spear = {
 };
 
 o.h_fireball = {
+	name: "Fireball",
 	role: "projectile",
 	cooldown: 75,
 	speed: 400,
@@ -82,6 +86,7 @@ o.h_fireball = {
 };
 
 o.h_axe = {
+	name: "Battle Axe",
 	role: "projectile",
 	cooldown: 450,
 	speed: 350,
@@ -96,6 +101,7 @@ o.h_axe = {
 };
 
 o.h_fire_sword = {
+	name: "Flame Sword",
 	role: "projectile",
 	cooldown: 450,
 	speed: 350,
