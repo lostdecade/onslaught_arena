@@ -63,6 +63,7 @@ horde.Object = function () {
 	this.shotsFired = 0;
 	this.shotsLanded = 0;
 	this.shotsPerWeapon = {};
+	this.meatEaten = 0;
 	
 	// Behavior phase stuff
 	this.phase = 0;

@@ -1215,6 +1215,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
+						o.meatEaten++;
 						horde.sound.play("eat_food");
 					} else if (o2.role == "powerup_coin") {
 						o2.die();
