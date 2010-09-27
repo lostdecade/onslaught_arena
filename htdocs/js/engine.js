@@ -7,7 +7,7 @@ var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
-var POINTER_Y_INC = 24;
+var POINTER_Y_INC = 30;
 var POINTER_Y_START = 300;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
@@ -47,6 +47,8 @@ horde.Engine = function horde_Engine () {
 	
 	this.enableClouds = false;
 	this.cloudTimer = null;
+	this.woundsTo = 0;
+	this.woundsToSpeed = 10;
 	
 	this.introTimer = new horde.Timer();
 	this.introPhase = 0;
@@ -1535,6 +1537,15 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	
 	this.monstersAlive = numMonsters;
 	this.monstersAboveGates = (numMonstersAboveGate > 0);
+
+	var player = this.getPlayerObject();
+	if (this.woundsTo < player.wounds) {
+		this.woundsTo += ((this.woundsToSpeed / 1000) * elapsed);
+	} else if (this.woundsTo > player.wounds) {
+		this.woundsTo -= ((this.woundsToSpeed / 1000) * elapsed);
+	} else {
+		this.woundsTo = player.wounds;
+	}
 	
 };
 
@@ -2050,8 +2061,9 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		if (object.shotsPerWeapon[x] > high) {
 			high = object.shotsPerWeapon[x];
 			favoredType = x;
-		} 
+		}
 	}
+	// This line is throwing this error: Uncaught TypeError: Cannot read property 'name' of undefined
 	favoredType = horde.objectTypes[favoredType].name;
 	
 	ctx.save();
@@ -2267,7 +2279,16 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	var wCount = (weaponInfo.count === null) ? "\u221E": weaponInfo.count;
 	
 	// Draw health bar
-	var width = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
+	var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
+	var width2 = (bar.width - Math.round((bar.width * this.woundsTo) / o.hitPoints));
+
+	if (this.woundsTo < o.wounds) {
+		var width = width1;
+		var toWidth = width2;
+	} else {
+		var width = width2;
+		var toWidth = width1;
+	}
 
 	// Outside border
 	ctx.save();
@@ -2279,7 +2300,10 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 	// The bar itself
 	ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
-	ctx.globalAlpha = 0.6;
+	ctx.globalAlpha = 0.4;
+
+	ctx.fillRect(bar.x, bar.y, toWidth, bar.height);
+
 	ctx.fillRect(bar.x, bar.y, width, bar.height);
 	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
 	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
@@ -2423,12 +2447,6 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	var textX = 280;
 	var textY = (POINTER_Y_START - TEXT_HEIGHT);
-
-	ctx.save();
-	this.drawText(ctx, "Play!", textX, textY, params);
-	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC), params);
-	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 2), params);
-	ctx.restore();
 
 	// Sword pointer
 	ctx.save();
