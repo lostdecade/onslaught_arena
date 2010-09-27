@@ -161,9 +161,13 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 			soundManager.stopAll();
 			break;
 		case "html5":
-			for (var id in sounds) {
-				sounds[id].pause();
-				sounds[id].currentTime = 0;
+			try {
+				for (var id in sounds) {
+					sounds[id].pause();
+					sounds[id].currentTime = 0;
+				}
+			} catch (e) {
+				console.log("[ERROR horde.sound.stopAll]", e);
 			}
 			break;
 		case "Titanium":
