@@ -105,7 +105,10 @@ horde.sound.isPlaying = function (id) {
 	switch (api) {
 		case "sm2":
 			var sound = soundManager.getSoundById(id);
-			return (sound.playState === 1);
+			if (sound) {
+				return (sound.playState === 1);
+			}
+			return false;
 			break;
 		case "html5":
 			// TODO

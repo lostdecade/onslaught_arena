@@ -35,28 +35,35 @@ exec($command);
 
 $js = file_get_contents("{$root}horde.js");
 
-//$ti_tpl = file_get_contents("{$root}template/titanium.template.html");
+$chrome_tpl = file_get_contents("{$root}template/chrome_app.template.html");
 $web_tpl = file_get_contents("{$root}template/web.template.html");
 
-//$ti_tpl = str_replace('{{GAME_CODE}}', $js, $ti_tpl);
+$chrome_tpl = str_replace('{{GAME_CODE}}', $js, $chrome_tpl);
 $web_tpl = str_replace('{{GAME_CODE}}', $js, $web_tpl);
 
-// Titanium
-/*
-file_put_contents("{$root}titanium/Resources/index.html", $ti_tpl);
-exec("cp -r {$root}htdocs/img {$root}titanium/Resources/");
-exec("cp -r {$root}htdocs/sound {$root}titanium/Resources/");
-exec("cp -r {$root}htdocs/css {$root}titanium/Resources/");
-*/
+exec("rm -rf {$root}/build");
+exec("mkdir {$root}/build");
+
+// Chrome
+exec("mkdir {$root}/build/chrome");
+file_put_contents("{$root}/build/chrome/index.html", $chrome_tpl);
+exec("cp -r {$root}htdocs/img {$root}build/chrome/");
+exec("cp -r {$root}htdocs/sound {$root}build/chrome/");
+exec("cp -r {$root}htdocs/css {$root}build/chrome/");
+exec("cp -r {$root}htdocs/lib {$root}build/chrome/");
+exec("cp -r {$root}htdocs/manifest.json {$root}build/chrome/");
+
+// TODO: Compress chrome code into zip
 
 // Web
-file_put_contents("{$root}web/index.html", $web_tpl);
-exec("cp -r {$root}htdocs/img {$root}web/");
-exec("cp -r {$root}htdocs/css {$root}web/");
-exec("cp -r {$root}htdocs/sound {$root}web/");
-exec("cp -r {$root}htdocs/favicon.ico {$root}web/");
-exec("cp -r {$root}htdocs/robots.txt {$root}web/");
-exec("cp -r {$root}htdocs/lib {$root}web/");
+exec("mkdir {$root}/build/web");
+file_put_contents("{$root}build/web/index.html", $web_tpl);
+exec("cp -r {$root}htdocs/img {$root}build/web/");
+exec("cp -r {$root}htdocs/css {$root}build/web/");
+exec("cp -r {$root}htdocs/sound {$root}build/web/");
+exec("cp -r {$root}htdocs/favicon.ico {$root}build/web/");
+exec("cp -r {$root}htdocs/robots.txt {$root}build/web/");
+exec("cp -r {$root}htdocs/lib {$root}build/web/");
 
 // Cleanup
 unlink("{$root}horde.js");

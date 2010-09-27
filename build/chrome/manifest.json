@@ -1,0 +1,20 @@
+{
+	"name": "Onslaught! Arena",
+	"description": "Fight off hordes of classic medieval monsters in this fast paced arcade shooter!",
+	"version": "1.0",
+	"app": {
+		"launch": {
+			"local_path": "index.html",
+			"container": "panel",
+			"width": 640,
+			"height": 506
+		}
+	},
+	"icons": {
+		"16": "img/icons/onslaught_16.png",
+		"24": "img/icons/onslaught_24.png",
+		"32": "img/icons/onslaught_32.png",
+		"48": "img/icons/onslaught_48.png",
+		"128": "img/icons/onslaught_128.png"
+	}	
+}
