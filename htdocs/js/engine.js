@@ -447,7 +447,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 17;
+	var testWave = 9;
 	this.currentWaveId = (testWave - 2);
 	*/
 

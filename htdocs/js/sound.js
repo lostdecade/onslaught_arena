@@ -2,7 +2,7 @@
 
 horde.sound = {};
 
-var api = "sm2";
+var api = "html5";
 var format = ".mp3";
 var muted = false;
 var sounds = {};
@@ -111,8 +111,7 @@ horde.sound.isPlaying = function (id) {
 			return false;
 			break;
 		case "html5":
-			// TODO
-			return false;
+			return (sounds[id].currentTime > 0);
 			break;
 	}
 };

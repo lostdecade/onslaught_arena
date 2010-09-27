@@ -1,7 +1,7 @@
 {
 	"name": "Onslaught! Arena",
 	"description": "Fight off hordes of classic medieval monsters in this fast paced arcade shooter!",
-	"version": "1.0",
+	"version": "0.4.1",
 	"app": {
 		"launch": {
 			"local_path": "index.html",
