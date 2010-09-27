@@ -41,6 +41,7 @@ o.h_sword = {
 o.h_knife = {
 	name: "Knife",
 	role: "projectile",
+	size: new horde.Size(32, 30),
 	cooldown: 200,
 	speed: 350,
 	hitPoints: 1,
@@ -124,7 +125,7 @@ o.bomb_smoke = {
 		if (defender.team !== this.team && defender.role === "monster") {
 			defender.addState(horde.Object.states.STUNNED, 5000);
 		}
-	},
+	}
 	
 };
 
@@ -303,8 +304,8 @@ o.bat = {
 	soundDies: "bat_dies",
 	
 	lootTable: [
-		{type: null, weight: 8},
-		{type: "item_coin", weight: 2}
+		{type: null, weight: 9},
+		{type: "item_coin", weight: 1}
 	],
 	
 	onInit: function () {
@@ -894,7 +895,7 @@ o.superclops = {
 	weapons: [{type: "e_energy_ball", count: null}],
 
 	lootTable: [
-		{type: "item_weapon_bomb", weight: 1}
+		{type: "item_gold_chest", weight: 1}
 	],
 
 	onInit: function () {
@@ -1691,6 +1692,59 @@ o.e_worm_spit = {
 };
 
 // OTHER SHIT
+
+o.mini_heart = {
+	role: "fluff",
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 128,
+	size: new horde.Size(10, 10),
+	ttl: 600,
+	speed: 75,
+	collidable: false,
+	drawIndex: 5,
+	onInit: function () {
+		this.setDirection(new horde.Vector2(0, -1));
+		this.speed = horde.randomRange(55, 85);
+	}
+	
+};
+
+o.mini_sparkle = {
+	role: "fluff",
+	spriteSheet: "objects",
+	spriteX: 224,
+	spriteY: 128,
+	size: new horde.Size(10, 10),
+	ttl: 600,
+	speed: 75,
+	collidable: false,
+	drawIndex: 5,
+	onInit: function () {
+		this.setDirection(new horde.Vector2(0, -1));
+		this.speed = horde.randomRange(55, 85);
+	}
+	
+};
+
+o.mini_sword = {
+	role: "fluff",
+	spriteSheet: "objects",
+	spriteX: 256,
+	spriteY: 128,
+	size: new horde.Size(10, 11),
+	ttl: 600,
+	speed: 75,
+	collidable: false,
+	drawIndex: 5,
+	onInit: function () {
+		this.setDirection(new horde.Vector2(0, -1));
+		this.speed = horde.randomRange(55, 85);
+	}
+	
+};
+
+
 
 o.cloud = {
 	

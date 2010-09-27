@@ -692,7 +692,8 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 120000;
 	w.bossWave = true;
 	this.waves.push(w);
-
+	
+	/*
 	// Level 3
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
@@ -733,7 +734,8 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	//w.addObjects(2, "goblin", 1);
 	w.nextWaveTime = 30000;
 	this.waves.push(w);
-
+	*/
+	
 	// Gelatinous Cube
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
@@ -742,6 +744,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.bossWave = true;
 	this.waves.push(w);
 
+	/*
 	// Level 4
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
@@ -839,7 +842,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 60000;
 	w.bossWave = true;
 	this.waves.push(w);
-	
+	*/
 };
 
 /**
@@ -1168,13 +1171,9 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
 		if (this.currentWaveId >= this.waves.length) {
-			alert("GAME OVER");
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 			this.waveModifier += DIFFICULTY_INCREMENT;
-			horde.sound.stop("normal_battle_music");
-			horde.sound.stop("final_battle_music");
-			horde.sound.play("normal_battle_music");
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			if (!horde.sound.isPlaying("final_battle_music")) {
@@ -1488,14 +1487,32 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						if (o.wounds < 0) o.wounds = 0;
 						o.meatEaten++;
 						horde.sound.play("eat_food");
+						for (var j = 0; j < 5; ++j) {
+							var heart = horde.makeObject("mini_heart");
+							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
+							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
+							this.addObject(heart);
+						}
 					} else if (o2.role == "powerup_coin") {
 						o2.die();
 						o.gold += o2.coinAmount;
 						horde.sound.play("coins");
+						for (var j = 0; j < 5; ++j) {
+							var heart = horde.makeObject("mini_sparkle");
+							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
+							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
+							this.addObject(heart);
+						}
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
 						horde.sound.play("chest_weapon");
+						for (var j = 0; j < 5; ++j) {
+							var heart = horde.makeObject("mini_sword");
+							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
+							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
+							this.addObject(heart);
+						}
 					}
 				}
 				if (

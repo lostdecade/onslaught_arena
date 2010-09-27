@@ -14,25 +14,12 @@
 		is an HTML5 game made by <a href="http://lostdecadegames.com/">Lost Decade Games</a>.
 	</p>
 	
-	<script>{{GAME_CODE}}</script>
-
+	<script src="lib/sm2/soundmanager2.js"></script>
 	<script>
-
-		if (location.hostname == 'lostdecadegamesapp.appspot.com') {
-
-			var _gaq = _gaq || [];
-			_gaq.push(['_setAccount', 'UA-16927444-3']);
-			_gaq.push(['_trackPageview']);
-
-			(function() {
-				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-			})();
-
-		}
-
+		soundManager.url = "lib/sm2/";
 	</script>
+	
+	<script>{{GAME_CODE}}</script>
 	
 </body>
 </html>
