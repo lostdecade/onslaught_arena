@@ -1,6 +1,6 @@
 (function define_horde_Engine () {
 
-var VERSION = "0.4.1";
+var VERSION = "{{VERSION}}";
 var DEMO = false;
 var DEFAULT_HIGH_SCORE = 10000;
 var DIFFICULTY_INCREMENT = 0.5;
@@ -2382,21 +2382,35 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	}
 
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
-	this.drawText(ctx, highScore, 196, 424, {
+	this.drawText(ctx, highScore, 218, 424, {
 		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace"
 	});
-	this.drawText(ctx, highScore, 198, 426, {
+	this.drawText(ctx, highScore, 220, 426, {
 		fillStyle : "rgb(255, 255, 255)",
 		font : "Bold 10px Monospace"
 	});
 
-	var version = ("v" + VERSION + " \u00A9 Lost Decade Games");
-	this.drawText(ctx, version, 172, 448, {
+	// Version
+	if (VERSION === "{{VERSION}}") {
+		var version = "DEBUG";
+	} else {
+		var version = ("v" + VERSION);
+	}
+	ctx.save();
+	ctx.fillStyle = "rgb(150, 150, 150)";
+	ctx.font = "Bold 14px Monospace";
+	ctx.textAlign = "right";
+	ctx.fillText(version, 637, 477);
+	ctx.restore();
+	
+	// Copyright text
+	var copyright = "\u00A9 Lost Decade Games";
+	this.drawText(ctx, copyright, 200, 448, {
 		fillStyle : "rgb(0, 0, 0)",
 		font : "Bold 10px Monospace"
 	});
-	this.drawText(ctx, version, 174, 450, {
+	this.drawText(ctx, copyright, 202, 450, {
 		fillStyle : "rgb(255, 255, 255)",
 		font : "Bold 10px Monospace"
 	});
