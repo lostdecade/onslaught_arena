@@ -1,6 +1,6 @@
 (function define_horde_Engine () {
 
-var VERSION = 0.4.1;
+var VERSION = "0.4.1";
 var DEMO = false;
 var DEFAULT_HIGH_SCORE = 10000;
 var DIFFICULTY_INCREMENT = 0.5;
@@ -445,9 +445,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
 
+	/*
 	// Wave testing code...
 	var testWave = 17;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	/***** START WAVES *********/
 
