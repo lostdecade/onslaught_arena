@@ -7,7 +7,7 @@ var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
-var POINTER_Y_INC = 24;
+var POINTER_Y_INC = 30;
 var POINTER_Y_START = 300;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
@@ -2409,12 +2409,6 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	var textX = 280;
 	var textY = (POINTER_Y_START - TEXT_HEIGHT);
-
-	ctx.save();
-	this.drawText(ctx, "Play!", textX, textY, params);
-	this.drawText(ctx, "How to play", textX, (textY + POINTER_Y_INC), params);
-	this.drawText(ctx, "Credits", textX, (textY + POINTER_Y_INC * 2), params);
-	ctx.restore();
 
 	// Sword pointer
 	ctx.save();
