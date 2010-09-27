@@ -29,7 +29,7 @@ o.h_sword = {
 	cooldown: 300,
 	speed: 250,
 	hitPoints: 1,
-	damage: 15,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 64,
 	spriteY: 0,
@@ -59,7 +59,7 @@ o.h_spear = {
 	cooldown: 350,
 	speed: 500,
 	hitPoints: 1,
-	damage: 20,
+	damage: 15,
 	spriteSheet: "objects",
 	spriteX: 96,
 	spriteY: 0,
@@ -74,7 +74,7 @@ o.h_fireball = {
 	cooldown: 75,
 	speed: 400,
 	hitPoints: 1,
-	damage: 3,
+	damage: 2,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
@@ -82,7 +82,50 @@ o.h_fireball = {
 	soundAttacks: "fire_attack",
 	ttl: 350,
 	priority: 3,
-	bounce: false
+	bounce: false,
+	damageType: "magic"
+};
+
+o.h_bomb = {
+	name: "Bomb",
+	role: "projectile",
+	cooldown: 750,
+	speed: 200,
+	hitPoints: 1,
+	damage: 0,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 0,
+	rotate: true,
+	rotateSpeed: 150,
+	priority: 4,
+	bounce: true,
+	
+	onDelete: function (engine) {
+		engine.spawnObject(this, "bomb_smoke");
+	}
+	
+};
+
+o.bomb_smoke = {
+	role: "trap",
+	size: new horde.Size(64, 64),
+	cooldown: 0,
+	speed: 0,
+	hitPoints: 9999,
+	damage: 0,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 544,
+	bounce: false,
+	ttl: 3000,
+	
+	onDamage: function (defender, engine) {
+		if (defender.team !== this.team && defender.role === "monster") {
+			defender.addState(horde.Object.states.STUNNED, 5000);
+		}
+	},
+	
 };
 
 o.h_axe = {
@@ -91,12 +134,12 @@ o.h_axe = {
 	cooldown: 450,
 	speed: 350,
 	hitPoints: 1,
-	damage: 35,
+	damage: 30,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
-	priority: 4,
+	priority: 5,
 	ttl: 10000
 };
 
@@ -106,11 +149,11 @@ o.h_fire_sword = {
 	cooldown: 450,
 	speed: 350,
 	hitPoints: 1,
-	damage: 50,
+	damage: 40,
 	spriteSheet: "objects",
 	spriteX: 384,
 	spriteY: 0,
-	priority: 5,
+	priority: 6,
 	bounce: false,
 	spriteAlign: true,
 	
@@ -133,7 +176,7 @@ o.fire_sword_trail = {
 	role: "projectile",
 	speed: 0,
 	hitPoints: 1,
-	damage: 3,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
@@ -141,7 +184,8 @@ o.fire_sword_trail = {
 	soundAttacks: "fire_attack",
 	ttl: 500,
 	bounce: false,
-	drawIndex: 0
+	drawIndex: 0,
+	damageType: "magic"
 };
 
 // ENEMIES
@@ -248,7 +292,7 @@ o.bat = {
 	speed: 100,
 	hitPoints: 5,
 	damage: 2,
-	worth: 10,
+	worth: 0,
 	spriteSheet: "characters",
 	spriteY: 96,
 	animated: true,
@@ -259,8 +303,8 @@ o.bat = {
 	soundDies: "bat_dies",
 	
 	lootTable: [
-		{type: null, weight: 5},
-		{type: "item_coin", weight: 5}
+		{type: null, weight: 8},
+		{type: "item_coin", weight: 2}
 	],
 	
 	onInit: function () {
@@ -277,7 +321,7 @@ o.dire_bat = {
 	speed: 150,
 	hitPoints: 10,
 	damage: 5,
-	worth: 10,
+	worth: 0,
 	spriteSheet: "characters",
 	spriteY: 128,
 	animated: true,
@@ -288,8 +332,8 @@ o.dire_bat = {
 	soundDies: "bat_dies",
 	
 	lootTable: [
-		{type: null, weight: 3},
-		{type: "item_coin", weight: 7}
+		{type: null, weight: 7},
+		{type: "item_coin", weight: 3}
 	],
 	
 	onInit: function () {
@@ -306,7 +350,7 @@ o.goblin = {
 	speed: 75,
 	hitPoints: 10,
 	damage: 10,
-	worth: 20,
+	worth: 0,
 	spriteSheet: "characters",
 	spriteY: 160,
 	animated: true,
@@ -335,14 +379,55 @@ o.goblin = {
 	}
 };
 
+o.hunter_goblin = {
+	role: "monster",
+	team: 1,
+	speed: 75,
+	hitPoints: 10,
+	damage: 10,
+	worth: 0,
+	spriteSheet: "characters",
+	spriteY: 160,
+	animated: true,
+	gibletSize: "medium",
+	moveChangeElapsed: 0,
+	moveChangeDelay: 3000,
+	weapons: [
+		{type: "e_arrow", count: null}
+	],
+	soundAttacks: "goblin_attacks",
+	soundDamage: "goblin_damage",
+	soundDies: "goblin_dies",
+	
+	lootTable: [
+		{type: null, weight: 2},
+		{type: "item_coin", weight: 4},
+		{type: "item_weapon_knife", weight: 2},
+		{type: "item_food", weight: 2}
+	],
+	
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+	},
+	onUpdate: function (elapsed, engine) {
+		if (this.position.y >= 50) {
+			if (!this.cooldown) {
+				this.chase(engine.getPlayerObject());
+				return "shoot";
+			}
+			movementTypes.wander.apply(this, arguments);
+		}
+	}
+};
+
 o.demoblin = {
 	role: "monster",
 	team: 1,
 	speed: 100,
 	defaultSpeed: 100,
-	hitPoints: 20,
+	hitPoints: 30,
 	damage: 15,
-	worth: 20,
+	worth: 0,
 	spriteSheet: "characters",
 	spriteY: 192,
 	animated: true,
@@ -356,8 +441,8 @@ o.demoblin = {
 	lootTable: [
 		{type: "item_coin", weight: 3},
 		{type: "item_weapon_spear", weight: 3},
-		{type: "item_chest", weight: 2},
-		{type: "item_food", weight: 2}
+		{type: "item_chest", weight: 3},
+		{type: "item_food", weight: 1}
 	],
 	
 	soundAttacks: "goblin_attacks",
@@ -379,9 +464,9 @@ o.flaming_skull = {
 	team: 1,
 	
 	speed: 200,
-	hitPoints: 25,
-	damage: 10,
-	worth: 100,
+	hitPoints: 50,
+	damage: 25,
+	worth: 0,
 	
 	spriteSheet: "characters",
 	spriteY: 32,
@@ -399,6 +484,22 @@ o.flaming_skull = {
 		{type: "item_weapon_fireball", weight: 3},
 		{type: "item_chest", weight: 3}
 	],
+	
+	onInit: function () {
+		switch (horde.randomRange(1, 3)) {
+			case 1:
+				this.speed *= 0.5;
+				this.animDelay *= 0.5;
+				break;
+			case 2:
+				this.speed *= 0.75;
+				this.animDelay *= 0.75;
+				break;
+			case 3:
+				// Nothing
+				break;
+		}
+	},
 	
 	onUpdate: function (elapsed, engine) {
 		if (!this.setDir && this.position.y >= 50) {
@@ -422,7 +523,7 @@ o.spike_sentry = {
 	
 	speed: 100,
 	hitPoints: 9999,
-	damage: 10,
+	damage: 25,
 	worth: 0,
 	
 	spriteSheet: "objects",
@@ -527,7 +628,7 @@ o.spikes = {
 	
 	speed: 0,
 	hitPoints: 9999,
-	damage: 5,
+	damage: 15,
 	worth: 0,
 
 	spriteSheet: "objects",
@@ -556,9 +657,10 @@ o.cyclops = {
 	moveChangeDelay: 1000,
 
 	damage: 25,
-	hitPoints: 100,
-	speed: 25,
-	worth: 100,
+	hitPoints: 200,
+	speed: 100,
+	animDelay: 100,
+	worth: 0,
 
 	soundAttacks: "cyclops_attacks",
 	soundDamage: "cyclops_damage",
@@ -567,10 +669,7 @@ o.cyclops = {
 	weapons: [{type: "e_boulder", count: null}],
 
 	lootTable: [
-		{type: "item_chest", weight: 1},
-		{type: "item_weapon_knife", weight: 3},
-		{type: "item_weapon_spear", weight: 3},
-		{type: "item_food", weight: 3}
+		{type: "item_food", weight: 1}
 	],
 
 	onInit: function () {
@@ -578,7 +677,11 @@ o.cyclops = {
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
 	},
 	onUpdate: function (elapsed, engine) {
-		if (this.position.y >= 50) this.onUpdate = movementTypes.chase;
+		if (this.position.y >= 50) {
+			this.speed = 25;
+			this.animDelay = 200;
+			this.onUpdate = movementTypes.chase;
+		}
 	}
 };
 
@@ -594,7 +697,7 @@ o.eyelet = {
 	damage: 10,
 	hitPoints: 100,
 	speed: 100,
-	worth: 10,
+	worth: 0,
 	
 	onInit: function () {
 		if (horde.randomRange(1, 10) > 5) {
@@ -626,10 +729,10 @@ o.cube = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 25,
+	damage: 35,
 	hitPoints: 500,
 	speed: 15,
-	worth: 10000,
+	worth: 0,
 	
 	soundAttacks: "cube_attacks",
 	soundDamage: "cube_damage",
@@ -728,7 +831,7 @@ o.gel = {
 	damage: 5,
 	hitPoints: 10,
 	speed: 200,
-	worth: 10,
+	worth: 0,
 
 	// TODO: gel sounds
 	soundAttacks: "cube_attacks",
@@ -782,7 +885,7 @@ o.superclops = {
 	damage: 35,
 	hitPoints: 600,
 	speed: 25,
-	worth: 1000,
+	worth: 0,
 
 	soundAttacks: "cyclops_attacks",
 	soundDamage: "cyclops_damage",
@@ -791,8 +894,7 @@ o.superclops = {
 	weapons: [{type: "e_energy_ball", count: null}],
 
 	lootTable: [
-		{type: "item_chest", weight: 5},
-		{type: "item_gold_chest", weight: 5}
+		{type: "item_weapon_bomb", weight: 1}
 	],
 
 	onInit: function () {
@@ -872,10 +974,10 @@ o.imp = {
 
 	speed: 100,
 
-	hitPoints: 35,
+	hitPoints: 20,
 	damage: 15,
 
-	worth: 50,
+	worth: 0,
 
 	spriteSheet: "characters",
 	spriteY: 64,
@@ -887,7 +989,7 @@ o.imp = {
 	moveChangeDelay: 3000,
 	
 	soundAttacks: "imp_attacks",
-	soundDamage: "imp_damage",
+	//soundDamage: "imp_damage",
 	soundDies: "imp_dies",
 	
 	phase: 0,
@@ -963,7 +1065,7 @@ o.wizard = {
 	speed: 100,
 	hitPoints: 20,
 	damage: 10,
-	worth: 50,
+	worth: 0,
 	spriteSheet: "characters",
 	spriteY: 416,
 	animated: true,
@@ -1028,9 +1130,9 @@ o.wizard = {
 			// Turn invisible and move around!
 			case 2:
 				if (!this.phaseInit) {
-					this.speed = 400;
+					this.speed = 500;
 					this.addState(horde.Object.states.INVISIBLE);
-					this.phaseTimer.start(horde.randomRange(3000, 10000));
+					this.phaseTimer.start(horde.randomRange(1000, 2000));
 					this.phaseInit = true;
 				}
 				movementTypes.wander.apply(this, arguments);
@@ -1087,19 +1189,20 @@ o.sandworm = {
 	team: 1,
 	
 	animated: true,
+	animDelay: 200,
 	spriteSheet: "characters",
 	spriteY: 480,
 	
 	damage: 25,
-	hitPoints: 25,
+	hitPoints: 50,
 	speed: 50,
-	worth: 50,
+	worth: 0,
 	
 	phase: 0,
 	phaseInit: false,
 	
 	moveChangeElapsed: 0,
-	moveChangeDelay: 1000,
+	moveChangeDelay: 2000,
 
 	lootTable: [
 		{type: null, weight: 4},
@@ -1118,9 +1221,9 @@ o.sandworm = {
 							
 			case 0:
 				if (!this.phaseInit) {
-					this.speed = 150;
+					this.speed = 50;
 					this.addState(horde.Object.states.INVISIBLE);
-					this.phaseTimer.start(horde.randomRange(3000, 6000));
+					this.phaseTimer.start(horde.randomRange(5000, 10000));
 					this.dirtTimer.start(150);
 					this.phaseInit = true;
 				}
@@ -1164,16 +1267,17 @@ o.sandworm = {
 					this.attackTimer.start(200);
 				}
 				this.attackTimer.update(elapsed);
-				if (this.phaseAttacks < 3 && this.attackTimer.expired()) {
+				if (this.phaseAttacks < 1 && this.attackTimer.expired()) {
 					this.phaseAttacks++;
-					this.setDirection(horde.randomDirection());
+					this.chase(engine.getPlayerObject());
+					//this.setDirection(horde.randomDirection());
 					engine.spawnObject(this, "e_worm_spit");
 					this.attackTimer.reset();
-					if (this.phaseAttacks === 3) {
-						this.phaseTimer.start(2000);
+					if (this.phaseAttacks === 1) {
+						this.phaseTimer.start(1000);
 					}
 				}
-				if (this.phaseAttacks >= 3 && this.phaseTimer.expired()) {
+				if (this.phaseAttacks >= 1 && this.phaseTimer.expired()) {
 					this.phase++;
 					this.phaseInit = false;
 				}
@@ -1212,10 +1316,10 @@ o.dragon = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 0,
 
-	damage: 50,
-	hitPoints: 500,
+	damage: 35,
+	hitPoints: 1000,
 	speed: 20,
-	worth: 9000,
+	worth: 0,
 
 	soundAttacks: "dragon_attacks",
 	soundDamage: "dragon_damage",
@@ -1234,8 +1338,11 @@ o.dragon = {
 		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.setDirection(horde.directions.toVector(horde.directions.DOWN));
+		this.altTimer = new horde.Timer();
 	},
 	onUpdate: function (elapsed, engine) {
+		
+		this.altTimer.update(elapsed);
 
 		switch (this.phase) {
 			
@@ -1246,26 +1353,22 @@ o.dragon = {
 					this.animDelay = 50;
 					this.phaseInit = true;
 				}
-				if (this.position.y >= 50) {
+				if (this.position.y >= 200) {
 					this.phase++;
 					this.phaseInit = false;
 				}
 				break;
-
+			
 			// Chase player and shoot fireballs
 			case 1:
 				if (!this.phaseInit) {
-					this.speed = 20;
-					this.animDelay = 200;
-					this.weapons = [{type: "e_fireball", count: null}];
-					this.phaseTimer.start(10000);
-					this.phaseInit = true;
-				}
-				if (this.phaseTimer.expired()) {
-					this.phase++;
+					this.cooldown = false;
+					this.stopMoving();
+					this.weapons = [{type: "e_ring_fire", count: null}];
 					this.phaseInit = false;
 				}
-				return movementTypes.chase.apply(this, arguments);
+				engine.objectAttack(this);
+				this.nextPhase();
 				break;
 			
 			// Wiggle it!
@@ -1275,14 +1378,24 @@ o.dragon = {
 					this.animDelay = 100;
 					this.phaseTimer.start(2000);
 					this.phaseInit = true;
+					this.altTimer.start(350);
+					this.followUpShot = false;
 				}
-				if (this.phaseTimer.expired()) {
+				if (!this.followUpShot && this.altTimer.expired()) {
+					if (this.wounds > (this.hitPoints / 2)) {
+						this.cooldown = false;
+						this.weapons = [{type: "e_ring_fire_blue", count: null}];
+						engine.objectAttack(this);
+						this.followUpShot = true;
+					}
+				}
+ 				if (this.phaseTimer.expired()) {
 					this.phase++;
 					this.phaseInit = false;
 				}
 				this.position.x += horde.randomRange(-1, 1);
 				break;
-			
+
 			// Charge player
 			case 3:
 				if (!this.phaseInit) {
@@ -1307,20 +1420,26 @@ o.dragon = {
 					this.weapons = [{type: "e_fireball_2", count: null}];
 					this.cooldown = false;
 					this.cooldownElapsed = 0;
-					this.phaseTimer.start(10000);
+					this.phaseTimer.start(2500);
 					this.phaseInit = true;
+					this.altTimer.start(750);
 				}
 				if (this.phaseTimer.expired()) {
-					this.phase++;
+					this.phase = 1;
 					this.phaseInit = false;
 				}
 				var p = engine.getPlayerObject();
 				this.chase(p);
+				if (this.altTimer.expired() && this.wounds > (this.hitPoints / 2)) {
+					engine.spawnObject(this, "e_fireball");
+					this.altTimer.reset();
+				}
 				return "shoot";
 				break;
 			
+			/*
 			// Kinda stunned, allow player to get some shots in
-			case 5:
+			case 6:
 				if (!this.phaseInit) {
 					this.speed = 10;
 					this.animDelay = 400;
@@ -1333,6 +1452,7 @@ o.dragon = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				break;
+			*/
 			
 		}
 
@@ -1347,7 +1467,7 @@ o.e_arrow = {
 	cooldown: 3000,
 	speed: 200,
 	hitPoints: 1,
-	damage: 5,
+	damage: 15,
 	spriteSheet: "objects",
 	spriteX: 256,
 	spriteY: 0,
@@ -1360,7 +1480,7 @@ o.e_trident = {
 	cooldown: 5000,
 	speed: 200,
 	hitPoints: 1,
-	damage: 10,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 160,
 	spriteY: 0,
@@ -1372,8 +1492,8 @@ o.e_boulder = {
 	role: "projectile",
 	cooldown: 1500,
 	speed: 150,
-	hitPoints: 25,
-	damage: 20,
+	hitPoints: Infinity,
+	damage: 25,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 0,
@@ -1385,7 +1505,7 @@ o.e_bouncing_boulder = {
 	role: "projectile",
 	cooldown: 1500,
 	speed: 150,
-	hitPoints: 25,
+	hitPoints: Infinity,
 	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 224,
@@ -1399,47 +1519,79 @@ o.e_energy_ball = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
-	hitPoints: 9999,
+	hitPoints: Infinity,
 	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 320,
 	spriteY: 0,
 	rotate: true,
-	bounce: false
+	bounce: false,
+	damageType: "magic"
 };
 
-o.e_fireball = {
+o.e_ring_fire = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
-	hitPoints: 9999,
+	hitPoints: Infinity,
 	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 352,
 	spriteY: 0,
 	rotate: true,
-	bounce: false
+	bounce: false,
+	damageType: "magic"
+};
+
+o.e_ring_fire_blue = {
+	role: "projectile",
+	cooldown: 2000,
+	speed: 200,
+	hitPoints: Infinity,
+	damage: 25,
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 32,
+	rotate: true,
+	bounce: false,
+	damageType: "magic"
+};
+
+
+o.e_fireball = {
+	role: "projectile",
+	cooldown: 2000,
+	speed: 350,
+	hitPoints: Infinity,
+	damage: 20,
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 32,
+	rotate: true,
+	bounce: false,
+	damageType: "magic"
 };
 
 o.e_fireball_2 = {
 	role: "projectile",
 	cooldown: 75,
 	speed: 350,
-	hitPoints: 9999,
-	damage: 15,
+	hitPoints: Infinity,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 352,
 	spriteY: 0,
 	rotate: true,
-	ttl: 500,
-	bounce: false
+	ttl: 400,
+	bounce: false,
+	damageType: "magic"
 };
 
 o.e_static_blue_fire = {
 	role: "projectile",
 	cooldown: 100,
 	speed: 0,
-	hitPoints: 1,
+	hitPoints: Infinity,
 	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 288,
@@ -1448,26 +1600,33 @@ o.e_static_blue_fire = {
 	rotateSpeed: 100,
 	ttl: 1000,
 	bounce: false,
-	drawIndex: 0
+	drawIndex: 0,
+	damageType: "magic"
 };
 
 o.e_dirt_pile = {
 	role: "trap",
 	cooldown: 100,
 	speed: 0,
-	hitPoints: 9999,
+	hitPoints: Infinity,
 	damage: 0,
 	spriteSheet: "characters",
 	spriteX: 0,
 	spriteY: 448,
-	animated: true,
-	ttl: 3500,
+	//animated: true,
+	ttl: 3000,
 	bounce: false,
 	drawIndex: -2,
 	
+	onInit: function () {
+		if (horde.randomRange(1, 10) > 5) {
+			this.spriteX += 32;
+		}
+	},
+	
 	onDamage: function (defender) {
 		if (defender.team !== this.team) {
-			defender.addState(horde.Object.states.SLOWED, 2000);
+			defender.addState(horde.Object.states.SLOWED, 750);
 		}
 	}
 	
@@ -1484,13 +1643,13 @@ o.e_spit_pool = {
 	spriteX: 896,
 	spriteY: 416,
 	animated: true,
-	ttl: 15000,
+	ttl: 7500,
 	bounce: false,
 	drawIndex: -1,
 	
 	onDamage: function (defender) {
 		if (defender.team !== this.team) {
-			defender.addState(horde.Object.states.SLOWED, 2000);
+			defender.addState(horde.Object.states.SLOWED, 750);
 		}
 	}
 	
@@ -1501,13 +1660,14 @@ o.e_shock_wave = {
 	cooldown: 1000,
 	speed: 200,
 	hitPoints: 9999,
-	damage: 10,
+	damage: 25,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 32,
 	spriteAlign: true,
 	bounce: false,
-	animated: true
+	animated: true,
+	damageType: "magic"
 };
 
 o.e_worm_spit = {
@@ -1522,8 +1682,8 @@ o.e_worm_spit = {
 	spriteAlign: true,
 	bounce: false,
 	animated: true,
-	ttl: 600,
-	
+	ttl: 1200,
+	damageType: "magic",
 	onDelete: function (engine) {
 		engine.spawnObject(this, "e_spit_pool");
 	}
@@ -1588,7 +1748,7 @@ o.gate = {
 
 o.item_food = {
 	role: "powerup_food",
-	healAmount: 5,
+	healAmount: 10,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 96,
@@ -1649,7 +1809,7 @@ o.item_weapon_spear = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_spear",
-	wepCount: 30
+	wepCount: 75
 };
 
 o.item_weapon_fireball = {
@@ -1660,7 +1820,18 @@ o.item_weapon_fireball = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fireball",
-	wepCount: 200
+	wepCount: 100
+};
+
+o.item_weapon_bomb = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 0,
+	ttl: 5000,
+	wepType: "h_bomb",
+	wepCount: 10
 };
 
 o.item_weapon_axe = {

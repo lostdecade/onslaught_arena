@@ -3,6 +3,7 @@
 horde.SpawnWave = function horde_SpawnWave () {
 	this.points = [];
 	this.nextWaveTime = 20000; // 20 seconds
+	this.bossWave = false;
 };
 
 var proto = horde.SpawnWave.prototype;

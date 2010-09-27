@@ -24,9 +24,9 @@ horde.sound.init = function horde_sound_init (callback) {
 	switch (api) {
 		case "sm2":
 			soundManager.useFastPolling = true;
-			soundManager.useHighPerformace = true;
+			soundManager.useHighPerformance = true;
 			soundManager.autoLoad = true;
-			soundManager.multishot = true;
+			soundManager.multiShot = true;
 			soundManager.volume = 100;
 			soundManager.onload = callback;
 			soundManager.useHTML5Audio = false;
@@ -97,6 +97,19 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 			sounds[id].play();
 			sounds[id].stop();
 			sounds[id].setVolume(volume / 100);
+			break;
+	}
+};
+
+horde.sound.isPlaying = function (id) {
+	switch (api) {
+		case "sm2":
+			var sound = soundManager.getSoundById(id);
+			return (sound.playState === 1);
+			break;
+		case "html5":
+			// TODO
+			return false;
 			break;
 	}
 };

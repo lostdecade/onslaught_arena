@@ -50,6 +50,12 @@ horde.Object = function () {
 	this.bounce = true;
 	this.weapons = [];
 	
+	// Default sounds
+	this.soundDamage = "bat_damage";
+	this.soundDies = "bat_dies";
+	
+	this.damageType = "physical";
+	
 	this.drawIndex = 1; // Controls what order objects are drawn, lower is first
 	
 	// AI stuff
@@ -91,7 +97,8 @@ horde.Object.states = {
 	INVINCIBLE: 5,
 	INVISIBLE: 6,
 	SPAWNING: 7,
-	DESPAWNING: 8
+	DESPAWNING: 8,
+	STUNNED: 9
 };
 
 var proto = horde.Object.prototype;
@@ -218,7 +225,23 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-		
+	
+	if (this.hasState(horde.Object.states.INVINCIBLE)) {
+		this.alpha += ((10  / 1000) * elapsed) * this.alphaMod;
+		if (this.alpha >= 1) {
+			this.alpha = 1;
+			this.alphaMod = -1;
+		}
+		if (this.alpha <= 0) {
+			this.alpha = 0;
+			this.alphaMod = 1;
+		}
+	}
+	
+	if (this.hasState(horde.Object.states.STUNNED)) {
+		return;
+	}
+	
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -239,18 +262,6 @@ proto.update = function horde_Object_proto_update (elapsed) {
 					this.removeState(horde.Object.states.DESPAWNING);
 				}
 			}
-		}
-	}
-	
-	if (this.hasState(horde.Object.states.INVINCIBLE)) {
-		this.alpha += ((10  / 1000) * elapsed) * this.alphaMod;
-		if (this.alpha >= 1) {
-			this.alpha = 1;
-			this.alphaMod = -1;
-		}
-		if (this.alpha <= 0) {
-			this.alpha = 0;
-			this.alphaMod = 1;
 		}
 	}
 	
@@ -375,6 +386,7 @@ proto.wound = function horde_Object_proto_wound (damage) {
 	if (damage < 1) {
 		return false;
 	}
+	this.removeState(horde.Object.states.STUNNED);
 	this.wounds += damage;
 	this.totalDamageTaken += damage;
 	this.timesWounded++;
@@ -422,7 +434,18 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
 		}
 		this.setDirection(d);
 	} else {
-		this.die();
+		if (this.damageType === "physical") {
+			this.role = "fluff";
+			this.rotateSpeed = this.speed * 5;
+			this.speed *= 0.50;
+			this.spriteAlign = false;
+			this.rotate = true;
+			this.ttl = 100;
+			this.alpha = 0.5;
+			this.bounce = true;
+		} else {
+			this.die();
+		}
 	}
 	this.execute("onWallCollide", [axis]);
 };
