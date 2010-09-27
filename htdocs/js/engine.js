@@ -1546,6 +1546,11 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	} else {
 		this.woundsTo = player.wounds;
 	}
+
+	// Snap to grid to prevent vibrating bars
+	if (Math.abs(player.wounds - this.woundsTo) <= 1) {
+		this.woundsTo = player.wounds
+	}
 	
 };
 
