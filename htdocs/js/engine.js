@@ -1,6 +1,6 @@
 (function define_horde_Engine () {
 
-var VERSION = 0.3;
+var VERSION = 0.4.1;
 var DEMO = false;
 var DEFAULT_HIGH_SCORE = 10000;
 var DIFFICULTY_INCREMENT = 0.5;
