@@ -2416,11 +2416,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	});
 
 	// Version
-	if (VERSION === "{{VERSION}}") {
-		var version = "DEBUG";
-	} else {
-		var version = ("v" + VERSION);
-	}
+	var version = ("v" + VERSION);
 	ctx.save();
 	ctx.fillStyle = "rgb(150, 150, 150)";
 	ctx.font = "Bold 14px Monospace";
