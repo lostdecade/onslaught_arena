@@ -221,7 +221,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.deathTimer.reset();
 			if (this.deathFrameIndex > 2) {
 				this.deathFrameIndex = 2;
-				this.ttl = 1500;
+				this.ttl = 750;
 			}
 		}
 	}
