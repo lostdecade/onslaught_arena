@@ -26,7 +26,6 @@ horde.Engine = function horde_Engine () {
 	this.objectIdSeed = 0;
 	this.playerObjectId = null;
 	this.keyboard = new horde.Keyboard();
-	this.mouse = new horde.Mouse();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
@@ -193,6 +192,8 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
+	
+	this.mouse = new horde.Mouse(this.canvases["display"]);
 	
 	horde.on("contextmenu", function (e) {
 		horde.stopEvent(e);

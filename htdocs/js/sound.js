@@ -2,7 +2,8 @@
 
 horde.sound = {};
 
-var api = "html5";
+// TODO: Fallback to HTML5 (lolz!)
+var api = "sm2";
 var format = ".mp3";
 var muted = false;
 var sounds = {};

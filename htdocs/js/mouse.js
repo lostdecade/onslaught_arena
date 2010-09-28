@@ -1,9 +1,10 @@
 (function define_horde_Mouse () {
 
-horde.Mouse = function () {
+horde.Mouse = function (canvas) {
 	this.buttonStates = {};
 	this.mouseX = 0;
 	this.mouseY = 0;
+	this.canvas = canvas;
 	horde.on("mousemove", this.handleMouseMove, window, this);
 	horde.on("mousedown", this.handleMouseDown, window, this);
 	horde.on("mouseup", this.handleMouseUp, window, this);
@@ -18,8 +19,8 @@ Mouse.Buttons = {
 };
 
 proto.handleMouseMove = function (e) {
-	this.mouseX = e.clientX;
-	this.mouseY = e.clientY;
+	this.mouseX = e.clientX - this.canvas.offsetLeft;
+	this.mouseY = e.clientY - this.canvas.offsetTop;
 };
 
 proto.handleMouseDown = function (e) {
