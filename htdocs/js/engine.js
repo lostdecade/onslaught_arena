@@ -1743,6 +1743,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isAnyKeyPressed()) {
 			kb.clearKeys();
 			this.state = "running";
+			this.woundsTo = 0;
 			horde.sound.play("normal_battle_music");
 		}
 	}
