@@ -1546,6 +1546,11 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	} else {
 		this.woundsTo = player.wounds;
 	}
+
+	// Snap to grid to prevent vibrating bars
+	if (Math.abs(player.wounds - this.woundsTo) <= 1) {
+		this.woundsTo = player.wounds
+	}
 	
 };
 
@@ -1738,6 +1743,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isAnyKeyPressed()) {
 			kb.clearKeys();
 			this.state = "running";
+			this.woundsTo = 0;
 			horde.sound.play("normal_battle_music");
 		}
 	}
