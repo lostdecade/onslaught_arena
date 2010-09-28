@@ -57,10 +57,14 @@ function buildWeb ($version) {
 
 // Build the Chrome Web Store app
 function buildChromeApp ($version) {
-	$manifest_file = ROOT . 'chrome_web_store/manifest.json';
+	$app_root = ROOT . 'chrome_web_store/app/';
+	$manifest_file = "{$app_root}manifest.json";
 	$manifest = json_decode(file_get_contents($manifest_file));
 	$manifest->version = $version;
 	file_put_contents($manifest_file, json_encode($manifest));
+	exec("cd {$app_root}; zip -r onslaught_arena_{$version}.zip manifest.json icons");
+	mkdir(ROOT . 'build/chrome');
+	exec("mv {$app_root}onslaught_arena_{$version}.zip " . ROOT . 'build/chrome/');
 }
 
 // Source JavaScript files; order matters!
@@ -84,7 +88,7 @@ $source_js = array(
 );
 
 $version = getVersion();
-echo "Buidling Onslaught! Arena v{$version}\n";
+echo "Building Onslaught! Arena v{$version}\n";
 
 echo "Compiling JavaScript...\n";
 compileJS($source_js, ROOT. 'horde.js');
