@@ -1687,7 +1687,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 			switch (this.titlePointerY) {
 				case 0:
-					//horde.sound.play("normal_battle_music");
 					this.state = "intro_cinematic";
 					break;
 				case 1:
@@ -2213,12 +2212,27 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 			128, 192, 48, 48, -22, -20, 48, 48
 		);
 	}
-	
+
 	ctx.drawImage(
 		this.images.getImage(o.spriteSheet),
 		s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
 		-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 	);
+
+	// Boss pain!
+	if (
+		(o.role === "monster")
+		&& o.badass
+		&& o.hasState(horde.Object.states.HURTING)
+	) {
+console.log('hurt ...');
+		this.drawImagePain(
+			ctx, this.images.getImage(o.spriteSheet),
+			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
+			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height,
+			"rgba(186, 51, 35, 0.6)"
+		);
+	}
 
 	// HP bar
 	if (
@@ -2265,6 +2279,40 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 		-32, -32, 64, 64
 	);
 	ctx.restore();
+};
+
+proto.drawImagePain = function horde_Engine_proto_drawImagePain (
+	ctx, image,
+	spriteX, spriteY,
+	spriteWidth, spriteHeight,
+	destX, destY,
+	destWidth, destHeight,
+	fillStyle
+) {
+
+	var buffer = this.canvases.buffer.getContext("2d");
+	buffer.save();
+	buffer.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	buffer.drawImage(
+		image,
+		spriteX, spriteY, spriteWidth, spriteHeight,
+		0, 0,
+		destWidth, destHeight
+	);
+	buffer.globalCompositeOperation = "source-in";
+	buffer.fillStyle = fillStyle;
+	buffer.fillRect(0, 0, destWidth, destHeight);
+	buffer.restore();
+
+	ctx.drawImage(
+		this.canvases.buffer,
+		0, 0,
+		destWidth, destHeight,
+		destX, destY,
+		destWidth, destHeight
+	);
+
 };
 
 /**
@@ -2373,7 +2421,6 @@ proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) 
 	}
 
 	buffer.fillText(text, 0, TEXT_HEIGHT);
-	buffer.restore();
 
 	ctx.drawImage(
 		this.canvases.buffer,
@@ -2382,6 +2429,7 @@ proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) 
 		x, (y - TEXT_HEIGHT),
 		(SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2)
 	);
+	buffer.restore();
 
 };
 
@@ -2448,16 +2496,18 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		textAlign : "left"
 	};
 
+	// Sword pointer
 	var textX = 280;
 	var textY = (POINTER_Y_START - TEXT_HEIGHT);
+	var pointerX = (textX - 48);
+	var pointerY = (POINTER_Y_START + (this.titlePointerY * POINTER_Y_INC) - 20);
 
-	// Sword pointer
 	ctx.save();
 	ctx.globalAlpha = this.titleAlpha;
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		320, 192, 36, 26,
-		(textX - 48), (POINTER_Y_START + (this.titlePointerY * POINTER_Y_INC) - 20),
+		pointerX, pointerY,
 		36, 26
 	);
 	ctx.restore();
