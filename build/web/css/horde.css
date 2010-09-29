@@ -1,5 +1,8 @@
+html {
+	background: #000 url(../img/frame_background.png);
+}
+
 html, body {
-	background: #000;
 	margin: 0;
 	padding: 0;
 }
@@ -8,7 +11,23 @@ h1, p {
 	display: none;
 }
 
+#site_link {
+	position: absolute;
+	bottom: 10px;
+	left: 10px;
+	font-family: tahoma, arial, sans;
+	font-size: 12px;
+	font-weight: bold;
+	color: #e1e1e1;
+	text-decoration: none;
+}
+
+#site_link:hover {
+	text-decoration: underline;
+}
+
 canvas {
+	border: solid 1px #111;
 	position: absolute;
 	top: 50%;
 	left: 50%;
