@@ -366,10 +366,10 @@ o.goblin = {
 	soundDies: "goblin_dies",
 	
 	lootTable: [
-		{type: null, weight: 2},
-		{type: "item_coin", weight: 4},
+		{type: null, weight: 5},
+		{type: "item_coin", weight: 2},
 		{type: "item_weapon_knife", weight: 2},
-		{type: "item_food", weight: 2}
+		{type: "item_food", weight: 1}
 	],
 	
 	onInit: function () {
@@ -440,9 +440,9 @@ o.demoblin = {
 	],
 	
 	lootTable: [
-		{type: "item_coin", weight: 3},
-		{type: "item_weapon_spear", weight: 3},
-		{type: "item_chest", weight: 3},
+		{type: null, weight: 6},
+		{type: "item_weapon_spear", weight: 2},
+		{type: "item_chest", weight: 1},
 		{type: "item_food", weight: 1}
 	],
 	
@@ -466,7 +466,7 @@ o.flaming_skull = {
 	
 	speed: 200,
 	hitPoints: 50,
-	damage: 25,
+	damage: 15,
 	worth: 0,
 	
 	spriteSheet: "characters",
@@ -480,10 +480,9 @@ o.flaming_skull = {
 	],
 	
 	lootTable: [
-		{type: null, weight: 1},
-		{type: "item_coin", weight: 3},
-		{type: "item_weapon_fireball", weight: 3},
-		{type: "item_chest", weight: 3}
+		{type: null, weight: 6},
+		{type: "item_weapon_fireball", weight: 2},
+		{type: "item_chest", weight: 2}
 	],
 	
 	onInit: function () {
@@ -657,7 +656,7 @@ o.cyclops = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 25,
+	damage: 20,
 	hitPoints: 200,
 	speed: 100,
 	animDelay: 100,
@@ -990,8 +989,8 @@ o.imp = {
 	moveChangeDelay: 3000,
 	
 	soundAttacks: "imp_attacks",
-	//soundDamage: "imp_damage",
-	soundDies: "imp_dies",
+	soundDamage: "imp_damage",
+	soundDies: "imp_death",
 	
 	phase: 0,
 	phaseInit: false,
@@ -1084,10 +1083,10 @@ o.wizard = {
 	soundDies: "goblin_dies",
 	
 	lootTable: [
-		{type: null, weight: 4},
+		{type: null, weight: 6},
 		{type: "item_chest", weight: 2},
 		{type: "item_gold_chest", weight: 1},
-		{type: "item_weapon_fireball", weight: 4}
+		{type: "item_weapon_fireball", weight: 1}
 	],
 	
 	phase: 0,
@@ -1275,7 +1274,7 @@ o.sandworm = {
 					engine.spawnObject(this, "e_worm_spit");
 					this.attackTimer.reset();
 					if (this.phaseAttacks === 1) {
-						this.phaseTimer.start(1000);
+						this.phaseTimer.start(2000);
 					}
 				}
 				if (this.phaseAttacks >= 1 && this.phaseTimer.expired()) {
@@ -1468,7 +1467,7 @@ o.e_arrow = {
 	cooldown: 3000,
 	speed: 200,
 	hitPoints: 1,
-	damage: 15,
+	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 256,
 	spriteY: 0,
@@ -1481,7 +1480,7 @@ o.e_trident = {
 	cooldown: 5000,
 	speed: 200,
 	hitPoints: 1,
-	damage: 20,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 160,
 	spriteY: 0,
@@ -1494,7 +1493,7 @@ o.e_boulder = {
 	cooldown: 1500,
 	speed: 150,
 	hitPoints: Infinity,
-	damage: 25,
+	damage: 15,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 0,
@@ -1507,7 +1506,7 @@ o.e_bouncing_boulder = {
 	cooldown: 1500,
 	speed: 150,
 	hitPoints: Infinity,
-	damage: 20,
+	damage: 15,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 0,
@@ -1547,7 +1546,7 @@ o.e_ring_fire = {
 o.e_ring_fire_blue = {
 	role: "projectile",
 	cooldown: 2000,
-	speed: 200,
+	speed: 150,
 	hitPoints: Infinity,
 	damage: 25,
 	spriteSheet: "objects",
@@ -1557,7 +1556,6 @@ o.e_ring_fire_blue = {
 	bounce: false,
 	damageType: "magic"
 };
-
 
 o.e_fireball = {
 	role: "projectile",
@@ -1660,8 +1658,8 @@ o.e_shock_wave = {
 	role: "projectile",
 	cooldown: 1000,
 	speed: 200,
-	hitPoints: 9999,
-	damage: 25,
+	hitPoints: Infinity,
+	damage: 15,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 32,
@@ -1814,7 +1812,7 @@ o.item_food = {
 
 o.item_coin = {
 	role: "powerup_coin",
-	coinAmount: 1,
+	coinAmount: 10,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 64,
@@ -1834,7 +1832,7 @@ o.item_chest = {
 
 o.item_gold_chest = {
 	role: "powerup_coin",
-	coinAmount: 1000,
+	coinAmount: 500,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 0,

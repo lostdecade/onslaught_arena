@@ -450,8 +450,20 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 9;
+	var testWave = 19;
 	this.currentWaveId = (testWave - 2);
+	*/
+	/*
+	// Test Wave
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 15000);
+	w.addSpawnPoint(2, 1000);
+	//w.addObjects(0, "dragon", 1);
+	w.addObjects(1, "superclops", 1);
+	//w.addObjects(2, "sandworm", 1);
+	w.nextWaveTime = 120000;
+	this.waves.push(w);
 	*/
 
 	/***** START WAVES *********/
@@ -501,38 +513,37 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 500);
 	w.addSpawnPoint(1, 750);
 	w.addSpawnPoint(2, 500);
-	w.addObjects(0, "bat", 10);
+	w.addObjects(0, "bat", 5);
 	w.addObjects(0, "goblin", 2);
 	w.addObjects(1, "goblin", 2);
 	w.addObjects(1, "cyclops", 1);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "bat", 10);
+	w.addObjects(1, "goblin", 3);
+	w.addObjects(2, "bat", 5);
 	w.addObjects(2, "goblin", 2);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 45000;
 	this.waves.push(w);
 	
 	// Wave 6
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 200);
+	w.addSpawnPoint(1, 200);
+	w.addSpawnPoint(2, 200);
+	w.addObjects(0, "bat", 20);
+	w.addObjects(1, "bat", 20);
+	w.addObjects(2, "bat", 20);
+	w.nextWaveTime = 45000;
+	this.waves.push(w);
+	
+	// Wave 7
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "demoblin", 5);
-	w.addObjects(0, "cyclops", 1);
+	w.addObjects(1, "cyclops", 1);
 	w.addObjects(1, "goblin", 10);
 	w.addObjects(2, "demoblin", 5);
-	w.addObjects(2, "cyclops", 1);
-	w.nextWaveTime = 30000;
-	this.waves.push(w);
-	
-	// Wave 7
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 200);
-	w.addSpawnPoint(1, 200);
-	w.addSpawnPoint(2, 200);
-	w.addObjects(0, "bat", 30);
-	w.addObjects(1, "bat", 30);
-	w.addObjects(2, "bat", 30);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 45000;
 	this.waves.push(w);
 	
 	// Wave 8
@@ -541,12 +552,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 750);
 	w.addSpawnPoint(2, 750);
 	w.addObjects(0, "cyclops", 1);
-	w.addObjects(1, "cyclops", 1);
 	w.addObjects(2, "cyclops", 1);
 	w.addObjects(0, "bat", 15);
 	w.addObjects(1, "bat", 15);
 	w.addObjects(2, "bat", 15);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 45000;
 	this.waves.push(w);
 	
 	// Wave 9
@@ -557,7 +567,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(0, "imp", 5);
 	w.addObjects(1, "imp", 5);
 	w.addObjects(2, "imp", 5);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 45000;
 	this.waves.push(w);
 
 	// Wave 10: Superclops
@@ -570,20 +580,21 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave 11: Level 2
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 15000);
-	w.addSpawnPoint(2, 1000);
+	w.addSpawnPoint(0, 15000);
+	w.addSpawnPoint(1, 8000);
+	w.addSpawnPoint(2, 15000);
 	w.addObjects(0, "sandworm", 2);
-	w.addObjects(1, "cyclops", 3);
+	w.addObjects(1, "sandworm", 1);
+	w.addObjects(1, "cyclops", 1);
 	w.addObjects(2, "sandworm", 2);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
 	// Wave 12
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 500);
-	w.addSpawnPoint(1, 500);
-	w.addSpawnPoint(2, 500);
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
 	w.addObjects(0, "goblin", 5);
 	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "goblin", 5);
@@ -593,14 +604,14 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(0, "goblin", 5);
 	w.addObjects(1, "goblin", 5);
 	w.addObjects(2, "goblin", 5);
-	w.nextWaveTime = 30000;
+	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
 	// Wave 13
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 5000);
-	w.addSpawnPoint(1, 5000);
-	w.addSpawnPoint(2, 5000);
+	w.addSpawnPoint(0, 7500);
+	w.addSpawnPoint(1, 7500);
+	w.addSpawnPoint(2, 7500);
 	w.addObjects(0, "flaming_skull", 3);
 	w.addObjects(1, "flaming_skull", 3);
 	w.addObjects(2, "flaming_skull", 3);
@@ -612,12 +623,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "demoblin", 10);
-	w.addObjects(1, "demoblin", 10);
-	w.addObjects(2, "demoblin", 10);
-	w.addObjects(0, "wizard", 3);
+	w.addObjects(0, "demoblin", 5);
+	w.addObjects(1, "hunter_goblin", 5);
+	w.addObjects(2, "demoblin", 5);
+	w.addObjects(0, "wizard", 2);
 	w.addObjects(1, "wizard", 3);
-	w.addObjects(2, "wizard", 3);
+	w.addObjects(2, "wizard", 2);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
 
@@ -2058,7 +2069,11 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx) {
 	
 	// Calculate weapon accuracy
-	var accuracy = ((object.shotsLanded / object.shotsFired) * 100).toFixed(0) + "%";
+	if (object.shotsFired > 0) {
+		var accuracy = ((object.shotsLanded / object.shotsFired) * 100).toFixed(0) + "%";
+	} else {
+		var accuracy = "0%";
+	}
 	
 	// Determine favorite weapon
 	var high = 0;
@@ -2069,8 +2084,12 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 			favoredType = x;
 		}
 	}
-	// This line is throwing this error: Uncaught TypeError: Cannot read property 'name' of undefined
-	favoredType = horde.objectTypes[favoredType].name;
+
+	if (favoredType !== null) {
+		favoredType = horde.objectTypes[favoredType].name;
+	} else {
+		favoredType = '';
+	}
 	
 	ctx.save();
 	
@@ -2225,7 +2244,6 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 		&& o.badass
 		&& o.hasState(horde.Object.states.HURTING)
 	) {
-console.log('hurt ...');
 		this.drawImagePain(
 			ctx, this.images.getImage(o.spriteSheet),
 			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
