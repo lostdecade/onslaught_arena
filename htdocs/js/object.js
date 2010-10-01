@@ -14,7 +14,6 @@ horde.Object = function () {
 	this.speed = 100; // The speed at which the object moves
 	this.team = null; // Which "team" the object is on (null = neutral)
 	this.hitPoints = 1; // Hit points
-	this.wounds = 0; // Amount of damage object has sustained
 	this.damage = 1; // Amount of damage object deals when colliding with enemies
 	this.spriteSheet = ""; // Sprite sheet where this object's graphics are found
 	this.spriteX = 0; // X location of spirte
@@ -30,7 +29,6 @@ horde.Object = function () {
 	this.rotateSpeed = 400; // Speed at which to rotate the object
 	this.rotate = false; // Enable/disable rotation of object
 	this.worth = 0; // Amount of gold this object is worth when killed
-	this.gold = 0; // Amount of gold this object has earned
 	this.ttl = 0; // How long (in milliseconds) this object *should* exist (0 = no TTL)
 	this.ttlElapsed = 0; // How long (in milliseconds) this object *has* existed
 	this.alpha = 1; // Alpha value for drawing this object
@@ -48,7 +46,6 @@ horde.Object = function () {
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
 	this.bounce = true;
-	this.weapons = [];
 	
 	// Default sounds
 	this.soundDamage = "bat_damage";
@@ -61,6 +58,10 @@ horde.Object = function () {
 	// AI stuff
 	this.moveChangeElapsed = 0;
 	this.moveChangeDelay = 500;
+	
+	this.wounds = 0; // Amount of damage object has sustained
+	this.weapons = [];
+	this.gold = 0; // Amount of gold this object has earned
 	
 	// Stats!
 	this.kills = 0;
@@ -102,6 +103,26 @@ horde.Object.states = {
 };
 
 var proto = horde.Object.prototype;
+
+/**
+ * Populates this object's key stats from a JSON dump
+ * @param {string} json JSON dump of an object
+ * @return {void}
+ */
+proto.load = function horde_Object_load (json) {
+	var data = JSON.parse(json);
+	this.wounds = data.wounds;
+	this.weapons = data.weapons;
+	this.currentWeaponIndex = data.currentWeaponIndex;
+	this.gold = data.gold;
+	this.kills = data.kills;
+	this.timesWounded = data.timesWounded;
+	this.totalDamageTaken = data.totalDamageTaken;
+	this.shotsFired = data.shotsFired;
+	this.shotsLanded = data.shotsLanded;
+	this.shotsPerWeapon = data.shotsPerWeapon;
+	this.meatEaten = data.meatEaten;
+};
 
 proto.setPhase = function (phase) {
 	this.phase = phase;

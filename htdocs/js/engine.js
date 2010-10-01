@@ -36,7 +36,7 @@ horde.Engine = function horde_Engine () {
 	this.gatesX = 0;
 	this.gatesY = 0;
 	this.titlePointerY = 0;
-	this.numTitleOptions = 2; // 2 means 3 ... sigh ... ;)
+	this.numTitleOptions = 3; // New Game, Continue, How to Play, Credits
 	
 	this.targetReticle = {
 		angle: 0,
@@ -450,9 +450,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 19;
+	var testWave = 10;
 	this.currentWaveId = (testWave - 2);
 	*/
+	
 	/*
 	// Test Wave
 	var w = new horde.SpawnWave();
@@ -1184,6 +1185,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	// If the timer has expired OR the spawns are empty AND there are no monsters alive
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
+		var actualWave = (this.currentWaveId + 1);
+		if (actualWave > 1 && (actualWave % 10) === 1) {
+			// CHECKPOINT REACHED!
+			// Triggers on the first wave after a boss: 11, 21, 31, 41
+			// TODO: Show "Checkpoint Reached" text or something...
+			this.putData("checkpoint_wave", this.currentWaveId);
+			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
+		}
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
@@ -1697,13 +1706,29 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			kb.clearKey(keys.SPACE);
 
 			switch (this.titlePointerY) {
-				case 0:
+				case 0: // New Game
 					this.state = "intro_cinematic";
 					break;
-				case 1:
+				case 1: // Continue
+					var checkpointWave = this.getData("checkpoint_wave");
+					if (checkpointWave !== null) {
+						// Checkpoint data exists
+						this.currentWaveId = (checkpointWave - 1);
+						var checkpointHero = this.getData("checkpoint_hero");
+						if (checkpointHero !== null) {
+							var player = this.getPlayerObject();
+							player.load(checkpointHero);
+						}
+						this.state = "intro_cinematic";
+					} else {
+						// No checkpoint data!
+						horde.sound.play("imp_damage");
+					}
+					break;
+				case 2: // How to Play
 					this.state = "how_to_play";
 					break;
-				case 2:
+				case 3: // Credits
 					this.state = "credits";
 					break;
 			}
@@ -1754,7 +1779,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isAnyKeyPressed()) {
 			kb.clearKeys();
 			this.state = "running";
-			this.woundsTo = 0;
+			var player = this.getPlayerObject();
+			this.woundsTo = player.wounds;
 			horde.sound.play("normal_battle_music");
 		}
 	}
