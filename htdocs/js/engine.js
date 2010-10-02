@@ -1576,24 +1576,64 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	
+	// Monsters don't damage projectiles
+	if (attacker.role === "monster" && defender.role === "projectile") {
+		return false;
+	}
+	
+	// Allow the objects to handle the collision
 	attacker.execute("onObjectCollide", [defender, this]);
+	
+	// Allow the defender to declare themselves immune to attacks from the attacker
+	// For example: Cube is immune to non-fire attacks
 	var nullify = defender.execute("onThreat", [attacker, this]);
+	
+	// Check for defender immunity
 	if (
 		defender.hasState(horde.Object.states.INVINCIBLE)
-		|| defender.role === "trap"
-		|| defender.role === "projectile"
+		|| defender.hitPoints === Infinity
 		|| nullify === true
 	) {
-		// Defender is invincible
-		if (attacker.role === "projectile" && attacker.hitPoints !== Infinity) {
-			attacker.die();
+		// Defender is immune/invincible
+		if (
+			attacker.role === "projectile" 
+			&& attacker.hitPoints !== Infinity
+		) {
+			if (
+				defender.damageType === "physical" 
+				&& attacker.damageType === "physical"
+			) {
+				// deflect if both parties are physical
+				attacker.reverseDirection();
+				attacker.deflect();
+			} else {
+				// otherwise just kill the attacker
+				attacker.die();
+			}
 		}
 		return false;
 	}
-	if (attacker.damage > 0 && defender.role === "hero") {
-		defender.addState(horde.Object.states.INVINCIBLE, 2500);
+
+	// Special case for non-immune projectiles hitting each other
+	if (
+		attacker.hitPoints !== Infinity
+		&& attacker.role === "projectile"
+		&& defender.role === "projectile"
+		&& attacker.damageType === "physical"
+		&& defender.damageType === "physical"
+	) {
+		attacker.reverseDirection();
+		attacker.deflect();
+		defender.reverseDirection();
+		defender.deflect();
+		return false;
 	}
+
+	// Allow attackers to do stuff when they've hurt something
 	attacker.execute("onDamage", [defender, this]);
+	
+	// Track combat stats
 	var scorer = attacker;
 	if (scorer.ownerId !== null) {
 		var owner = this.objects[scorer.ownerId];
@@ -1604,19 +1644,42 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	if (attacker.role === "projectile") {
 		scorer.shotsLanded++;
 	}
+
+	// Deal damage and check for death
 	if (defender.wound(attacker.damage)) {
-		// defender has died; assign gold/kills etc
+		// defender has died 
+		
+		// Assign gold/kills etc
 		scorer.gold += defender.worth;
 		scorer.kills++;
 		defender.execute("onKilled", [attacker, this]);
 		if (defender.lootTable.length > 0) {
 			this.spawnLoot(defender);
 		}
-	} else {
-		if (attacker.role === "projectile" && attacker.hitPoints !== Infinity) {
+		
+		// Handler piercing weapons
+		if (
+			attacker.role === "projectile"
+			&& attacker.piercing === false
+		) {
 			attacker.die();
 		}
+		
+	} else {
+		// defender did NOT die
+		
+		// Make the player invincible after some damage
+		if (attacker.damage > 0 && defender.role === "hero") {
+			defender.addState(horde.Object.states.INVINCIBLE, 2500);
+		}
+		
+		// Projectile failed to kill it's target; automatic death for projectile
+		if (attacker.role === "projectile") {
+			attacker.die();
+		}
+		
 	}
+	
 };
 
 /**

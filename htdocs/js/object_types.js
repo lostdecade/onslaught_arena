@@ -10,6 +10,7 @@ o.hero = {
 	speed: 150,
 	hitPoints: 100,
 	damage: 0,
+	damageType: null,
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
@@ -66,7 +67,8 @@ o.h_spear = {
 	spriteY: 0,
 	spriteAlign: true,
 	priority: 2,
-	bounce: false
+	bounce: false,
+	piercing: true
 };
 
 o.h_fireball = {
@@ -522,7 +524,7 @@ o.spike_sentry = {
 	team: 1,
 	
 	speed: 100,
-	hitPoints: 9999,
+	hitPoints: Infinity,
 	damage: 25,
 	worth: 0,
 	
@@ -627,7 +629,7 @@ o.spikes = {
 	team: 1,
 	
 	speed: 0,
-	hitPoints: 9999,
+	hitPoints: Infinity,
 	damage: 15,
 	worth: 0,
 
