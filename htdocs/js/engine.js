@@ -2,7 +2,7 @@
 
 var VERSION = "{{VERSION}}";
 var DEMO = false;
-var DIFFICULTY_INCREMENT = 0.5;
+var DIFFICULTY_INCREMENT = 0.5; // TODO: remove
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
