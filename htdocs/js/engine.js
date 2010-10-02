@@ -1577,6 +1577,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
+	attacker.execute("onObjectCollide", [defender, this]);
 	var nullify = defender.execute("onThreat", [attacker, this]);
 	if (
 		defender.hasState(horde.Object.states.INVINCIBLE)

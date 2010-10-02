@@ -1623,9 +1623,9 @@ o.e_dirt_pile = {
 		}
 	},
 	
-	onDamage: function (defender) {
-		if (defender.team !== this.team) {
-			defender.addState(horde.Object.states.SLOWED, 750);
+	onObjectCollide: function (object, engine) {
+		if (object.team !== this.team && object.role !== "projectile") {
+			object.addState(horde.Object.states.SLOWED, 750);
 		}
 	}
 	
@@ -1646,9 +1646,9 @@ o.e_spit_pool = {
 	bounce: false,
 	drawIndex: -1,
 	
-	onDamage: function (defender) {
-		if (defender.team !== this.team) {
-			defender.addState(horde.Object.states.SLOWED, 750);
+	onObjectCollide: function (object, engine) {
+		if (object.team !== this.team && object.role !== "projectile") {
+			object.addState(horde.Object.states.SLOWED, 750);
 		}
 	}
 	
