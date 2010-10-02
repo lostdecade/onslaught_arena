@@ -2,7 +2,6 @@
 
 var VERSION = "{{VERSION}}";
 var DEMO = false;
-var DEFAULT_HIGH_SCORE = 10000;
 var DIFFICULTY_INCREMENT = 0.5;
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
@@ -230,7 +229,7 @@ proto.init = function horde_Engine_proto_init () {
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
 	if (highScore === null) {
-		this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
+		this.putData(HIGH_SCORE_KEY, 0);
 	}
 	
 	this.initSound();
