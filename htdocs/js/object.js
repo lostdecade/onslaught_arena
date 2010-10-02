@@ -46,6 +46,7 @@ horde.Object = function () {
 	this.currentWeaponIndex = 0;
 	this.collidable = true;
 	this.bounce = true;
+	this.piercing = false;
 	
 	// Default sounds
 	this.soundDamage = "bat_damage";
@@ -456,19 +457,23 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
 		this.setDirection(d);
 	} else {
 		if (this.damageType === "physical") {
-			this.role = "fluff";
-			this.rotateSpeed = this.speed * 5;
-			this.speed *= 0.50;
-			this.spriteAlign = false;
-			this.rotate = true;
-			this.ttl = 100;
-			this.alpha = 0.5;
-			this.bounce = true;
+			this.deflect();
 		} else {
 			this.die();
 		}
 	}
 	this.execute("onWallCollide", [axis]);
+};
+
+proto.deflect = function horde_Object_proto_deflect () {
+	this.role = "fluff";
+	this.rotateSpeed = this.speed * 5;
+	this.speed *= 0.50;
+	this.spriteAlign = false;
+	this.rotate = true;
+	this.ttl = 100;
+	this.alpha = 0.5;
+	this.bounce = true;
 };
 
 /**
@@ -483,6 +488,12 @@ proto.setDirection = function horde_Object_proto_setDirection (v) {
 		this.direction = v;
 		this.facing = this.direction.clone();
 	}
+};
+
+proto.reverseDirection = function () {
+	var d = this.direction.clone();
+	d.scale(-1);
+	this.setDirection(d);
 };
 
 /**
