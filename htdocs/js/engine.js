@@ -343,6 +343,7 @@ proto.initGame = function () {
 
 	// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 	var player = this.getPlayerObject();
+player.wounds = 100; // TODO: remove
 	
 	var wep = horde.makeObject("item_weapon_knife");
 	wep.position = player.position.clone();
@@ -1202,7 +1203,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
-			waveTextString = "CHECKPOINT!";
+			waveTextString = "Game Saved!";
 		}
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
@@ -2253,7 +2254,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	ctx.save();
 	ctx.globalAlpha = this.gameOverAlpha;
-	ctx.fillStyle = "rgb(215, 25, 32)";
+	ctx.fillStyle = "rgb(215, 25, 32)"; // red
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
 
@@ -2265,13 +2266,39 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 			return;
 		}
 
+		var headerY = 70;
+
+		// Modal
 		ctx.drawImage(
 			this.preloader.getImage("ui"),
 			0, 2322, 564, 404,
-			41, 65, 564, 404
+			38, 38, 564, 404
 		);
-		
+
+		// Game Over
+		var gotNewHighScore = false; // TODO
+		if (gotNewHighScore) {
+			ctx.drawImage(
+				this.preloader.getImage("ui"),
+				564, 2374, 404, 50,
+				119, headerY, 404, 50
+			);
+		} else {
+			ctx.drawImage(
+				this.preloader.getImage("ui"),
+				564, 2324, 218, 50,
+				211, headerY, 218, 50
+			);
+		}
+
 		this.drawObjectStats(this.getPlayerObject(), ctx);
+
+		// Press anything to continue ...
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			564, 2424, 334, 20,
+			153, 404, 334, 20
+		);
 		
 	}
 	
@@ -2280,6 +2307,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx) {
 	
 	// Calculate weapon accuracy
+	/*
 	if (object.shotsFired > 0) {
 		var accuracy = ((object.shotsLanded / object.shotsFired) * 100).toFixed(0) + "%";
 	} else {
@@ -2301,26 +2329,43 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	} else {
 		favoredType = '';
 	}
+	*/
+
+	var textX = 350;
+	var textHeight = 55;
 	
 	ctx.save();
-	
-	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.font = "Bold 35px Monospace";
-	ctx.textAlign = "center";
 
-	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText(object.kills, 175, 225);
+	ctx.font = "Bold 35px Monospace";
+
+	// Wave reached
+	ctx.fillStyle = "rgb(199, 234, 251)";
+	ctx.fillText((this.currentWaveId + 1), textX, 180);
+
+	// Gold earned
 	ctx.fillStyle = "rgb(255, 245, 121)";
+	ctx.fillText(object.gold, textX, 180 + textHeight);
+
+	// Damage taken
+	var TODO = "TODO"; // Total wounds
+	ctx.fillStyle = "rgb(237, 28, 36)";
+	ctx.fillText(TODO, textX, 180 + (textHeight * 2));
+
+	// Total score
+	var TODO = "TODO"; // Total score
+	ctx.fillStyle = "rgb(250, 116, 26)";
+	ctx.fillText(TODO, textX, 180 + (textHeight * 3));
+
+/*
+	ctx.fillText(object.kills, 175, 225);
 	ctx.fillText(object.gold, 175, 305);
 	ctx.fillStyle = "rgb(108, 192, 113)";
 	ctx.fillText(object.meatEaten, 175, 385);
-	
-	ctx.fillStyle = "rgb(199, 234, 251)";
 	ctx.fillText(object.shotsFired, 450, 225);
 	ctx.fillStyle = "rgb(207, 18, 140)";
 	ctx.fillText(accuracy, 450, 305);
-	ctx.fillStyle = "rgb(250, 166, 26)";
 	ctx.fillText(favoredType, 450, 385);
+	*/
 	
 	ctx.restore();
 	
@@ -2386,8 +2431,9 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		0, 1718, 564, 404,
-		41, 65, 564, 404
+		38, 38, 564, 404
 	);
+
 	ctx.restore();
 
 };
@@ -2720,7 +2766,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
-	var textY = (this.pointerYStart - TEXT_HEIGHT);
+	var textY = (this.pointerYStart - 18);
 	var x = (POINTER_X - 42);
 	var y = (this.pointerYStart + (this.pointerY * POINTER_HEIGHT) - POINTER_HEIGHT);
 
@@ -2842,10 +2888,11 @@ proto.initOptions = function () {
 			}
 			break;
 		case "running":
-			this.pointerYStart = 402;
+			this.pointerYStart = 378;
 			this.pointerY = 0;
 			this.numPointerOptions = 1;
 			this.pointerOptionsStart = 0;
+			this.verifyQuit = false;
 			break;
 	}
 
@@ -2859,7 +2906,7 @@ proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		0, 910, 564, 404,
-		41, 65, 564, 404
+		38, 38, 564, 404
 	);
 	ctx.restore();
 };
@@ -2872,7 +2919,7 @@ proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		0, 1314, 564, 404,
-		41, 65, 564, 404
+		38, 38, 564, 404
 	);
 	ctx.restore();
 };
