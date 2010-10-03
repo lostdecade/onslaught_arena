@@ -1661,6 +1661,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		if (
 			attacker.role === "projectile"
 			&& attacker.piercing === false
+			&& attacker.hitPoints !== Infinity
 		) {
 			attacker.die();
 		}
@@ -1674,7 +1675,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		}
 		
 		// Projectile failed to kill it's target; automatic death for projectile
-		if (attacker.role === "projectile") {
+		if (attacker.role === "projectile" && attacker.hitPoints !== Infinity) {
 			attacker.die();
 		}
 		
