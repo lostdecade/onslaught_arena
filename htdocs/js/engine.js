@@ -246,20 +246,25 @@ proto.initSound = function horde_Engine_proto_initSound () {
 	
 		var s = horde.sound;
 		
-		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
-		s.create("final_battle_music", "sound/music/final_battle", true, 20);
-
 		s.create("move_pointer", "sound/effects/chest_damage");
-		s.create("eat_food", "sound/effects/chest_food", false, 20);
-		s.create("coins", "sound/effects/chest_gold", false, 10);
-		s.create("chest_opens", "sound/effects/chest_opens");
-		s.create("chest_weapon", "sound/effects/chest_weapon");
-
+		
 		s.create("gate_opens", "sound/effects/gate_opens");
 		s.create("gate_closes", "sound/effects/gate_closes");
+		
+		s.create("chest_weapon", "sound/effects/chest_weapon");
+		
+		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
 
 		s.create("hero_attacks", "sound/effects/char_attacks");
 		s.create("hero_damage", "sound/effects/char_damage_3");
+
+		s.create("eat_food", "sound/effects/chest_food", false, 20);
+		s.create("coins", "sound/effects/chest_gold", false, 10);
+		s.create("chest_opens", "sound/effects/chest_opens");
+		
+		s.create("pause", "sound/effects/pause");
+		s.create("unpause", "sound/effects/unpause");
+		
 		s.create("hero_dies", "sound/effects/char_dies");
 		
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
@@ -274,6 +279,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("imp_attacks", "sound/effects/imp_attacks");
 		s.create("imp_damage", "sound/effects/imp_damage");
 		s.create("imp_dies", "sound/effects/imp_dies");
+
+		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
 		s.create("cyclops_damage", "sound/effects/cyclops_damage");
@@ -286,11 +293,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_death");
-
-		s.create("pause", "sound/effects/pause");
-		s.create("unpause", "sound/effects/unpause");
 		
-		s.create("spike_attack", "sound/effects/spike_attacks");
+		s.create("final_battle_music", "sound/music/final_battle", true, 20);
 		
 	});
 	
@@ -446,6 +450,13 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveTimer.start(1);
 	this.currentWaveId = -1;
 	this.waveModifier = 1;
+
+	this.waveText = {
+		string: "<WAVE TEXT HERE>",
+		size: 20,
+		state: "off",
+		alpha: 0
+	};
 
 	/*
 	// Wave testing code...
@@ -1209,6 +1220,40 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			}
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
+		if (this.waves[this.currentWaveId].bossWave) {
+			this.waveText.string = "BOSS INCOMING!";
+		} else {
+			this.waveText.string = "WAVE " + actualWave;
+		}
+		this.waveText.alpha = 0;
+		this.waveText.size = 30;
+		this.waveText.state = "show";
+	}
+	switch (this.waveText.state) {
+		case "show":
+			this.waveText.alpha += ((2 / 1000) * elapsed);
+			if (this.waveText.alpha >= 1) {
+				this.waveText.alpha = 1;
+				this.waveText.timer = new horde.Timer();
+				this.waveText.timer.start(250);
+				this.waveText.state = "display";
+			}
+			break;
+		case "display":
+			this.waveText.timer.update(elapsed);
+			if (this.waveText.timer.expired()) {
+				this.waveText.state = "hide";
+			}
+			break;
+		case "hide":
+			// hide the text
+			this.waveText.alpha -= ((1.5 / 1000) * elapsed);
+			this.waveText.size += ((200 / 1000) * elapsed);
+			if (this.waveText.alpha <= 0) {
+				this.waveText.alpha = 0;
+				this.waveText.state = "off";
+			}
+			break;
 	}
 };
 
@@ -2085,6 +2130,7 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
 			this.drawShadow(ctx);
+			this.drawWaveText(ctx);
 			this.drawUI(ctx);
 			if (this.paused) this.drawPaused(ctx);
 			break;
@@ -2099,6 +2145,51 @@ proto.render = function horde_Engine_proto_render () {
 		this.drawDebugInfo(ctx);
 	}
 	
+};
+
+proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
+
+	if (
+		this.waveText.state == "show" 
+		|| this.waveText.state == "hide"
+		|| this.waveText.state == "display"
+	) {
+
+		var text = this.waveText.string;
+		var size = parseInt(this.waveText.size);
+
+		var b = this.canvases.buffer.getContext("2d");
+
+		var bw = (SCREEN_WIDTH / 2);
+		var bh = (SCREEN_HEIGHT / 2);
+
+		b.save();
+		b.clearRect(0, 0, bw, bh);
+		b.font = "Bold " + size + "px Cracked";
+		b.textBaseline = "top";
+		b.lineWidth = 3;
+		b.strokeStyle = "rgb(76, 7, 10)";
+		b.fillStyle = "rgb(184, 16, 22)";
+
+		var metrics = b.measureText(text);
+		var x = ((bw / 2) - (metrics.width / 2));
+		var y = ((bh / 2) - (size / 2) - 20);
+
+		b.strokeText(text, x, y);
+		b.fillText(text, x, y);
+		b.restore();
+
+		ctx.save();
+		ctx.globalAlpha = this.waveText.alpha;
+		ctx.drawImage(
+			this.canvases.buffer,
+			0, 0, bw, bh,
+			0, 0, SCREEN_WIDTH, SCREEN_HEIGHT
+		);
+		ctx.restore();
+
+	}
+		
 };
 
 /**
