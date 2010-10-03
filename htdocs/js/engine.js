@@ -214,17 +214,12 @@ proto.init = function horde_Engine_proto_init () {
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		"how_to_play": "img/how_to_play.png",
-		"credits": "img/credits.png",
-		"paused": "img/paused.png",
 		"arena_floor": "img/arena_floor.png",
 		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png",
-		"beholder": "img/sheet_beholder.png",
-		"stats_defeat": "img/stats_defeat.png",
-		"stats_victory": "img/stats_victory.png"
+		"beholder": "img/sheet_beholder.png"
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -2146,8 +2141,9 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		}
 
 		ctx.drawImage(
-			this.images.getImage("stats_defeat"),
-			38, 38, 564, 404
+			this.preloader.getImage("ui"),
+			0, 2322, 564, 404,
+			41, 65, 564, 404
 		);
 		
 		this.drawObjectStats(this.getPlayerObject(), ctx);
@@ -2263,8 +2259,9 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("paused"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 1718, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 
@@ -2638,8 +2635,9 @@ proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("how_to_play"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 910, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 };
@@ -2650,8 +2648,9 @@ proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("credits"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 1314, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 };
