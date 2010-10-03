@@ -6,8 +6,6 @@ var DIFFICULTY_INCREMENT = 0.5; // TODO: remove
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
-var POINTER_Y_INC = 30;
-var POINTER_Y_START = 300;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
@@ -34,8 +32,11 @@ horde.Engine = function horde_Engine () {
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
 	this.gatesY = 0;
-	this.titlePointerY = 0;
-	this.numTitleOptions = 3; // New Game, Continue, How to Play, Credits
+
+	// Sword pointer
+	this.defaultPointerY = 300;
+	this.pointerY = 0;
+	this.numPointerOptions = 3;
 	
 	this.targetReticle = {
 		angle: 0,
@@ -207,24 +208,18 @@ proto.init = function horde_Engine_proto_init () {
 	// Load just the logo
 	this.preloader = new horde.ImageLoader();
 	this.preloader.load({
-		"logo": "img/ldg.png"
+		"ui": "img/sheet_ui.png"
 	}, this.preloadComplete, this);
 	
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		"title_screen": "img/title_screen.png",
-		"how_to_play": "img/how_to_play.png",
-		"credits": "img/credits.png",
-		"paused": "img/paused.png",
 		"arena_floor": "img/arena_floor.png",
 		"arena_walls": "img/arena_walls.png",
 		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png",
-		"beholder": "img/sheet_beholder.png",
-		"stats_defeat": "img/stats_defeat.png",
-		"stats_victory": "img/stats_victory.png"
+		"beholder": "img/sheet_beholder.png"
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -1814,7 +1809,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
-			switch (this.titlePointerY) {
+			switch (this.pointerY) {
 				case 0: // New Game
 					this.state = "intro_cinematic";
 					break;
@@ -1850,8 +1845,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		) {
 			this.keyboard.keyStates[keys.W] = false;
 			this.keyboard.keyStates[keys.UP] = false;
-			this.titlePointerY--;
-			if (this.titlePointerY < 0) this.titlePointerY = this.numTitleOptions;
+			this.pointerY--;
+			if (this.pointerY < 0) this.pointerY = this.numPointerOptions;
 			horde.sound.play("move_pointer");
 		}
 		if (
@@ -1860,8 +1855,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		) {
 			this.keyboard.keyStates[keys.S] = false;
 			this.keyboard.keyStates[keys.DOWN] = false;
-			this.titlePointerY++;
-			if (this.titlePointerY > this.numTitleOptions) this.titlePointerY = 0;
+			this.pointerY++;
+			if (this.pointerY > this.numPointerOptions) this.pointerY = 0;
 			horde.sound.play("move_pointer");
 		}
 
@@ -2237,8 +2232,9 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		}
 
 		ctx.drawImage(
-			this.images.getImage("stats_defeat"),
-			38, 38, 564, 404
+			this.preloader.getImage("ui"),
+			0, 2322, 564, 404,
+			41, 65, 564, 404
 		);
 		
 		this.drawObjectStats(this.getPlayerObject(), ctx);
@@ -2308,7 +2304,11 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 	if (this.logoAlpha > 0) {
 		ctx.save();
 		ctx.globalAlpha = this.logoAlpha;
-		ctx.drawImage(this.preloader.getImage("logo"), 0, 0);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			0, 0, 370, 430,
+			160, 0, 370, 430
+		);
 		ctx.restore();
 	}
 
@@ -2350,8 +2350,9 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("paused"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 1718, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 
@@ -2640,8 +2641,9 @@ proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) 
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	
 	ctx.drawImage(
-		this.images.getImage("title_screen"),
-		0, 0
+		this.preloader.getImage("ui"),
+		0, 430, 640, 480,
+		0, 0, 640, 480
 	);
 	
 	if (this.titleAlphaStep) {
@@ -2695,18 +2697,23 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		textAlign : "left"
 	};
 
-	// Sword pointer
+	this.drawPointer(ctx);
+
+};
+
+proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
+
 	var textX = 280;
-	var textY = (POINTER_Y_START - TEXT_HEIGHT);
-	var pointerX = (textX - 48);
-	var pointerY = (POINTER_Y_START + (this.titlePointerY * POINTER_Y_INC) - 20);
+	var textY = (this.defaultPointerY - TEXT_HEIGHT);
+	var x = (textX - 48);
+	var y = (this.defaultPointerY + (this.pointerY * 30) - 20);
 
 	ctx.save();
 	ctx.globalAlpha = this.titleAlpha;
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		320, 192, 36, 26,
-		pointerX, pointerY,
+		x, y,
 		36, 26
 	);
 	ctx.restore();
@@ -2719,8 +2726,9 @@ proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("how_to_play"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 910, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 };
@@ -2731,8 +2739,9 @@ proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
-		this.images.getImage("credits"),
-		38, 38, 564, 404
+		this.preloader.getImage("ui"),
+		0, 1314, 564, 404,
+		41, 65, 564, 404
 	);
 	ctx.restore();
 };
