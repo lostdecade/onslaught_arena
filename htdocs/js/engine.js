@@ -1832,6 +1832,67 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			p.addWeapon("h_axe", null);
 		}
 
+		// Accept hover/click with mouse on title screen options [#102]
+		var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
+		var startX = (POINTER_X - 40);
+		var stopX = (POINTER_X + 130);
+		var startY = (this.pointerYStart - 22);
+		var newPointerY;
+
+		// Continue
+		if (this.canContinue()) {
+			if (
+				(mouseV.x >= startX && mouseV.x <= stopX)
+				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
+			) {
+				if (this.pointerY !== 0) newPointerY = 0;
+				if (this.mouse.isButtonDown(buttons.LEFT)) {
+					this.keyboard.keyStates[keys.SPACE] = true;
+				}
+			}
+		}
+
+		// New game
+		startY += POINTER_HEIGHT;
+		if (
+			(mouseV.x >= startX && mouseV.x <= stopX)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
+		) {
+			if (this.pointerY !== 1) newPointerY = 1;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				this.keyboard.keyStates[keys.SPACE] = true;
+			}
+		}
+
+		// Controls
+		startY += POINTER_HEIGHT;
+		if (
+			(mouseV.x >= startX && mouseV.x <= stopX)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
+		) {
+			if (this.pointerY !== 2) newPointerY = 2;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				this.keyboard.keyStates[keys.SPACE] = true;
+			}
+		}
+
+		// Credits
+		startY += POINTER_HEIGHT;
+		if (
+			(mouseV.x >= startX && mouseV.x <= stopX)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
+		) {
+			if (this.pointerY !== 3) newPointerY = 3;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				this.keyboard.keyStates[keys.SPACE] = true;
+			}
+		}
+
+		if (newPointerY !== undefined) {
+			horde.sound.play("move_pointer");
+			this.pointerY = newPointerY;
+		}
+
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 			kb.clearKey(keys.ENTER);
@@ -1871,15 +1932,21 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
-	if (this.state === "how_to_play") {
-		if (this.keyboard.isAnyKeyPressed()) {
-			kb.clearKeys();
-			this.state = "title";
+	if (
+		(this.state === "credits")
+		|| (this.state === "how_to_play")
+	) {
+		var mouseDown = false;
+		if (this.mouse.isButtonDown(buttons.LEFT)) {
+			if (this.beenDown) {
+				mouseDown = true;
+				this.beenDown = false;
+			}
+		} else {
+			this.beenDown = true;
 		}
-	}
 
-	if (this.state === "credits") {
-		if (this.keyboard.isAnyKeyPressed()) {
+		if (this.keyboard.isAnyKeyPressed() || mouseDown) {
 			kb.clearKeys();
 			this.state = "title";
 		}
@@ -2785,15 +2852,18 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
 };
 
+proto.canContinue = function () {
+	var checkpointWave = this.getData("checkpoint_wave");
+	return (checkpointWave !== null);
+};
+
 proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOptions (ctx) {
 
-	var checkpointWave = this.getData("checkpoint_wave");
-	var canContinue = (checkpointWave !== null);
 	var startY = (this.pointerYStart - 22);
 	var spriteY;
 
 	// Continue
-	if (canContinue) {
+	if (this.canContinue()) {
 		spriteY = ((this.pointerY == 0) ? 630 : 430);
 	} else {
 		spriteY = 530;
@@ -2877,11 +2947,9 @@ proto.initOptions = function () {
 
 	switch (this.state) {
 		case "title":
-			var checkpointWave = this.getData("checkpoint_wave");
-			var canContinue = (checkpointWave !== null);
 			this.pointerYStart = 300;
 
-			if (canContinue) {
+			if (this.canContinue()) {
 				this.pointerY = 0;
 				this.numPointerOptions = 3;
 				this.pointerOptionsStart = 0;
