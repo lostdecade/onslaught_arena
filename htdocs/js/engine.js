@@ -7,7 +7,6 @@ var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
 var POINTER_X = 270;
-var POINTER_Y = 300;
 var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
@@ -38,6 +37,7 @@ horde.Engine = function horde_Engine () {
 
 	// Sword pointer
 	this.pointerY = 0;
+	this.pointerYStart = 0;
 	this.numPointerOptions = 0;
 	this.pointerOptionsStart = 0;
 	
@@ -95,6 +95,7 @@ proto.togglePause = (function horde_Engine_proto_togglePause () {
 			horde.sound.play("unpause");
 		} else {
 			this.paused = true;
+			this.initOptions();
 			isMuted = horde.sound.isMuted();
 			horde.sound.play("pause");
 			horde.sound.setMuted(true);
@@ -1771,6 +1772,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 	var buttons = horde.Mouse.Buttons;
+	var usingPointerOptions = false;
 
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 
@@ -1782,10 +1784,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			return;
 		}
 
-		// Press any key to unpause.
-		if (this.paused && this.keyboard.isAnyKeyPressed()) {
-			this.togglePause();
-			return;
+		if (this.paused) {
+			usingPointerOptions = true;
 		}
 
 		// Toggle sound with "M" for "mute".
@@ -1793,9 +1793,32 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.toggleMuted();
 		}
 
+		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
+
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
+
+			switch (this.pointerY) {
+				case 0: // Resume
+					this.togglePause();
+					break;
+				case 1: // Quit
+					if (this.verifyQuit) {
+						console.log('TODO: back to title screen');
+					} else {
+						this.pointerY = 0;
+						this.verifyQuit = true;
+					}
+					break;
+			}
+
+		}
+
 	}
 
 	if (this.state === "title") {
+
+		usingPointerOptions = true;
 
 		// ZOMG INFINITE AXES!!!111!!
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
@@ -1807,7 +1830,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
-		
+
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
@@ -1841,30 +1864,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		}
 
-		if (
-			this.keyboard.isKeyPressed(keys.W)
-			|| this.keyboard.isKeyPressed(keys.UP)
-		) {
-			this.keyboard.keyStates[keys.W] = false;
-			this.keyboard.keyStates[keys.UP] = false;
-			this.pointerY--;
-			if (this.pointerY < this.pointerOptionsStart) this.pointerY = this.numPointerOptions;
-			horde.sound.play("move_pointer");
-		}
-		if (
-			this.keyboard.isKeyPressed(keys.S)
-			|| this.keyboard.isKeyPressed(keys.DOWN)
-		) {
-			this.keyboard.keyStates[keys.S] = false;
-			this.keyboard.keyStates[keys.DOWN] = false;
-			this.pointerY++;
-			if (this.pointerY > this.numPointerOptions) this.pointerY = this.pointerOptionsStart;
-			horde.sound.play("move_pointer");
-		}
-
-		this.keyboard.storeKeyStates();
-		return;
-
 	}
 
 	if (this.state === "how_to_play") {
@@ -1889,6 +1888,33 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.woundsTo = player.wounds;
 			horde.sound.play("normal_battle_music");
 		}
+	}
+
+	if (usingPointerOptions) {
+
+		if (
+			this.keyboard.isKeyPressed(keys.W)
+			|| this.keyboard.isKeyPressed(keys.UP)
+		) {
+			this.keyboard.keyStates[keys.W] = false;
+			this.keyboard.keyStates[keys.UP] = false;
+			this.pointerY--;
+			if (this.pointerY < this.pointerOptionsStart) this.pointerY = this.numPointerOptions;
+			horde.sound.play("move_pointer");
+		}
+		if (
+			this.keyboard.isKeyPressed(keys.S)
+			|| this.keyboard.isKeyPressed(keys.DOWN)
+		) {
+			this.keyboard.keyStates[keys.S] = false;
+			this.keyboard.keyStates[keys.DOWN] = false;
+			this.pointerY++;
+			if (this.pointerY > this.numPointerOptions) this.pointerY = this.pointerOptionsStart;
+			horde.sound.play("move_pointer");
+		}
+
+		this.keyboard.storeKeyStates();
+
 	}
 
 	if (this.state === "running") {
@@ -2102,7 +2128,7 @@ proto.render = function horde_Engine_proto_render () {
 		case "title":
 			this.drawTitle(ctx);
 			this.drawPointer(ctx);
-			this.drawPointerOptions(ctx);
+			this.drawTitlePointerOptions(ctx);
 			break;
 
 		// How to Play
@@ -2131,7 +2157,11 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawShadow(ctx);
 			this.drawWaveText(ctx);
 			this.drawUI(ctx);
-			if (this.paused) this.drawPaused(ctx);
+			if (this.paused) {
+				this.drawPaused(ctx);
+				this.drawPointer(ctx);
+				this.drawPausedPointerOptions(ctx);
+			}
 			break;
 		
 		case "game_over":
@@ -2690,9 +2720,9 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
-	var textY = (POINTER_Y - TEXT_HEIGHT);
+	var textY = (this.pointerYStart - TEXT_HEIGHT);
 	var x = (POINTER_X - 42);
-	var y = (POINTER_Y + (this.pointerY * POINTER_HEIGHT) - POINTER_HEIGHT);
+	var y = (this.pointerYStart + (this.pointerY * POINTER_HEIGHT) - POINTER_HEIGHT);
 
 	ctx.save();
 	ctx.drawImage(
@@ -2705,11 +2735,11 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
 };
 
-proto.drawPointerOptions = function horde_Engine_proto_drawPointerOptions (ctx) {
+proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOptions (ctx) {
 
 	var checkpointWave = this.getData("checkpoint_wave");
 	var canContinue = (checkpointWave !== null);
-	var startY = 278;
+	var startY = (this.pointerYStart - 22);
 	var spriteY;
 
 	// Continue
@@ -2750,12 +2780,56 @@ proto.drawPointerOptions = function horde_Engine_proto_drawPointerOptions (ctx) 
 
 };
 
+proto.drawPausedPointerOptions = function horde_Engine_proto_drawPausedPointerOptions (ctx) {
+
+	var startY = (this.pointerYStart - 22);
+	var spriteY;
+
+	if (this.verifyQuit) {
+		// Nevermind
+		spriteY = ((this.pointerY == 0) ? 1932 : 1860);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			564, spriteY, 158, 26,
+			POINTER_X, startY, 158, 26
+		);
+	} else {
+		// Resume
+		spriteY = ((this.pointerY == 0) ? 1788 : 1718);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			564, spriteY, 106, 26,
+			POINTER_X, startY, 106, 26
+		);
+	}
+
+	if (this.verifyQuit) {
+		// Quit, seriously
+		spriteY = ((this.pointerY == 1) ? 1966 : 1894);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			564, spriteY, 192, 32,
+			POINTER_X, (startY + POINTER_HEIGHT), 196, 32
+		);
+	} else {
+		// Quit
+		spriteY = ((this.pointerY == 1) ? 1822 : 1752);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			564, spriteY, 70, 36,
+			POINTER_X, (startY + POINTER_HEIGHT), 70, 36
+		);
+	}
+
+};
+
 proto.initOptions = function () {
 
 	switch (this.state) {
 		case "title":
 			var checkpointWave = this.getData("checkpoint_wave");
 			var canContinue = (checkpointWave !== null);
+			this.pointerYStart = 300;
 
 			if (canContinue) {
 				this.pointerY = 0;
@@ -2766,6 +2840,12 @@ proto.initOptions = function () {
 				this.numPointerOptions = 3;
 				this.pointerOptionsStart = 1;
 			}
+			break;
+		case "running":
+			this.pointerYStart = 402;
+			this.pointerY = 0;
+			this.numPointerOptions = 1;
+			this.pointerOptionsStart = 0;
 			break;
 	}
 
