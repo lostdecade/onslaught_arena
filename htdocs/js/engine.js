@@ -343,7 +343,6 @@ proto.initGame = function () {
 
 	// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 	var player = this.getPlayerObject();
-player.wounds = 100; // TODO: remove
 	
 	var wep = horde.makeObject("item_weapon_knife");
 	wep.position = player.position.clone();
@@ -1203,7 +1202,10 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
-			waveTextString = "Game Saved!";
+
+			if (!this.continuing) {
+				waveTextString = "Game Saved!";
+			}
 		}
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
@@ -1846,6 +1848,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 							var player = this.getPlayerObject();
 							player.load(checkpointHero);
 						}
+						this.continuing = true;
 						this.state = "intro_cinematic";
 					} else {
 						// No checkpoint data!
@@ -1853,6 +1856,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					}
 					break;
 				case 1: // New Game
+					this.continuing = false;
 					this.state = "intro_cinematic";
 					break;
 				case 2: // How to Play
