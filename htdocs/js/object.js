@@ -49,8 +49,8 @@ horde.Object = function () {
 	this.piercing = false;
 	
 	// Default sounds
-	this.soundDamage = "bat_damage";
-	this.soundDies = "bat_dies";
+	this.soundDamage = null;
+	this.soundDies = null;
 	
 	this.damageType = "physical";
 	
