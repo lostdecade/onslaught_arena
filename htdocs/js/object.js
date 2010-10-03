@@ -501,7 +501,11 @@ proto.reverseDirection = function () {
  * @return {void}
  */
 proto.chase = function horde_Object_proto_chase (object) {
-	var direction = object.position.clone().subtract(this.position).normalize();
+	this.moveToward(object.position.clone());
+};
+
+proto.moveToward = function horde_Object_proto_moveToward (vector) {
+	var direction = vector.clone().subtract(this.position).normalize();
 	this.setDirection(direction);
 };
 
