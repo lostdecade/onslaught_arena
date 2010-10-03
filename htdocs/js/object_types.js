@@ -518,6 +518,66 @@ o.flaming_skull = {
 	
 };
 
+o.spike_wall = {
+	
+	role: "trap",
+	team: 1,
+	
+	speed: 150,
+	hitPoints: Infinity,
+	damage: 20,
+	
+	spriteSheet: "objects",
+	spriteX: 32,
+	spriteY: 256,
+	
+	rotate: true,
+	rotateSpeed: 0,
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+		this.spinUpTime = 7500;
+		this.wallDirection = new horde.Vector2(0, 1);
+	},
+	
+	onDamage: function (defender, engine) {
+		this.spriteX = 128;
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseTimer.start(this.spinUpTime);
+					this.phaseInit = true;
+				}
+				var step = (this.spinUpTime / 200);
+				this.rotateSpeed += ((step / 1000) * elapsed);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			case 1:
+				if (!this.phaseInit) {
+					this.setDirection(this.wallDirection);
+					this.phaseInit = true;
+				}
+				break;
+			
+		}
+		
+	},
+	
+	onWallCollide: function () {
+		this.stopMoving();
+		this.ttl = 1500;
+	}
+	
+};
+
 o.spike_sentry = {
 	
 	role: "trap",
@@ -1300,6 +1360,178 @@ o.sandworm = {
 				break;
 
 		}
+	}
+	
+};
+
+o.nega_xam = {
+	role: "monster",
+	team: 1,
+	badass: true,
+	
+	animated: true,
+	spriteSheet: "characters",
+	spriteY: 768,
+	
+	damage: 35,
+	hitPoints: 5000,
+	
+	speed: 200,
+
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+	},
+
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			// Charge out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 300;
+					this.animDelay = 100;
+					this.phaseInit = true;
+				}
+				if (this.position.y > 60) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Dash to X,Y
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 200;
+					this.phaseInit = true;
+					this.targetPos = new horde.Vector2((640 / 2) - 16, (480 / 2) - 16);
+				}
+				this.moveToward(this.targetPos);
+				var diff = this.targetPos.clone().subtract(this.position).abs();
+				if (diff.x < 16 && diff.y < 16) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Shake
+			case 2:
+				if (!this.phaseInit) {
+					this.numDashes = 0;
+					this.setDirection(new horde.Vector2(0, 1));
+					this.stopMoving();
+					this.phaseTimer.start(500);
+					this.phaseInit = true;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+				
+			// Dash around dropping spikes
+			case 3:
+				if (!this.phaseInit) {
+					this.numDashes++;
+					this.speed = 400;
+					this.animDelay = 100;
+					this.setDirection(horde.randomDirection());
+					this.phaseTimer.start(1500);
+					this.phaseInit = true;
+					this.spikeTimer = new horde.Timer();
+					this.spikeTimer.start(200);
+				}
+				this.spikeTimer.update(elapsed);
+				if (this.spikeTimer.expired()) {
+					var id = engine.spawnObject(this, "spikes");
+					var o = engine.objects[id];
+					if (o) {
+						o.ttl = 10000;
+					}
+					this.spikeTimer.reset();
+				}
+				if (this.phaseTimer.expired()) {
+					if (this.numDashes >= 4) {
+						// Finished dashing
+						this.nextPhase();
+					} else {
+						// Keep dashing!
+						this.setPhase(3);
+					}
+				}
+				break;
+			
+			case 4:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.phaseInit = true;
+					
+					// Make top wall
+					var spike = [];
+					for (var a = 0; a < 18; ++a) {
+						spike.push(true);
+					}
+					
+					for (var j = 0; j < 3; ++j) {
+						c = 0;
+						var found = false;
+						while (found === false) {
+							c = horde.randomRange(0, (spike.length - 1));
+							found = (spike[c] === true);
+						}
+						spike[c] = false;
+					}
+					
+					for (var x = 0; x < spike.length; ++x) {
+						if (spike[x] === true) {
+							var obj = horde.makeObject("spike_wall");
+							obj.position = new horde.Vector2(32 + (x * 32), 64);
+							engine.addObject(obj);
+						}
+					}
+					
+					// Make left wall
+					var spike = [];
+					for (var a = 0; a < 9; ++a) {
+						spike.push(true);
+					}
+
+					for (var j = 0; j < 3; ++j) {
+						c = 0;
+						var found = false;
+						while (found === false) {
+							c = horde.randomRange(0, (spike.length - 1));
+							found = (spike[c] === true);
+						}
+						spike[c] = false;
+					}
+
+					for (var x = 0; x < spike.length; ++x) {
+						if (spike[x] === true) {
+							var obj = horde.makeObject("spike_wall");
+							obj.position = new horde.Vector2(32, 96 + (x * 32));
+							obj.wallDirection = new horde.Vector2(1, 0);
+							engine.addObject(obj);
+						}
+					}
+					
+					
+				}
+				this.nextPhase();
+				break;
+
+			case 4:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 200;
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				break;
+			
+			
+		}
+		
+		
 	}
 	
 };

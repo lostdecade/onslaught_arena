@@ -156,7 +156,7 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facin
 	o.centerOn(parent.boundingBox().center());
 	o.setDirection(f);
 	o.init();
-	this.addObject(o);
+	return this.addObject(o);
 };
 
 /**
@@ -464,18 +464,18 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = (testWave - 2);
 	*/
 	
-	/*
+	
 	// Test Wave
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 15000);
 	w.addSpawnPoint(2, 1000);
 	//w.addObjects(0, "dragon", 1);
-	w.addObjects(1, "superclops", 1);
+	w.addObjects(1, "nega_xam", 1);
 	//w.addObjects(2, "sandworm", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
-	*/
+	
 
 	/***** START WAVES *********/
 
