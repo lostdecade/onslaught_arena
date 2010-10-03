@@ -1191,12 +1191,13 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
+		var waveTextString = "WAVE " + actualWave;
 		if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
-			// TODO: Show "Checkpoint Reached" text or something...
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
+			waveTextString = "CHECKPOINT!";
 		}
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
@@ -1204,6 +1205,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			this.waveModifier += DIFFICULTY_INCREMENT;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
+			waveTextString = "BOSS INCOMING!";
 			if (!horde.sound.isPlaying("final_battle_music")) {
 				horde.sound.stop("normal_battle_music");
 				horde.sound.play("final_battle_music");
@@ -1215,11 +1217,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			}
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
-		if (this.waves[this.currentWaveId].bossWave) {
-			this.waveText.string = "BOSS INCOMING!";
-		} else {
-			this.waveText.string = "WAVE " + actualWave;
-		}
+		this.waveText.string = waveTextString;
 		this.waveText.alpha = 0;
 		this.waveText.size = 30;
 		this.waveText.state = "show";
@@ -2163,8 +2161,8 @@ proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 		b.font = "Bold " + size + "px Cracked";
 		b.textBaseline = "top";
 		b.lineWidth = 3;
-		b.strokeStyle = "rgb(76, 7, 10)";
-		b.fillStyle = "rgb(184, 16, 22)";
+		b.strokeStyle = "rgb(0, 0, 0)";
+		b.fillStyle = "rgb(230, 103, 8)";
 
 		var metrics = b.measureText(text);
 		var x = ((bw / 2) - (metrics.width / 2));
