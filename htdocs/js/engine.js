@@ -6,6 +6,9 @@ var DIFFICULTY_INCREMENT = 0.5; // TODO: remove
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
+var POINTER_X = 270;
+var POINTER_Y = 300;
+var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
@@ -34,9 +37,9 @@ horde.Engine = function horde_Engine () {
 	this.gatesY = 0;
 
 	// Sword pointer
-	this.defaultPointerY = 300;
 	this.pointerY = 0;
-	this.numPointerOptions = 3;
+	this.numPointerOptions = 0;
+	this.pointerOptionsStart = 0;
 	
 	this.targetReticle = {
 		angle: 0,
@@ -323,6 +326,7 @@ proto.initGame = function () {
 	
 	this.objects = {};
 	this.state = "title";
+	this.initOptions();
 	
 	this.initMap();
 
@@ -1765,10 +1769,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			kb.clearKey(keys.SPACE);
 
 			switch (this.pointerY) {
-				case 0: // New Game
-					this.state = "intro_cinematic";
-					break;
-				case 1: // Continue
+				case 0: // Continue
 					var checkpointWave = this.getData("checkpoint_wave");
 					if (checkpointWave !== null) {
 						// Checkpoint data exists
@@ -1783,6 +1784,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						// No checkpoint data!
 						horde.sound.play("imp_damage");
 					}
+					break;
+				case 1: // New Game
+					this.state = "intro_cinematic";
 					break;
 				case 2: // How to Play
 					this.state = "how_to_play";
@@ -1801,7 +1805,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.keyStates[keys.W] = false;
 			this.keyboard.keyStates[keys.UP] = false;
 			this.pointerY--;
-			if (this.pointerY < 0) this.pointerY = this.numPointerOptions;
+			if (this.pointerY < this.pointerOptionsStart) this.pointerY = this.numPointerOptions;
 			horde.sound.play("move_pointer");
 		}
 		if (
@@ -1811,7 +1815,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.keyStates[keys.S] = false;
 			this.keyboard.keyStates[keys.DOWN] = false;
 			this.pointerY++;
-			if (this.pointerY > this.numPointerOptions) this.pointerY = 0;
+			if (this.pointerY > this.numPointerOptions) this.pointerY = this.pointerOptionsStart;
 			horde.sound.play("move_pointer");
 		}
 
@@ -2054,6 +2058,8 @@ proto.render = function horde_Engine_proto_render () {
 		// Title Screen
 		case "title":
 			this.drawTitle(ctx);
+			this.drawPointer(ctx);
+			this.drawPointerOptions(ctx);
 			break;
 
 		// How to Play
@@ -2555,21 +2561,6 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		0, 0, 640, 480
 	);
 	
-	if (this.titleAlphaStep) {
-		this.titleAlpha += this.titleAlphaStep;
-		if (this.titleAlpha <= 0.5) {
-			this.titleAlpha = 0.5;
-			this.titleAlphaStep = 0.025;
-		}
-		if (this.titleAlpha >= 1) {
-			this.titleAlpha = 1;
-			this.titleAlphaStep = -0.025;
-		}
-	} else {
-		this.titleAlphaStep = -0.025;
-		this.titleAlpha = 1;
-	}
-
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
 	this.drawText(ctx, highScore, 218, 424, {
 		fillStyle : "rgb(0, 0, 0)",
@@ -2606,19 +2597,15 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 		textAlign : "left"
 	};
 
-	this.drawPointer(ctx);
-
 };
 
 proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
-	var textX = 280;
-	var textY = (this.defaultPointerY - TEXT_HEIGHT);
-	var x = (textX - 48);
-	var y = (this.defaultPointerY + (this.pointerY * 30) - 20);
+	var textY = (POINTER_Y - TEXT_HEIGHT);
+	var x = (POINTER_X - 42);
+	var y = (POINTER_Y + (this.pointerY * POINTER_HEIGHT) - POINTER_HEIGHT);
 
 	ctx.save();
-	ctx.globalAlpha = this.titleAlpha;
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		320, 192, 36, 26,
@@ -2626,6 +2613,72 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 		36, 26
 	);
 	ctx.restore();
+
+};
+
+proto.drawPointerOptions = function horde_Engine_proto_drawPointerOptions (ctx) {
+
+	var checkpointWave = this.getData("checkpoint_wave");
+	var canContinue = (checkpointWave !== null);
+	var startY = 278;
+	var spriteY;
+
+	// Continue
+	if (canContinue) {
+		spriteY = ((this.pointerY == 0) ? 630 : 430);
+	} else {
+		spriteY = 530;
+	}
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		640, spriteY, 116, 20,
+		POINTER_X, startY, 116, 20
+	);
+
+	// New game
+	spriteY = ((this.pointerY == 1) ? 655 : 456);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		640, spriteY, 132, 26,
+		POINTER_X, (startY + POINTER_HEIGHT), 132, 26
+	);
+
+	// Controls
+	spriteY = ((this.pointerY == 2) ? 681 : 482);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		640, spriteY, 106, 22,
+		POINTER_X, (startY + (POINTER_HEIGHT * 2)), 106, 22
+	);
+
+	// Credits
+	spriteY = ((this.pointerY == 3) ? 708 : 508);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		640, spriteY, 90, 22,
+		POINTER_X, (startY + (POINTER_HEIGHT * 3)), 90, 22
+	);
+
+};
+
+proto.initOptions = function () {
+
+	switch (this.state) {
+		case "title":
+			var checkpointWave = this.getData("checkpoint_wave");
+			var canContinue = (checkpointWave !== null);
+
+			if (canContinue) {
+				this.pointerY = 0;
+				this.numPointerOptions = 3;
+				this.pointerOptionsStart = 0;
+			} else {
+				this.pointerY = 1;
+				this.numPointerOptions = 3;
+				this.pointerOptionsStart = 1;
+			}
+			break;
+	}
 
 };
 
