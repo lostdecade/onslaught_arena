@@ -473,7 +473,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	//w.addObjects(0, "dragon", 1);
 	w.addObjects(1, "nega_xam", 1);
 	//w.addObjects(2, "sandworm", 1);
-	w.nextWaveTime = 120000;
+	w.nextWaveTime = Infinity;
 	this.waves.push(w);
 	
 

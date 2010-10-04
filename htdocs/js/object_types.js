@@ -1513,14 +1513,34 @@ o.nega_xam = {
 				return "shoot";
 				break;
 
-			// Wander throwing battle axes
+			// Chill out for a bit
 			case 7:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.phaseTimer.start(4000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					// Poop out a meat...
+					var meat = horde.makeObject("item_food");
+					meat.position.x = 32;
+					meat.position.y = 64;
+					meat.healAmount *= 2;
+					engine.addObject(meat);
+					this.nextPhase();
+				}
+				break;
+
+			// Wander throwing battle axes
+			case 8:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
 					this.phaseInit = true;
 					this.phaseTimer.start(15000);
 					this.weapons = [{type: "e_nega_axe", count: null}];
+					this.cooldown = false;
+					this.setDirection(horde.randomDirection());
 				}
 				if (this.phaseTimer.expired()) {
 					this.nextPhase();
@@ -1530,7 +1550,7 @@ o.nega_xam = {
 				break;
 			
 			// Dash to center
-			case 8:
+			case 9:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
@@ -1545,7 +1565,7 @@ o.nega_xam = {
 				break;
 				
 			// Spawn some shit...
-			case 9:
+			case 10:
 				if (!this.phaseInit) {
 					this.setDirection(new horde.Vector2(0, 1));
 					this.stopMoving();
@@ -1583,7 +1603,7 @@ o.nega_xam = {
 			wallSpeedMod = 1.5;
 		}
 		
-		this.phaseTimer.start(spinUpTime - 2000);
+		this.phaseTimer.start(spinUpTime - 1500);
 		
 		// Make top wall
 		var spike = [];
