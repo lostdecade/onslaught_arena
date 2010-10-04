@@ -707,6 +707,105 @@ o.spikes = {
 	
 };
 
+o.owlbear = {
+	role: "monster",
+	team: 1,
+	badass: true,
+	
+	animated: true,
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 800,
+	
+	damage: 15,
+	hitPoints: 500,
+	speed: 75,
+	
+	lootTable: [
+		{type: "item_food", weight: 1}
+	],
+	
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.phaseTimer = new horde.Timer();
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		switch (this.phase) {
+		
+			// Charge out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 150;
+					this.animDelay = 150;
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 60) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Wander around, slowly
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 75;
+					this.animDelay = 300;
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				var player = engine.getPlayerObject();
+				var diff = player.position.clone().subtract(this.position).abs();
+				if (diff.x < (this.size.width / 2) || diff.y < (this.size.height / 2)) {
+					this.chase(player);
+					this.nextPhase();
+				}
+				break;
+			
+			// Spotted the player, prepare to charge	
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 0;
+					this.animDelay = 150;
+					this.phaseTimer.start(500);
+					this.phaseInit = true;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+				
+			// Charge!
+			case 3:
+				if (!this.phaseInit) {
+					this.speed = 400;
+					this.animDelay = 75;
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Stunned for bit
+			case 4:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.animDelay = 400;
+					this.phaseTimer.start(1250);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.setPhase(1);
+				}
+				break;
+			
+		}
+	}
+	
+};
+
 o.cyclops = {
 	role: "monster",
 	team: 1,
