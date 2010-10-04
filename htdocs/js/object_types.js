@@ -699,9 +699,12 @@ o.spikes = {
 
 	gibletSize: "medium",
 
-	onInit: function () {
-
+	onDamage: function (defender, engine) {
+		if (defender.role === "hero") {
+			this.spriteX = 96;
+		}
 	}
+	
 };
 
 o.cyclops = {
@@ -1374,7 +1377,7 @@ o.nega_xam = {
 	spriteY: 768,
 	
 	damage: 35,
-	hitPoints: 5000,
+	hitPoints: 2500,
 	
 	speed: 200,
 
@@ -1398,7 +1401,7 @@ o.nega_xam = {
 				}
 				break;
 			
-			// Dash to X,Y
+			// Dash to center
 			case 1:
 				if (!this.phaseInit) {
 					this.speed = 200;
@@ -1460,80 +1463,215 @@ o.nega_xam = {
 				}
 				break;
 			
+			// Chase hero slowly
 			case 4:
 				if (!this.phaseInit) {
-					this.stopMoving();
+					this.speed = 100;
+					this.animDelay = 200;
+					this.phaseTimer.start(15000);
 					this.phaseInit = true;
-					
-					// Make top wall
-					var spike = [];
-					for (var a = 0; a < 18; ++a) {
-						spike.push(true);
-					}
-					
-					for (var j = 0; j < 3; ++j) {
-						c = 0;
-						var found = false;
-						while (found === false) {
-							c = horde.randomRange(0, (spike.length - 1));
-							found = (spike[c] === true);
-						}
-						spike[c] = false;
-					}
-					
-					for (var x = 0; x < spike.length; ++x) {
-						if (spike[x] === true) {
-							var obj = horde.makeObject("spike_wall");
-							obj.position = new horde.Vector2(32 + (x * 32), 64);
-							engine.addObject(obj);
-						}
-					}
-					
-					// Make left wall
-					var spike = [];
-					for (var a = 0; a < 9; ++a) {
-						spike.push(true);
-					}
-
-					for (var j = 0; j < 3; ++j) {
-						c = 0;
-						var found = false;
-						while (found === false) {
-							c = horde.randomRange(0, (spike.length - 1));
-							found = (spike[c] === true);
-						}
-						spike[c] = false;
-					}
-
-					for (var x = 0; x < spike.length; ++x) {
-						if (spike[x] === true) {
-							var obj = horde.makeObject("spike_wall");
-							obj.position = new horde.Vector2(32, 96 + (x * 32));
-							obj.wallDirection = new horde.Vector2(1, 0);
-							engine.addObject(obj);
-						}
-					}
-					
-					
 				}
-				this.nextPhase();
+				var player = engine.getPlayerObject();
+				this.chase(player);
+				// TODO: Shoot swords
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
 				break;
-
-			case 4:
+			
+			// Dash to upper left
+			case 5:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
 					this.phaseInit = true;
+					this.targetPos = new horde.Vector2(32, 66);
 				}
-				movementTypes.wander.apply(this, arguments);
+				this.moveToward(this.targetPos);
+				var diff = this.targetPos.clone().subtract(this.position).abs();
+				if (diff.x < 2 && diff.y < 2) {
+					this.position.x = 32;
+					this.position.y = 66;
+					this.nextPhase();
+				}
 				break;
 			
+			// Summon spike walls and shoot spears
+			case 6:
+				if (!this.phaseInit) {
+					this.setDirection(new horde.Vector2(0, 1));
+					this.stopMoving();
+					this.phaseInit = true;
+					this.makeSpikeWalls(engine);
+					this.weapons = [{type: "e_nega_spear", count: null}];
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				this.chase(engine.getPlayerObject());
+				this.stopMoving();
+				return "shoot";
+				break;
+
+			// Wander throwing battle axes
+			case 7:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 200;
+					this.phaseInit = true;
+					this.phaseTimer.start(15000);
+					this.weapons = [{type: "e_nega_axe", count: null}];
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				movementTypes.wander.apply(this, arguments);
+				return "shoot";
+				break;
 			
+			// Dash to center
+			case 8:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.animDelay = 200;
+					this.phaseInit = true;
+					this.targetPos = new horde.Vector2((640 / 2) - 16, (480 / 2) - 16);
+				}
+				this.moveToward(this.targetPos);
+				var diff = this.targetPos.clone().subtract(this.position).abs();
+				if (diff.x < 5 && diff.y < 5) {
+					this.nextPhase();
+				}
+				break;
+				
+			// Spawn some shit...
+			case 9:
+				if (!this.phaseInit) {
+					this.setDirection(new horde.Vector2(0, 1));
+					this.stopMoving();
+					this.phaseInit = true;
+					for (var b = 0; b < 60; ++b) {
+						var id = engine.spawnObject(this, "dire_bat");
+						engine.objects[id].setDirection(horde.randomDirection());
+					}
+					this.phaseTimer.start(10000);
+				}
+				if (this.phaseTimer.expired()) {
+					this.setPhase(1);
+				}
+				break;
+	
+		}
+	
+	},
+	
+	makeSpikeWalls: function (engine) {
+		
+		var safeSpots = 3;
+		var spinUpTime = 10000;
+		var wallSpeedMod = 1;
+	
+		if (this.wounds > (this.hitPoints * 0.66)) {
+			// 1/3 HP (or lower)
+			safeSpots = 1;
+			spinUpTime = 5000;
+			wallSpeedMod = 2;
+		} else if (this.wounds > (this.hitPoints * 0.33)) {
+			// 2/3 HP (or lower)
+			safeSpots = 2;
+			spinUpTime = 7500;
+			wallSpeedMod = 1.5;
 		}
 		
+		this.phaseTimer.start(spinUpTime - 2000);
+		
+		// Make top wall
+		var spike = [];
+		for (var a = 0; a < 18; ++a) {
+			spike.push(true);
+		}
+		
+		for (var j = 0; j < safeSpots; ++j) {
+			c = 0;
+			var found = false;
+			while (found === false) {
+				c = horde.randomRange(1, (spike.length - 1));
+				found = (spike[c] === true);
+			}
+			spike[c] = false;
+		}
+		
+		for (var x = 0; x < spike.length; ++x) {
+			if (spike[x] === true) {
+				var obj = horde.makeObject("spike_wall");
+				obj.position = new horde.Vector2(32 + (x * 32), 64);
+				obj.spinUpTime = spinUpTime;
+				obj.speed *= wallSpeedMod;
+				engine.addObject(obj);
+			}
+		}
+		
+		// Make left wall
+		var spike = [];
+		for (var a = 0; a < 10; ++a) {
+			spike.push(true);
+		}
+
+		for (var j = 0; j < safeSpots; ++j) {
+			c = 0;
+			var found = false;
+			while (found === false) {
+				c = horde.randomRange(1, (spike.length - 1));
+				found = (spike[c] === true);
+			}
+			spike[c] = false;
+		}
+
+		for (var x = 0; x < spike.length; ++x) {
+			if (spike[x] === true) {
+				var obj = horde.makeObject("spike_wall");
+				obj.position = new horde.Vector2(32, 64 + (x * 32));
+				obj.wallDirection = new horde.Vector2(1, 0);
+				obj.spinUpTime = spinUpTime;
+				obj.speed = 275; // More ground to cover
+				obj.speed *= wallSpeedMod;
+				engine.addObject(obj);
+			}
+		}	
 		
 	}
 	
+};
+
+o.e_nega_axe = {
+	name: "Nega Axe",
+	role: "projectile",
+	cooldown: 2500,
+	speed: 250,
+	hitPoints: Infinity,
+	damage: 15,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 544,
+	rotate: true,
+	priority: 5,
+	ttl: 10000
+};
+
+o.e_nega_spear = {
+	name: "Nega Spear",
+	role: "projectile",
+	cooldown: 750,
+	speed: 350,
+	hitPoints: Infinity,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 544,
+	spriteAlign: true,
+	priority: 2,
+	bounce: false,
+	piercing: true
 };
 
 o.dragon = {
