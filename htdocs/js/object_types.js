@@ -707,6 +707,105 @@ o.spikes = {
 	
 };
 
+o.owlbear = {
+	role: "monster",
+	team: 1,
+	badass: true,
+	
+	animated: true,
+	size: new horde.Size(64, 64),
+	spriteSheet: "characters",
+	spriteY: 800,
+	
+	damage: 15,
+	hitPoints: 500,
+	speed: 75,
+	
+	lootTable: [
+		{type: "item_food", weight: 1}
+	],
+	
+	onInit: function () {
+		this.moveChangeDelay = horde.randomRange(500, 1000);
+		this.phaseTimer = new horde.Timer();
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		switch (this.phase) {
+		
+			// Charge out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 150;
+					this.animDelay = 150;
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 60) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Wander around, slowly
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 75;
+					this.animDelay = 300;
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				var player = engine.getPlayerObject();
+				var diff = player.position.clone().subtract(this.position).abs();
+				if (diff.x < (this.size.width / 2) || diff.y < (this.size.height / 2)) {
+					this.chase(player);
+					this.nextPhase();
+				}
+				break;
+			
+			// Spotted the player, prepare to charge	
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 0;
+					this.animDelay = 150;
+					this.phaseTimer.start(500);
+					this.phaseInit = true;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+				
+			// Charge!
+			case 3:
+				if (!this.phaseInit) {
+					this.speed = 400;
+					this.animDelay = 75;
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Stunned for bit
+			case 4:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.animDelay = 400;
+					this.phaseTimer.start(1250);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.setPhase(1);
+				}
+				break;
+			
+		}
+	}
+	
+};
+
 o.cyclops = {
 	role: "monster",
 	team: 1,
@@ -1513,14 +1612,34 @@ o.nega_xam = {
 				return "shoot";
 				break;
 
-			// Wander throwing battle axes
+			// Chill out for a bit
 			case 7:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.phaseTimer.start(4000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					// Poop out a meat...
+					var meat = horde.makeObject("item_food");
+					meat.position.x = 32;
+					meat.position.y = 64;
+					meat.healAmount *= 2;
+					engine.addObject(meat);
+					this.nextPhase();
+				}
+				break;
+
+			// Wander throwing battle axes
+			case 8:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
 					this.phaseInit = true;
 					this.phaseTimer.start(15000);
 					this.weapons = [{type: "e_nega_axe", count: null}];
+					this.cooldown = false;
+					this.setDirection(horde.randomDirection());
 				}
 				if (this.phaseTimer.expired()) {
 					this.nextPhase();
@@ -1530,7 +1649,7 @@ o.nega_xam = {
 				break;
 			
 			// Dash to center
-			case 8:
+			case 9:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
@@ -1545,7 +1664,7 @@ o.nega_xam = {
 				break;
 				
 			// Spawn some shit...
-			case 9:
+			case 10:
 				if (!this.phaseInit) {
 					this.setDirection(new horde.Vector2(0, 1));
 					this.stopMoving();
@@ -1583,7 +1702,7 @@ o.nega_xam = {
 			wallSpeedMod = 1.5;
 		}
 		
-		this.phaseTimer.start(spinUpTime - 2000);
+		this.phaseTimer.start(spinUpTime - 1500);
 		
 		// Make top wall
 		var spike = [];
