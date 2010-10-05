@@ -1833,7 +1833,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Accept hover/click with mouse on title screen options [#102]
-		var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 		var startX = (POINTER_X - 40);
 		var stopX = (POINTER_X + 130);
 		var startY = (this.pointerYStart - 22);
