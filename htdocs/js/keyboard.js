@@ -43,11 +43,9 @@ Keyboard.konamiCode = [
 	Keys.A
 ];
 
-// L D G D E B U G
 Keyboard.debugCode = [
 	76, // L
 	68, // D
-	71, // G
 	68, // D
 	69, // E
 	66, // B

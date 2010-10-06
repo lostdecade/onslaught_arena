@@ -27,7 +27,7 @@ horde.Engine = function horde_Engine () {
 	this.keyboard = new horde.Keyboard();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
-	this.debug = true; // Debugging toggle
+	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
 	
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -1974,7 +1974,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.toggleMuted();
 		}
 
-		// Code: ldgdebug = toggle debug
+		// Code: LDDEBUG = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
 			this.debug = !this.debug;
