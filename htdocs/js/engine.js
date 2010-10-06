@@ -27,7 +27,7 @@ horde.Engine = function horde_Engine () {
 	this.keyboard = new horde.Keyboard();
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
-	this.debug = false; // Debugging toggle
+	this.debug = true; // Debugging toggle
 	this.konamiEntered = false;
 	
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -220,7 +220,6 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"arena_floor": "img/arena_floor.png",
 		"arena_walls": "img/arena_walls.png",
-		"shadow": "img/arena_shadow.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png",
 		"beholder": "img/sheet_beholder.png"
@@ -1976,6 +1975,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.toggleMuted();
 		}
 
+		// Code: ldgdebug = toggle debug
+		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
+			this.keyboard.clearHistory();
+			this.debug = !this.debug;
+		}
+
 		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
 
 			kb.clearKey(keys.ENTER);
@@ -2663,14 +2668,6 @@ proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
 	this.drawWalls(ctx);
 };
 
-proto.drawShadow = function horde_Engine_proto_drawShadow (ctx) {
-	ctx.drawImage(
-		this.images.getImage("shadow"),
-		0, 0, 576, 386,
-		32, 0, 576, 386
-	);
-};
-
 proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	ctx.save();
@@ -3202,7 +3199,6 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 		case 1:
 			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
 			if (this.introFadeAlpha > 0) {
 				ctx.save();
 				ctx.globalAlpha = this.introFadeAlpha;
@@ -3216,7 +3212,6 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 		case 3:
 			this.drawArena(ctx);
 			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
 			break;
 			
 		case 4:
@@ -3227,7 +3222,6 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 				this.drawObject(ctx, this.introHero);
 			}
 			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
 			break;
 			
 		case 6:
@@ -3239,7 +3233,6 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 				304, 224, 32, 32
 			);
 			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
 			break;
 	}
 
@@ -3278,6 +3271,8 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "bold 20px Monospace";
 	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
+	ctx.textAlign = "right";
+	ctx.fillText(Math.round(1000 / this.lastElapsed) + " FPS", 630, 20);
 	ctx.restore();
 	
 };

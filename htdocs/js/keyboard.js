@@ -11,7 +11,7 @@ horde.Keyboard = function () {
 var Keyboard = horde.Keyboard;
 var proto = Keyboard.prototype;
 
-Keyboard.Keys = {
+var Keys = {
 	ENTER: 13,
 	SPACE: 32,
 	LEFT: 37,
@@ -28,38 +28,51 @@ Keyboard.Keys = {
 	X: 88,
 	Z: 90
 };
+Keyboard.Keys = Keys;
 
 Keyboard.konamiCode = [
-	Keyboard.Keys.UP,
-	Keyboard.Keys.UP,
-	Keyboard.Keys.DOWN,
-	Keyboard.Keys.DOWN,
-	Keyboard.Keys.LEFT,
-	Keyboard.Keys.RIGHT,
-	Keyboard.Keys.LEFT,
-	Keyboard.Keys.RIGHT,
-	Keyboard.Keys.B,
-	Keyboard.Keys.A
+	Keys.UP,
+	Keys.UP,
+	Keys.DOWN,
+	Keys.DOWN,
+	Keys.LEFT,
+	Keys.RIGHT,
+	Keys.LEFT,
+	Keys.RIGHT,
+	Keys.B,
+	Keys.A
+];
+
+// L D G D E B U G
+Keyboard.debugCode = [
+	76, // L
+	68, // D
+	71, // G
+	68, // D
+	69, // E
+	66, // B
+	85, // U
+	71 // G
 ];
 
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
-		case Keyboard.Keys.ENTER:
-		case Keyboard.Keys.LEFT:
-		case Keyboard.Keys.UP:
-		case Keyboard.Keys.RIGHT:
-		case Keyboard.Keys.DOWN:
-		case Keyboard.Keys.B:
-		case Keyboard.Keys.A:
-		case Keyboard.Keys.M:
-		case Keyboard.Keys.Z:
-		case Keyboard.Keys.X:
-		case Keyboard.Keys.P:
-		case Keyboard.Keys.SPACE:
-		case Keyboard.Keys.W:
-		case Keyboard.Keys.S:
-		case Keyboard.Keys.D:
+		case Keys.ENTER:
+		case Keys.LEFT:
+		case Keys.UP:
+		case Keys.RIGHT:
+		case Keys.DOWN:
+		case Keys.B:
+		case Keys.A:
+		case Keys.M:
+		case Keys.Z:
+		case Keys.X:
+		case Keys.P:
+		case Keys.SPACE:
+		case Keys.W:
+		case Keys.S:
+		case Keys.D:
 			horde.stopEvent(e);
 			break;
 	}
@@ -99,6 +112,10 @@ proto.clearKey = function (keyCode) {
 
 proto.clearKeys = function (keyCode) {
 	this.keyStates = {};
+};
+
+proto.clearHistory = function () {
+	this.history = [];
 };
 
 proto.historyMatch = function (keys) {
