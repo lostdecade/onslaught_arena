@@ -2402,10 +2402,9 @@ proto.render = function horde_Engine_proto_render () {
 		case "running":
 			this.drawFloor(ctx);
 			this.drawTargetReticle(ctx);
-			this.drawWalls(ctx);
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
-			this.drawShadow(ctx);
+			this.drawWalls(ctx);
 			this.drawWaveText(ctx);
 			this.drawUI(ctx);
 			if (this.paused) {
