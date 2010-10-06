@@ -249,7 +249,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	}
 	
 	if (this.hasState(horde.Object.states.INVINCIBLE)) {
-		this.alpha += ((10  / 1000) * elapsed) * this.alphaMod;
+		this.alpha += ((10 / 1000) * elapsed) * this.alphaMod;
 		if (this.alpha >= 1) {
 			this.alpha = 1;
 			this.alphaMod = -1;
@@ -345,7 +345,7 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 					|| this.hasState(horde.Object.states.DESPAWNING)
 				) {
 					return new horde.Vector2(
-						(17 + this.spawnFrameIndex) * this.size.width, 
+						(17 + this.spawnFrameIndex) * this.size.width,
 						this.spriteY - this.size.height
 					);
 				}
