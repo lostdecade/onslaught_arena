@@ -218,8 +218,7 @@ proto.init = function horde_Engine_proto_init () {
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
-		"arena_floor": "img/arena_floor.png",
-		"arena_walls": "img/arena_walls.png",
+		"arena": "img/sheet_arena.png",
 		"characters": "img/sheet_characters.png",
 		"objects": "img/sheet_objects.png",
 		"beholder": "img/sheet_beholder.png"
@@ -2649,15 +2648,15 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 
 proto.drawFloor = function horde_Engine_proto_drawFloor (ctx) {
 	ctx.drawImage(
-		this.images.getImage("arena_floor"),
-		0, 0, 576, 386,
+		this.images.getImage("arena"),
+		32, 480, 576, 386,
 		32, 0, 576, 386
 	);
 };
 
 proto.drawWalls = function horde_Engine_proto_drawWalls (ctx) {
 	ctx.drawImage(
-		this.images.getImage("arena_walls"),
+		this.images.getImage("arena"),
 		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
 		0, 0, this.view.width, this.view.height
 	);
