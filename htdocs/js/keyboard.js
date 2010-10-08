@@ -22,9 +22,15 @@ var Keys = {
 	A: 65,
 	B: 66,
 	D: 68,
+	E: 69,
+	G: 71,
+	L: 76,
 	M: 77,
 	P: 80,
+	R: 82,
 	S: 83,
+	T: 84,
+	U: 85,
 	W: 87,
 	X: 88,
 	Z: 90
@@ -45,23 +51,23 @@ Keyboard.konamiCode = [
 ];
 
 Keyboard.debugCode = [
-	76, // L
-	68, // D
-	68, // D
-	69, // E
-	66, // B
-	85, // U
-	71 // G
+	Keys.L,
+	Keys.D,
+	Keys.D,
+	Keys.E,
+	Keys.B,
+	Keys.U,
+	Keys.G
 ];
 
 Keyboard.resetCode = [
-	76, // L
-	68, // D
-	82, // R
-	69, // E
-	83, // S
-	69, // E
-	84 // T
+	Keys.L,
+	Keys.D,
+	Keys.R,
+	Keys.E,
+	Keys.S,
+	Keys.E,
+	Keys.T
 ];
 
 proto.supressKeys = function (e) {
