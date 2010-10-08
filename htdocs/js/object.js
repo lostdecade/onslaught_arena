@@ -387,6 +387,13 @@ proto.boundingBox = function horde_Object_proto_boundingBox () {
 	if (this.role === "projectile") {
 		rect.reduce(1);
 	}
+	if (this.type === "e_spit_pool") {
+		// Kind of a hack...
+		rect.y += (this.size.height / 4);
+		rect.x += 5;
+		rect.height -= (this.size.height / 2);
+		rect.width -= 10;
+	}
 	return rect;
 };
 
