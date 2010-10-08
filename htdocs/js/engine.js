@@ -438,7 +438,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 21;
+	var testWave = 30;
 	this.currentWaveId = (testWave - 2);
 	*/
 	
@@ -565,6 +565,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "superclops", 1);
 	w.nextWaveTime = 60000;
 	w.bossWave = true;
+	w.bossName = "Superclops";
 	this.waves.push(w);
 
 	// Wave 11: Level 2
@@ -694,6 +695,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "dragon", 1);
 	w.nextWaveTime = 120000;
 	w.bossWave = true;
+	w.bossName = "Green Dragon"
 	this.waves.push(w);
 	
 	// Wave 21: Level 3
@@ -801,6 +803,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "cube", 1);
 	w.nextWaveTime = 60000;
 	w.bossWave = true;
+	w.bossName = "Gelatinous Cube"
 	this.waves.push(w);
 
 	// Wave 31: Level 4
@@ -908,6 +911,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "demoblin", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
+	w.bossName = "Beholder"
 	this.waves.push(w);
 	
 	// Wave 41: Level 5
@@ -1015,6 +1019,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(1, "nega_xam", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
+	w.bossName = "Nega Xam"
 	this.waves.push(w);
 
 };
@@ -1392,7 +1397,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
 		this.spawnWaveExtras(actualWave);
-		var waveTextString = "WAVE " + actualWave;
+		var waveTextString = "Wave: " + actualWave;
 		if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
@@ -1408,7 +1413,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			this.currentWaveId = 0;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
-			waveTextString = "BOSS INCOMING!";
+			waveTextString = "Boss: " + this.waves[this.currentWaveId].bossName;
 			if (!horde.sound.isPlaying("final_battle_music")) {
 				horde.sound.stop("normal_battle_music");
 				horde.sound.play("final_battle_music");
