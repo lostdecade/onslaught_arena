@@ -1666,16 +1666,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		
 		if (o.isDead()) {
 			if (o.role === "hero") {
-
-				this.gameOverReady = false;
-				this.gameOverAlpha = 0;
-				this.updateGameOver();
-				this.state = "game_over";
-
-				var highScore = Number(this.getData(HIGH_SCORE_KEY));
-				if (o.gold > highScore) {
-					this.putData(HIGH_SCORE_KEY, o.gold);
-				}
+				this.endGame();
 				return;
 			}
 			o.execute("onDelete", [this]);
@@ -1988,7 +1979,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					break;
 				case 1: // Quit
 					if (this.verifyQuit) {
+					/*
 						console.log('TODO: back to title screen');
+						var p = this.getPlayerObject();
+						p.die();
+						this.endGame();
+						*/
+						this.verifyQuit = false;
+						this.togglePause();
+						var p = this.getPlayerObject();
+						p.wound(100);
 					} else {
 						this.pointerY = 0;
 						this.verifyQuit = true;
@@ -2589,7 +2589,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	ctx.font = "Bold 35px Monospace";
 
 	var waveReached = (this.currentWaveId + 1);
-	var score = this.getTotalScore(
+	var totalScore = this.getTotalScore(
 		waveReached,
 		object.gold,
 		object.totalDamageTaken
@@ -3298,6 +3298,23 @@ proto.putData = function horde_Engine_proto_putData (key, value) {
 	if (typeof localStorage == "object") {
 		localStorage.setItem(key, value);
 	}
+};
+
+proto.endGame = function () {
+
+	this.gameOverReady = false;
+	this.gameOverAlpha = 0;
+	this.updateGameOver();
+	this.state = "game_over";
+
+/*
+	var highScore = Number(this.getData(HIGH_SCORE_KEY));
+
+	if (o.gold > highScore) {
+		this.putData(HIGH_SCORE_KEY, o.gold);
+	}
+	*/
+
 };
 
 }());
