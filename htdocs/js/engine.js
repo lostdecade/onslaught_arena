@@ -2615,8 +2615,6 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		object.totalDamageTaken
 	);
 
-	var totalScore = 0;
-
 	// Wave reached
 	ctx.fillStyle = "rgb(199, 234, 251)";
 	ctx.fillText(waveReached, textX, 180);
