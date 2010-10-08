@@ -4,6 +4,7 @@ var VERSION = "{{VERSION}}";
 var DEMO = false;
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
+var DEFAULT_HIGH_SCORE = 1000;
 var NUM_GATES = 3;
 var POINTER_X = 270;
 var POINTER_HEIGHT = 24;
@@ -46,6 +47,7 @@ horde.Engine = function horde_Engine () {
 		position: new horde.Vector2()
 	};
 	
+	this.enableFullscreen = true;
 	this.enableClouds = false;
 	this.cloudTimer = null;
 	this.woundsTo = 0;
@@ -59,6 +61,9 @@ horde.Engine = function horde_Engine () {
 var proto = horde.Engine.prototype;
 
 proto.resize = function horde_Engine_proto_resize () {
+	if (!this.enableFullscreen) {
+		return;
+	}
 	var height = window.innerHeight;
 	height -= 40; // Some buffer around the game
 	if (height < 480) {
@@ -244,7 +249,7 @@ proto.init = function horde_Engine_proto_init () {
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
 	if (highScore === null) {
-		this.putData(HIGH_SCORE_KEY, 0);
+		this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
 	}
 	
 	this.initSound();
@@ -2020,7 +2025,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.clearHistory();
 			this.clearData("checkpoint_wave");
 			this.clearData("checkpoint_hero");
-			this.putData(HIGH_SCORE_KEY, 0);
+			this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
 		}
 
 		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
