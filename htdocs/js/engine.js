@@ -59,6 +59,23 @@ horde.Engine = function horde_Engine () {
 
 var proto = horde.Engine.prototype;
 
+proto.resize = function horde_Engine_proto_resize () {
+	var height = window.innerHeight;
+	height -= 40; // Some buffer around the game
+	if (height < 480) {
+		height = 480;
+	}
+	if (height > 768) {
+		height = 768;
+	}
+	var width = Math.round(height * 1.333);
+	var c = this.canvases["display"];
+	c.style.width = width + "px";
+	c.style.height = height + "px";
+	c.style.marginLeft = -(width / 2) + "px";
+	c.style.marginTop = -(height / 2) + "px";
+};
+
 /**
  * Runs the engine
  * @return {void}
@@ -195,6 +212,9 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
+	
+	this.resize();
+	horde.on("resize", this.resize, window, this);
 	
 	this.mouse = new horde.Mouse(this.canvases["display"]);
 	
@@ -2594,6 +2614,8 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		object.gold,
 		object.totalDamageTaken
 	);
+
+	var totalScore = 0;
 
 	// Wave reached
 	ctx.fillStyle = "rgb(199, 234, 251)";
