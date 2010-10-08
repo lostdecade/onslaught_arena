@@ -12,6 +12,7 @@ var Keyboard = horde.Keyboard;
 var proto = Keyboard.prototype;
 
 var Keys = {
+	ESCAPE: 27,
 	ENTER: 13,
 	SPACE: 32,
 	LEFT: 37,

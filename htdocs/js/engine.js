@@ -2,7 +2,6 @@
 
 var VERSION = "{{VERSION}}";
 var DEMO = false;
-var DIFFICULTY_INCREMENT = 0.5; // TODO: remove
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var NUM_GATES = 3;
@@ -387,7 +386,7 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 		sp.lastSpawnElapsed = sp.delay;
 		for (var z in p.objects) {
 			var o = p.objects[z];
-			sp.queueSpawn(o.type, o.count * this.waveModifier);
+			sp.queueSpawn(o.type, o.count);
 		}
 		var timeToSpawn = ((sp.queue.length - 1) * sp.delay);
 		if (timeToSpawn > longestTTS) {
@@ -395,7 +394,7 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
 		}
 	}
 	var ttl = longestTTS + wave.nextWaveTime;
-	this.waveTimer.start(ttl * this.waveModifier);
+	this.waveTimer.start(ttl);
 	this.openGates();
 };
 
@@ -409,7 +408,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.waveTimer = new horde.Timer();
 	this.waveTimer.start(1);
 	this.currentWaveId = -1;
-	this.waveModifier = 1;
 
 	this.waveText = {
 		string: "<WAVE TEXT HERE>",
@@ -1388,7 +1386,6 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		if (this.currentWaveId >= this.waves.length) {
 			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
-			this.waveModifier += DIFFICULTY_INCREMENT;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			waveTextString = "BOSS INCOMING!";
@@ -1959,7 +1956,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (this.state == "running") {
 		// Press "p" to pause.
-		if (this.keyboard.isKeyPressed(80)) {
+		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
 			this.togglePause();
 			this.keyboard.clearKeys();
 			return;
@@ -2529,7 +2526,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		);
 
 		// Game Over
-		var gotNewHighScore = false; // TODO
+		var gotNewHighScore = false; // TODO - #122
 		if (gotNewHighScore) {
 			ctx.drawImage(
 				this.preloader.getImage("ui"),
@@ -2592,7 +2589,11 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	ctx.font = "Bold 35px Monospace";
 
 	var waveReached = (this.currentWaveId + 1);
-console.log('waveReached:', waveReached);
+	var score = this.getTotalScore(
+		waveReached,
+		object.gold,
+		object.totalDamageTaken
+	);
 
 	// Wave reached
 	ctx.fillStyle = "rgb(199, 234, 251)";
@@ -2608,9 +2609,7 @@ console.log('waveReached:', waveReached);
 
 	// Total score
 	ctx.fillStyle = "rgb(250, 116, 26)";
-	ctx.fillText(this.getTotalScore(
-		waveReached, object.gold, object.totalDamageTaken
-	), textX, 180 + (textHeight * 3));
+	ctx.fillText(totalScore, textX, 180 + (textHeight * 3));
 
 	ctx.restore();
 	
