@@ -54,7 +54,6 @@ horde.Engine = function horde_Engine () {
 	this.introTimer = new horde.Timer();
 	this.introPhase = 0;
 	this.introPhaseInit = false;
-	
 };
 
 var proto = horde.Engine.prototype;
@@ -270,6 +269,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("chest_weapon", "sound/effects/chest_weapon");
 		
 		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
+		s.create("final_battle_music", "sound/music/final_battle", true, 20);
+		s.create("victory", "sound/music/victory", true, 20);
 
 		s.create("hero_attacks", "sound/effects/char_attacks");
 		s.create("hero_damage", "sound/effects/char_damage_3");
@@ -309,9 +310,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_death");
-		
-		s.create("final_battle_music", "sound/music/final_battle", true, 20);
-		
+			
 	});
 	
 };
@@ -336,6 +335,12 @@ proto.initGame = function () {
 	this.gameOverBg = null;
 
 	this.monstersAlive = 0;
+
+	this.gotNewHighScore = 0;
+	this.statsCount = 0;
+	this.statsIncrement = 0;
+	this.statsIndex = 0;
+	this.statsTimer = null;
 
 };
 
@@ -1467,9 +1472,26 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 
 	var alphaChange = ((0.2 / 1000) * elapsed);
 	this.gameOverAlpha += Number(alphaChange) || 0;
+
 	if (this.gameOverAlpha >= 0.75) {
 		this.gameOverReady = true;
 		this.gameOverAlpha = 0.75;
+	}
+
+	if (this.gameOverReady) {
+		if (!this.statsTimer) {
+			this.statsTimer = new horde.Timer();
+			this.statsCount = 0;
+			this.statsIndex = 0;
+			// Settings for Wave reached:
+			this.statsTimer.start(50);
+			this.statsIncrement = 1;
+		}
+		this.statsTimer.update(elapsed);
+		if (this.statsTimer.expired()) {
+			this.statsTimer.reset();
+			this.statsCount += this.statsIncrement;
+		}
 	}
 
 };
@@ -1987,10 +2009,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.toggleMuted();
 		}
 
-		// Code: LDDEBUG = toggle debug
+		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
 			this.debug = !this.debug;
+		}
+
+		// Code: lddebug = toggle debug
+		if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
+			this.keyboard.clearHistory();
+			this.putData(HIGH_SCORE_KEY, 0);
 		}
 
 		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
@@ -2004,12 +2032,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					break;
 				case 1: // Quit
 					if (this.verifyQuit) {
-					/*
-						console.log('TODO: back to title screen');
-						var p = this.getPlayerObject();
-						p.die();
-						this.endGame();
-						*/
 						this.verifyQuit = false;
 						this.togglePause();
 						var p = this.getPlayerObject();
@@ -2537,8 +2559,12 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		
 		if (this.keyboard.isAnyKeyPressed()) {
 			this.keyboard.clearKeys();
-			this.initGame();
-			return;
+			this.statsIndex += 1;
+			if (this.statsIndex >= 5) {
+				horde.sound.stop("victory");
+				this.initGame();
+				return;
+			}
 		}
 
 		var headerY = 70;
@@ -2551,8 +2577,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		);
 
 		// Game Over
-		var gotNewHighScore = false; // TODO - #122
-		if (gotNewHighScore) {
+		if (this.gotNewHighScore) {
 			ctx.drawImage(
 				this.preloader.getImage("ui"),
 				564, 2374, 404, 50,
@@ -2569,11 +2594,13 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		this.drawObjectStats(this.getPlayerObject(), ctx);
 
 		// Press anything to continue ...
-		ctx.drawImage(
-			this.preloader.getImage("ui"),
-			564, 2424, 334, 20,
-			153, 404, 334, 20
-		);
+		if (this.statsIndex >= 4) {
+			ctx.drawImage(
+				this.preloader.getImage("ui"),
+				564, 2424, 334, 20,
+				153, 404, 334, 20
+			);
+		}
 		
 	}
 	
@@ -2613,6 +2640,10 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 
 	ctx.font = "Bold 35px Monospace";
 
+	var increment;
+	var max = 0;
+	var nextTimer = 0;
+
 	var waveReached = (this.currentWaveId + 1);
 	var totalScore = this.getTotalScore(
 		waveReached,
@@ -2621,20 +2652,78 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	);
 
 	// Wave reached
+	var displayWaveReached = "";
+	if (this.statsIndex === 0) {
+		displayWaveReached = this.statsCount;
+		max = waveReached;
+		// Settings for Gold earned:
+		increment = 199;
+		nextTimer = 10;
+	} else {
+		displayWaveReached = waveReached;
+	}
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText(waveReached, textX, 180);
+	ctx.fillText(displayWaveReached, textX, 180);
 
 	// Gold earned
+	var displayGold = "";
+	if (this.statsIndex === 1) {
+		displayGold = this.statsCount;
+		max = object.gold;
+		// Settings for Damage taken:
+		increment = 13;
+		nextTimer = 10;
+	} else if (this.statsIndex > 1) {
+		displayGold = object.gold;
+	}
 	ctx.fillStyle = "rgb(255, 245, 121)";
-	ctx.fillText(object.gold, textX, 180 + textHeight);
+	ctx.fillText(displayGold, textX, 180 + textHeight);
 
 	// Damage taken
+	var displayDamage = "";
+	if (this.statsIndex === 2) {
+		displayDamage = this.statsCount;
+		max = object.totalDamageTaken;
+		// Settings for Total score:
+		increment = 299;
+		nextTimer = 5;
+	} else if (this.statsIndex > 2)  {
+		displayDamage = object.totalDamageTaken;
+	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText(object.totalDamageTaken, textX, 180 + (textHeight * 2));
+	ctx.fillText(displayDamage, textX, 180 + (textHeight * 2));
 
 	// Total score
+	var displayScore = "";
+	if (this.statsIndex === 3) {
+		displayScore = this.statsCount;
+		max = totalScore;
+	} else if (this.statsIndex > 3)  {
+		displayScore = totalScore;
+	}
 	ctx.fillStyle = "rgb(250, 116, 26)";
-	ctx.fillText(totalScore, textX, 180 + (textHeight * 3));
+	ctx.fillText(displayScore, textX, 180 + (textHeight * 3));
+
+	if (this.statsCount >= max) {
+		this.statsCount = 0;
+		this.statsIncrement = increment;
+		this.statsIndex += 1;
+		this.statsTimer.start(nextTimer);
+	}
+
+	// All done! Run this once
+	if (this.statsIndex == 4) {
+		this.statsIndex += 1;
+
+		var highScore = Number(this.getData(HIGH_SCORE_KEY));
+
+		if (totalScore > highScore) {
+			this.putData(HIGH_SCORE_KEY, totalScore);
+			horde.sound.play("victory");
+			this.gotNewHighScore = totalScore;
+		}
+
+	}
 
 	ctx.restore();
 	
@@ -3326,20 +3415,10 @@ proto.putData = function horde_Engine_proto_putData (key, value) {
 };
 
 proto.endGame = function () {
-
 	this.gameOverReady = false;
 	this.gameOverAlpha = 0;
 	this.updateGameOver();
 	this.state = "game_over";
-
-/*
-	var highScore = Number(this.getData(HIGH_SCORE_KEY));
-
-	if (o.gold > highScore) {
-		this.putData(HIGH_SCORE_KEY, o.gold);
-	}
-	*/
-
 };
 
 }());

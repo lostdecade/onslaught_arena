@@ -54,6 +54,16 @@ Keyboard.debugCode = [
 	71 // G
 ];
 
+Keyboard.resetCode = [
+	76, // L
+	68, // D
+	82, // R
+	69, // E
+	83, // S
+	69, // E
+	84 // T
+];
+
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
