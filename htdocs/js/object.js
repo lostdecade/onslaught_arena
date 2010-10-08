@@ -25,6 +25,9 @@ horde.Object = function () {
 	this.animDelay = 200; // Delay (in milliseconds) between animation frames
 	this.animElapsed = 0; // Elapsed time (in milliseconds) since last animation frame increment
 	this.spawnFrameIndex = 0;
+	this.spawnFrameCount = 2;
+	this.spawnFramesX = 0;
+	this.spawnFramesY = 0;
 	this.angle = 0; // Angle to draw this object
 	this.rotateSpeed = 400; // Speed at which to rotate the object
 	this.rotate = false; // Enable/disable rotation of object
@@ -274,7 +277,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 			if (this.hasState(horde.Object.states.SPAWNING)) {
 				this.spawnFrameIndex++;
-				if (this.spawnFrameIndex > 2) {
+				if (this.spawnFrameIndex > this.spawnFrameCount) {
 					this.removeState(horde.Object.states.SPAWNING);
 				}
 			}
@@ -345,8 +348,8 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 					|| this.hasState(horde.Object.states.DESPAWNING)
 				) {
 					return new horde.Vector2(
-						(17 + this.spawnFrameIndex) * this.size.width,
-						this.spriteY - this.size.height
+						this.spawnFramesX + (this.spawnFrameIndex * this.size.width),
+						this.spawnFramesY
 					);
 				}
 				if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
@@ -362,6 +365,15 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 				break;
 
 			default:
+				if (
+					this.hasState(horde.Object.states.SPAWNING)
+					|| this.hasState(horde.Object.states.DESPAWNING)
+				) {
+					return new horde.Vector2(
+						this.spawnFramesX + (this.spawnFrameIndex * this.size.width),
+						this.spawnFramesY
+					);
+				}
 				return new horde.Vector2(
 					this.spriteX + (this.animFrameIndex * this.size.width),
 					this.spriteY

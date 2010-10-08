@@ -696,8 +696,19 @@ o.spikes = {
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 256,
+	
+	animated: true,
+	animNumFrames: 1,
+	
+	spawnFramesX: 224,
+	spawnFramesY: 256,
+	spawnFrameCount: 3,
 
 	gibletSize: "medium",
+
+	onInit: function () {
+		this.addState(horde.Object.states.SPAWNING);
+	},
 
 	onDamage: function (defender, engine) {
 		if (defender.role === "hero") {
@@ -1356,6 +1367,10 @@ o.sandworm = {
 	animDelay: 200,
 	spriteSheet: "characters",
 	spriteY: 480,
+	
+	spawnFramesX: 544,
+	spawnFramesY: 448,
+	spawnFrameCount: 2,
 	
 	damage: 25,
 	hitPoints: 50,
