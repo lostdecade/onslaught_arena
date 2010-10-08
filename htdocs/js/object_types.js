@@ -426,8 +426,8 @@ o.hunter_goblin = {
 o.demoblin = {
 	role: "monster",
 	team: 1,
-	speed: 100,
-	defaultSpeed: 100,
+	speed: 75,
+	defaultSpeed: 75,
 	hitPoints: 30,
 	damage: 15,
 	worth: 0,
@@ -1996,7 +1996,7 @@ o.e_trident = {
 
 o.e_boulder = {
 	role: "projectile",
-	cooldown: 1500,
+	cooldown: 2000,
 	speed: 150,
 	hitPoints: Infinity,
 	damage: 15,
