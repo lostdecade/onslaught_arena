@@ -2591,37 +2591,39 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 
 	ctx.font = "Bold 35px Monospace";
 
+	var waveReached = (this.currentWaveId + 1);
+console.log('waveReached:', waveReached);
+
 	// Wave reached
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText((this.currentWaveId + 1), textX, 180);
+	ctx.fillText(waveReached, textX, 180);
 
 	// Gold earned
 	ctx.fillStyle = "rgb(255, 245, 121)";
 	ctx.fillText(object.gold, textX, 180 + textHeight);
 
 	// Damage taken
-	var TODO = "TODO"; // Total wounds
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText(TODO, textX, 180 + (textHeight * 2));
+	ctx.fillText(object.totalDamageTaken, textX, 180 + (textHeight * 2));
 
 	// Total score
-	var TODO = "TODO"; // Total score
 	ctx.fillStyle = "rgb(250, 116, 26)";
-	ctx.fillText(TODO, textX, 180 + (textHeight * 3));
+	ctx.fillText(this.getTotalScore(
+		waveReached, object.gold, object.totalDamageTaken
+	), textX, 180 + (textHeight * 3));
 
-/*
-	ctx.fillText(object.kills, 175, 225);
-	ctx.fillText(object.gold, 175, 305);
-	ctx.fillStyle = "rgb(108, 192, 113)";
-	ctx.fillText(object.meatEaten, 175, 385);
-	ctx.fillText(object.shotsFired, 450, 225);
-	ctx.fillStyle = "rgb(207, 18, 140)";
-	ctx.fillText(accuracy, 450, 305);
-	ctx.fillText(favoredType, 450, 385);
-	*/
-	
 	ctx.restore();
 	
+};
+
+proto.getTotalScore = function (wave, gold, damage) {
+	var score = 0;
+
+	score += (wave * 1000);
+	score += gold;
+	score -= (damage * 10);
+
+	return score;
 };
 
 proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
