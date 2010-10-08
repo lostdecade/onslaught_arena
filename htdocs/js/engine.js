@@ -2018,6 +2018,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
 			this.keyboard.clearHistory();
+			this.clearData("checkpoint_wave");
+			this.clearData("checkpoint_hero");
 			this.putData(HIGH_SCORE_KEY, 0);
 		}
 
@@ -3143,7 +3145,7 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
 proto.canContinue = function () {
 	var checkpointWave = this.getData("checkpoint_wave");
-	return (checkpointWave !== null);
+	return Boolean(checkpointWave);
 };
 
 proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOptions (ctx) {
@@ -3411,6 +3413,16 @@ proto.getData = function horde_Engine_proto_getData (key, value) {
 proto.putData = function horde_Engine_proto_putData (key, value) {
 	if (typeof localStorage == "object") {
 		localStorage.setItem(key, value);
+	}
+};
+
+/**
+ * Clears some persistent data by key
+ * @param {String} key The key of the data to clear
+ */
+proto.clearData = function horde_Engine_proto_clearData (key) {
+	if (typeof localStorage == "object") {
+		localStorage.removeItem(key);
 	}
 };
 
