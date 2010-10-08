@@ -2136,6 +2136,7 @@ o.e_spit_pool = {
 	ttl: 7500,
 	bounce: false,
 	drawIndex: -1,
+	collidable: false,
 	
 	onObjectCollide: function (object, engine) {
 		if (object.team !== this.team && object.role !== "projectile") {
@@ -2172,8 +2173,20 @@ o.e_worm_spit = {
 	spriteAlign: true,
 	bounce: false,
 	animated: true,
-	ttl: 1200,
 	damageType: "magic",
+
+	onInit: function () {
+		this.dieTimer = new horde.Timer();
+		this.dieTimer.start(1000);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.dieTimer.update(elapsed);
+		if (this.dieTimer.expired()) {
+			this.die();
+		}
+	},
+	
 	onDelete: function (engine) {
 		engine.spawnObject(this, "e_spit_pool");
 	}
