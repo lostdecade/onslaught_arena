@@ -443,7 +443,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 30;
+	var testWave = 15;
 	this.currentWaveId = (testWave - 2);
 	*/
 	
@@ -632,9 +632,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 15000);
 	w.addSpawnPoint(1, 1500);
 	w.addSpawnPoint(2, 15000);
-	w.addObjects(0, "owlbear", 2);
+	w.addObjects(0, "owlbear", 1);
 	w.addObjects(1, "imp", 15);
-	w.addObjects(2, "owlbear", 2);
+	w.addObjects(2, "owlbear", 1);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
 

@@ -729,7 +729,7 @@ o.owlbear = {
 	spriteY: 800,
 	
 	damage: 15,
-	hitPoints: 500,
+	hitPoints: 250,
 	speed: 75,
 	
 	lootTable: [
@@ -789,7 +789,7 @@ o.owlbear = {
 			// Charge!
 			case 3:
 				if (!this.phaseInit) {
-					this.speed = 400;
+					this.speed = 350;
 					this.animDelay = 75;
 					this.phaseTimer.start(2000);
 					this.phaseInit = true;
