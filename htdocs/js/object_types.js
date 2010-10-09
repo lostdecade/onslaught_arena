@@ -448,7 +448,7 @@ o.demoblin = {
 		{type: "item_food", weight: 1}
 	],
 	
-	soundAttacks: "goblin_attacks",
+	soundAttacks: "demoblin_attacks",
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
 	onInit: function () {
@@ -477,9 +477,8 @@ o.flaming_skull = {
 	
 	setDir: false,
 
-	//soundAttacks: "skull_attacks",
 	soundDamage: "skull_damage",
-	//soundDies: "skull_dies",
+	soundDies: "skull_dies",
 	
 	weapons: [
 		{type: "e_static_blue_fire", count: null}
@@ -738,7 +737,7 @@ o.owlbear = {
 
 	soundAttacks: "owlbear_attacks",
 	soundDamage: "owlbear_damage",
-	soundDies: "owlbear_damage",
+	soundDies: "owlbear_dies",
 	
 	lootTable: [
 		{type: "item_food", weight: 1}
@@ -1016,9 +1015,8 @@ o.gel = {
 	speed: 200,
 	worth: 0,
 
-	//soundAttacks: "gel_attacks",
 	soundDamage: "gel_damage",
-	//soundDies: "gel_dies",
+	soundDies: "gel_dies",
 
 	onInit: function () {
 		this.setDirection(horde.randomDirection());
@@ -1170,7 +1168,6 @@ o.imp = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
 	
-	soundAttacks: "imp_attacks",
 	soundDamage: "imp_damage",
 	soundDies: "imp_dies",
 	

@@ -244,8 +244,9 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"arena": "img/sheet_arena.png",
 		"characters": "img/sheet_characters.png",
-		"objects": "img/sheet_objects.png",
+		"objects": "img/sheet_objects.png"/*,
 		"beholder": "img/sheet_beholder.png"
+		*/
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -265,73 +266,88 @@ proto.initSound = function horde_Engine_proto_initSound () {
 	
 	horde.sound.init(function () {
 	
+		// Create all sound files
 		var s = horde.sound;
-		
-		s.create("move_pointer", "sound/effects/chest_damage");
-		
-		s.create("gate_opens", "sound/effects/gate_opens");
-		s.create("gate_closes", "sound/effects/gate_closes");
-		
-		s.create("chest_weapon", "sound/effects/chest_weapon");
-		
+
+		// Music
 		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
 		s.create("final_battle_music", "sound/music/final_battle", true, 20);
 		s.create("victory", "sound/music/victory", true, 20);
-
-		s.create("hero_attacks", "sound/effects/char_attacks");
-		s.create("hero_damage", "sound/effects/char_damage_3");
-
-		s.create("eat_food", "sound/effects/chest_food", false, 20);
-		s.create("coins", "sound/effects/chest_gold", false, 10);
-		s.create("code_entered", "sound/effects/code_entered");
-		s.create("immunity", "sound/effects/immunity", false, 25);
 		
+		// UI
+		s.create("move_pointer", "sound/effects/move_pointer");
+		s.create("select_pointer", "sound/effects/_move_pointer");
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
-		s.create("hero_dies", "sound/effects/char_dies");
+		// Environment
+		s.create("code_entered", "sound/effects/code_entered");
+		s.create("gate_opens", "sound/effects/gate_opens");
+		s.create("gate_closes", "sound/effects/gate_closes");
+		s.create("spike_attack", "sound/effects/spike_attacks");
 		
+		// Hero
+		s.create("coins", "sound/effects/chest_gold", false, 80);
+		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
+		s.create("hero_attacks", "sound/effects/char_attacks");
+		s.create("hero_damage", "sound/effects/char_damage_3");
+		s.create("hero_dies", "sound/effects/char_dies");
+		s.create("immunity", "sound/effects/immunity", false, 25);
+		s.create("pickup_weapon", "sound/effects/pickup_weapon");
 		
+		// Bat
 		s.create("bat_damage", "sound/effects/bat_damage");
 		s.create("bat_dies", "sound/effects/bat_dies");
 		
+		// Goblin
 		s.create("goblin_attacks", "sound/effects/goblin_attacks");
 		s.create("goblin_damage", "sound/effects/goblin_damage");
 		s.create("goblin_dies", "sound/effects/goblin_dies");
 
-		s.create("imp_attacks", "sound/effects/imp_attacks");
+		// Demoblin
+		s.create("demoblin_attacks", "sound/effects/demoblin_attacks");
+
+		// Imp
 		s.create("imp_damage", "sound/effects/imp_damage");
 		s.create("imp_dies", "sound/effects/imp_dies");
 
-		s.create("spike_attack", "sound/effects/spike_attacks");
-		
-		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
-		s.create("cyclops_damage", "sound/effects/cyclops_damage");
-		s.create("cyclops_dies", "sound/effects/cyclops_dies");
-
-		s.create("dragon_attacks", "sound/effects/dragon_attacks");
-		s.create("dragon_damage", "sound/effects/dragon_damage");
-		s.create("dragon_dies", "sound/effects/dragon_dies");
-
-		s.create("cube_attacks", "sound/effects/cube_attacks");
-		s.create("cube_damage", "sound/effects/cube_damage");
-		s.create("cube_dies", "sound/effects/cube_dies");
+		// Gel
 		s.create("gel_damage", "sound/effects/gel_damage", false, 40);
-		//s.create("gel_dies", "sound/effects/gel_dies");
+		s.create("gel_dies", "sound/effects/gel_dies", false, 40);
 
-		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
-		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 70);
-
-		s.create("skull_damage", "sound/effects/skull_damage", false, 35);
-		//s.create("skull_dies", "sound/effects/skull_dies");
-
+		// Flaming Skull
+		s.create("skull_damage", "sound/effects/skull_damage", false, 30);
+		s.create("skull_dies", "sound/effects/skull_dies", false, 10);
+	
+		// Wizard
 		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 30);
 		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 60);
 		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 60);
 
+		// Sandworm
 		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 90);
 		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 50);
+
+		// Cyclops
+		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
+		s.create("cyclops_damage", "sound/effects/cyclops_damage");
+		s.create("cyclops_dies", "sound/effects/cyclops_dies");
+
+		// Owlbear
+		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
+		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 40);
+		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 70);
+
+		// Boss: Green Dragon
+		s.create("dragon_attacks", "sound/effects/dragon_attacks");
+		s.create("dragon_damage", "sound/effects/dragon_damage");
+		s.create("dragon_dies", "sound/effects/dragon_dies");
+
+		// Boss: Gelatinous Cube
+		s.create("cube_attacks", "sound/effects/cube_attacks");
+		s.create("cube_damage", "sound/effects/cube_damage");
+		s.create("cube_dies", "sound/effects/cube_dies");
 			
 	});
 	
@@ -489,6 +505,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "owlbear", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
@@ -1844,7 +1861,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
-						horde.sound.play("chest_weapon");
+						horde.sound.play("pickup_weapon");
 						for (var j = 0; j < 5; ++j) {
 							var heart = horde.makeObject("mini_sword");
 							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
@@ -2091,6 +2108,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.togglePause();
 					break;
 				case 1: // Quit
+					horde.sound.play("select_pointer");
 					if (this.verifyQuit) {
 						this.verifyQuit = false;
 						this.togglePause();
@@ -2182,6 +2200,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
+			horde.sound.play("select_pointer");
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
