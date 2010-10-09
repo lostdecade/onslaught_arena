@@ -3487,4 +3487,23 @@ proto.endGame = function () {
 	this.state = "game_over";
 };
 
+proto.sendHighScore = function (highScore) {
+
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/onslaught_arena/high_scores");
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+
+  /*
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      if (xhr.status == 200) {
+      }
+    }
+  };
+  */
+
+  xhr.send("high_score=" + highScore);
+
+};
+
 }());
