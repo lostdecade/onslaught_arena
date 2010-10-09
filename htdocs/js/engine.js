@@ -287,7 +287,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 		// Hero
-		s.create("coins", "sound/effects/chest_gold", false, 80);
+		s.create("coins", "sound/effects/chest_gold", false, 40);
 		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		s.create("hero_attacks", "sound/effects/char_attacks");
@@ -306,7 +306,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("goblin_dies", "sound/effects/goblin_dies");
 
 		// Demoblin
-		s.create("demoblin_attacks", "sound/effects/demoblin_attacks");
+		s.create("demoblin_attacks", "sound/effects/demoblin_attacks", false, 80);
 
 		// Imp
 		s.create("imp_damage", "sound/effects/imp_damage");
@@ -317,17 +317,17 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("gel_dies", "sound/effects/gel_dies", false, 40);
 
 		// Flaming Skull
-		s.create("skull_damage", "sound/effects/skull_damage", false, 30);
-		s.create("skull_dies", "sound/effects/skull_dies", false, 10);
+		s.create("skull_damage", "sound/effects/skull_damage", false, 25);
+		s.create("skull_dies", "sound/effects/skull_dies", false, 5);
 	
 		// Wizard
-		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 30);
-		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 60);
-		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 60);
+		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 25);
+		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 50);
+		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 50);
 
 		// Sandworm
-		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 90);
-		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 50);
+		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 75);
+		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 40);
 
 		// Cyclops
 		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
@@ -336,8 +336,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		// Owlbear
 		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
-		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 40);
-		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 70);
+		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 25);
+		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 75);
 
 		// Boss: Green Dragon
 		s.create("dragon_attacks", "sound/effects/dragon_attacks");
@@ -505,7 +505,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "owlbear", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
@@ -572,10 +571,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "demoblin", 5);
+	w.addObjects(0, "demoblin", 3);
 	w.addObjects(1, "cyclops", 1);
 	w.addObjects(1, "goblin", 10);
-	w.addObjects(2, "demoblin", 5);
+	w.addObjects(2, "demoblin", 3);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
 	
@@ -629,15 +628,15 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "goblin", 5);
+	w.addObjects(0, "goblin", 3);
+	w.addObjects(1, "goblin", 3);
+	w.addObjects(2, "goblin", 3);
 	w.addObjects(0, "wizard", 2);
 	w.addObjects(1, "wizard", 1);
 	w.addObjects(2, "wizard", 2);
-	w.addObjects(0, "goblin", 5);
-	w.addObjects(1, "goblin", 5);
-	w.addObjects(2, "goblin", 5);
+	w.addObjects(0, "goblin", 3);
+	w.addObjects(1, "goblin", 3);
+	w.addObjects(2, "goblin", 3);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -1485,19 +1484,20 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			}
 		}
 		if (this.currentWaveId >= this.waves.length) {
-			// Waves have rolled over, increase the difficulty!!
 			this.currentWaveId = 0;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
-			waveTextString = "Boss: " + this.waves[this.currentWaveId].bossName;
-			if (!horde.sound.isPlaying("final_battle_music")) {
+			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName);
+			if (horde.sound.isPlaying("normal_battle_music")) {
 				horde.sound.stop("normal_battle_music");
-				this.currentMusic = "final_battle_music";
-				horde.sound.play(this.currentMusic);
 			}
+			this.currentMusic = "final_battle_music";
+			horde.sound.play(this.currentMusic);
 		} else {
-			if (!horde.sound.isPlaying("normal_battle_music")) {
+			if (horde.sound.isPlaying("final_battle_music")) {
 				horde.sound.stop("final_battle_music");
+			}
+			if (!horde.sound.isPlaying("normal_battle_music")) {
 				this.currentMusic = "normal_battle_music";
 				horde.sound.play(this.currentMusic);
 			}
@@ -2088,6 +2088,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
 			this.debug = !this.debug;
+			horde.sound.play("code_entered");
 		}
 
 		// Code: lddebug = toggle debug
@@ -2096,6 +2097,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.clearData("checkpoint_wave");
 			this.clearData("checkpoint_hero");
 			this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
+			horde.sound.play("code_entered");
 		}
 
 		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {

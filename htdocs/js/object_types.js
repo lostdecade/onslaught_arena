@@ -368,9 +368,9 @@ o.goblin = {
 	soundDies: "goblin_dies",
 	
 	lootTable: [
-		{type: null, weight: 5},
+		{type: null, weight: 6},
 		{type: "item_coin", weight: 2},
-		{type: "item_weapon_knife", weight: 2},
+		{type: "item_weapon_knife", weight: 1},
 		{type: "item_food", weight: 1}
 	],
 	
