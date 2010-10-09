@@ -1016,7 +1016,6 @@ o.gel = {
 	speed: 200,
 	worth: 0,
 
-	// TODO: gel sounds
 	//soundAttacks: "gel_attacks",
 	soundDamage: "gel_damage",
 	//soundDies: "gel_dies",

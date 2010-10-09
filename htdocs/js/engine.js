@@ -4,6 +4,7 @@ var VERSION = "{{VERSION}}";
 var DEMO = false;
 var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
+var DEFAULT_HIGH_SCORE = 1000;
 var NUM_GATES = 3;
 var POINTER_X = 270;
 var POINTER_HEIGHT = 24;
@@ -46,6 +47,7 @@ horde.Engine = function horde_Engine () {
 		position: new horde.Vector2()
 	};
 	
+	this.enableFullscreen = true;
 	this.enableClouds = false;
 	this.cloudTimer = null;
 	this.woundsTo = 0;
@@ -59,6 +61,9 @@ horde.Engine = function horde_Engine () {
 var proto = horde.Engine.prototype;
 
 proto.resize = function horde_Engine_proto_resize () {
+	if (!this.enableFullscreen) {
+		return;
+	}
 	var height = window.innerHeight;
 	height -= 40; // Some buffer around the game
 	if (height < 480) {
@@ -244,7 +249,7 @@ proto.init = function horde_Engine_proto_init () {
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
 	if (highScore === null) {
-		this.putData(HIGH_SCORE_KEY, 0);
+		this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
 	}
 	
 	this.initSound();
@@ -310,7 +315,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_dies");
-		s.create("gel_damage", "sound/effects/gel_damage");
+		s.create("gel_damage", "sound/effects/gel_damage", false, 50);
 		//s.create("gel_dies", "sound/effects/gel_dies");
 
 		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
@@ -458,7 +463,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 15;
+	var testWave = 21;
 	this.currentWaveId = (testWave - 2);
 	*/
 	
@@ -482,7 +487,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "flaming_skull", 1);
+	w.addObjects(0, "gel", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
@@ -1370,6 +1375,20 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			this.addObject(wep);
 			break;
 		
+		case 11:
+			var locs = [
+				{x: 224, y: 224},
+				{x: 384, y: 224}
+			];
+			var len = locs.length;
+			for (var x = 0; x < len; ++x) {
+				var pos = locs[x];
+				var s = horde.makeObject("spikes");
+				s.position = new horde.Vector2(pos.x, pos.y);
+				this.addObject(s);
+			}
+			break;
+		
 		case 21:
 			// Spike sentries in each corner
 			var spikeLocs = [
@@ -1387,8 +1406,18 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			}
 			break;
 	
+		case 31:
+			// TODO: traps!
+			// More regular spikes?
+			break;
+			
+		case 41:
+			// TODO: traps!
+			// Durrr?
+			break;
+	
 		case 50:
-			// Despawn all traps
+			// Despawn all traps; Nega Xam is hard enough!!
 			for (var id in this.objects) {
 				var obj = this.objects[id];
 				if (obj.role === "trap") {
@@ -1417,7 +1446,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
-		this.spawnWaveExtras(actualWave);
+		if (this.continuing) {
+			// Start with 2 as we don't want the bonus weapons spawning at continue
+			for (var wn = 2; wn <= actualWave; ++wn) {
+				this.spawnWaveExtras(wn);
+			}
+		} else {
+			this.spawnWaveExtras(actualWave);
+		}
 		var waveTextString = "Wave: " + actualWave;
 		if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
@@ -1450,6 +1486,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		this.waveText.alpha = 0;
 		this.waveText.size = 30;
 		this.waveText.state = "show";
+		this.continuing = false;
 	}
 	switch (this.waveText.state) {
 		case "show":
@@ -2036,7 +2073,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.clearHistory();
 			this.clearData("checkpoint_wave");
 			this.clearData("checkpoint_hero");
-			this.putData(HIGH_SCORE_KEY, 0);
+			this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
 		}
 
 		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
