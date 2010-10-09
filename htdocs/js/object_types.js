@@ -1009,9 +1009,11 @@ o.gel = {
 	worth: 0,
 
 	// TODO: gel sounds
+	/*
 	soundAttacks: "cube_attacks",
 	soundDamage: "cube_damage",
 	soundDies: "cube_dies",
+	*/
 
 	onInit: function () {
 		this.setDirection(horde.randomDirection());

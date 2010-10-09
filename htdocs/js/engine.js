@@ -448,7 +448,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	/*
 	// Wave testing code...
-	var testWave = 15;
+	var testWave = 21;
 	this.currentWaveId = (testWave - 2);
 	*/
 	
@@ -1359,6 +1359,20 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			this.addObject(wep);
 			break;
 		
+		case 11:
+			var locs = [
+				{x: 224, y: 224},
+				{x: 384, y: 224}
+			];
+			var len = locs.length;
+			for (var x = 0; x < len; ++x) {
+				var pos = locs[x];
+				var s = horde.makeObject("spikes");
+				s.position = new horde.Vector2(pos.x, pos.y);
+				this.addObject(s);
+			}
+			break;
+		
 		case 21:
 			// Spike sentries in each corner
 			var spikeLocs = [
@@ -1376,8 +1390,18 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			}
 			break;
 	
+		case 31:
+			// TODO: traps!
+			// More regular spikes?
+			break;
+			
+		case 41:
+			// TODO: traps!
+			// Durrr?
+			break;
+	
 		case 50:
-			// Despawn all traps
+			// Despawn all traps; Nega Xam is hard enough!!
 			for (var id in this.objects) {
 				var obj = this.objects[id];
 				if (obj.role === "trap") {
@@ -1406,7 +1430,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
-		this.spawnWaveExtras(actualWave);
+		if (this.continuing) {
+			// Start with 2 as we don't want the bonus weapons spawning at continue
+			for (var wn = 2; wn <= actualWave; ++wn) {
+				this.spawnWaveExtras(wn);
+			}
+		} else {
+			this.spawnWaveExtras(actualWave);
+		}
 		var waveTextString = "Wave: " + actualWave;
 		if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
@@ -1439,6 +1470,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		this.waveText.alpha = 0;
 		this.waveText.size = 30;
 		this.waveText.state = "show";
+		this.continuing = false;
 	}
 	switch (this.waveText.state) {
 		case "show":
