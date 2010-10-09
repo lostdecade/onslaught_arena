@@ -487,7 +487,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "gel", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
