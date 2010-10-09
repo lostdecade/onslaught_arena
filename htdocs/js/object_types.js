@@ -2146,7 +2146,7 @@ o.e_dirt_pile = {
 	
 	onObjectCollide: function (object, engine) {
 		if (object.team !== this.team && object.role !== "projectile") {
-			object.addState(horde.Object.states.SLOWED, 750);
+			object.addState(horde.Object.states.SLOWED, 300);
 		}
 	}
 	
@@ -2170,7 +2170,7 @@ o.e_spit_pool = {
 	
 	onObjectCollide: function (object, engine) {
 		if (object.team !== this.team && object.role !== "projectile") {
-			object.addState(horde.Object.states.SLOWED, 750);
+			object.addState(horde.Object.states.SLOWED, 300);
 		}
 	}
 	

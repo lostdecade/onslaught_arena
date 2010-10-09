@@ -113,12 +113,13 @@ proto.togglePause = (function horde_Engine_proto_togglePause () {
 			this.paused = false;
 			horde.sound.setMuted(isMuted);
 			horde.sound.play("unpause");
+			horde.sound.play(this.currentMusic);
 		} else {
 			this.paused = true;
 			this.initOptions();
 			isMuted = horde.sound.isMuted();
 			horde.sound.play("pause");
-			horde.sound.setMuted(true);
+			horde.sound.stop(this.currentMusic);
 		}
 
 	};
@@ -1209,7 +1210,8 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 			}
 			this.introHero.update(elapsed);
 			if (this.introTimer.expired()) {
-				horde.sound.play("normal_battle_music");
+				this.currentMusic = "normal_battle_music";
+				horde.sound.play(this.currentMusic);
 				this.state = "running";
 			}
 			break;
@@ -1473,12 +1475,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			waveTextString = "Boss: " + this.waves[this.currentWaveId].bossName;
 			if (!horde.sound.isPlaying("final_battle_music")) {
 				horde.sound.stop("normal_battle_music");
-				horde.sound.play("final_battle_music");
+				this.currentMusic = "final_battle_music";
+				horde.sound.play(this.currentMusic);
 			}
 		} else {
 			if (!horde.sound.isPlaying("normal_battle_music")) {
 				horde.sound.stop("final_battle_music");
-				horde.sound.play("normal_battle_music");
+				this.currentMusic = "normal_battle_music";
+				horde.sound.play(this.currentMusic);
 			}
 		}
 		this.initSpawnWave(this.waves[this.currentWaveId]);
@@ -2241,7 +2245,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.state = "running";
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
-			horde.sound.play("normal_battle_music");
+			this.currentMusic = "normal_battle_music";
+			horde.sound.play(this.currentMusic);
 		}
 	}
 
