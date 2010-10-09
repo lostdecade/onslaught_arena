@@ -476,6 +476,10 @@ o.flaming_skull = {
 	animated: true,
 	
 	setDir: false,
+
+	//soundAttacks: "skull_attacks",
+	soundDamage: "skull_damage",
+	//soundDies: "skull_dies",
 	
 	weapons: [
 		{type: "e_static_blue_fire", count: null}
@@ -731,6 +735,10 @@ o.owlbear = {
 	damage: 15,
 	hitPoints: 250,
 	speed: 75,
+
+	soundAttacks: "owlbear_attacks",
+	soundDamage: "owlbear_damage",
+	soundDies: "owlbear_damage",
 	
 	lootTable: [
 		{type: "item_food", weight: 1}
@@ -1009,9 +1017,9 @@ o.gel = {
 	worth: 0,
 
 	// TODO: gel sounds
-	soundAttacks: "cube_attacks",
-	soundDamage: "cube_damage",
-	soundDies: "cube_dies",
+	//soundAttacks: "gel_attacks",
+	soundDamage: "gel_damage",
+	//soundDies: "gel_dies",
 
 	onInit: function () {
 		this.setDirection(horde.randomDirection());
@@ -1165,7 +1173,7 @@ o.imp = {
 	
 	soundAttacks: "imp_attacks",
 	soundDamage: "imp_damage",
-	soundDies: "imp_death",
+	soundDies: "imp_dies",
 	
 	phase: 0,
 	phaseInit: false,
@@ -1252,8 +1260,9 @@ o.wizard = {
 		{type: "e_shock_wave", count: null}
 	],
 
-	// TODO: Wizard sounds?
-	soundAttacks: "goblin_attacks",
+	soundAttacks: "wizard_attacks",
+	soundDisappear: "wizard_disappear",
+	soundReappear: "wizard_reappear",
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
 	
@@ -1295,6 +1304,7 @@ o.wizard = {
 					this.addState(horde.Object.states.INVINCIBLE);
 					this.phaseTimer.start(1000);
 					this.phaseInit = true;
+					horde.sound.play(this.soundDisappear);
 				}
 				if (this.phaseTimer.expired()) {
 					this.phase++;
@@ -1324,6 +1334,7 @@ o.wizard = {
 					this.removeState(horde.Object.states.INVISIBLE);
 					this.phaseTimer.start(1000);
 					this.phaseInit = true;
+					horde.sound.play(this.soundReappear);
 				}
 				if (this.phaseTimer.expired()) {
 					this.phase++;
@@ -1382,6 +1393,10 @@ o.sandworm = {
 	
 	moveChangeElapsed: 0,
 	moveChangeDelay: 2000,
+
+	soundAttacks: "sandworm_attacks",
+	soundDamage: "goblin_damage",
+	soundDies: "sandworm_dies",
 
 	lootTable: [
 		{type: null, weight: 4},
@@ -1451,6 +1466,7 @@ o.sandworm = {
 					this.chase(engine.getPlayerObject());
 					//this.setDirection(horde.randomDirection());
 					engine.spawnObject(this, "e_worm_spit");
+					horde.sound.play(this.soundAttacks);
 					this.attackTimer.reset();
 					if (this.phaseAttacks === 1) {
 						this.phaseTimer.start(2000);

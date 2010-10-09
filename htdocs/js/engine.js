@@ -277,7 +277,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		s.create("eat_food", "sound/effects/chest_food", false, 20);
 		s.create("coins", "sound/effects/chest_gold", false, 10);
-		s.create("chest_opens", "sound/effects/chest_opens");
+		s.create("code_entered", "sound/effects/code_entered");
 		
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
@@ -309,7 +309,22 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
-		s.create("cube_dies", "sound/effects/cube_death");
+		s.create("cube_dies", "sound/effects/cube_dies");
+		s.create("gel_damage", "sound/effects/gel_damage");
+		//s.create("gel_dies", "sound/effects/gel_dies");
+
+		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
+		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 70);
+
+		s.create("skull_damage", "sound/effects/skull_damage", false, 35);
+		//s.create("skull_dies", "sound/effects/skull_dies");
+
+		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 30);
+		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 60);
+		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 60);
+
+		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 90);
+		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 50);
 			
 	});
 	
@@ -467,6 +482,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "flaming_skull", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
@@ -2055,7 +2071,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// ZOMG INFINITE AXES!!!111!!
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
-			horde.sound.play("chest_opens");
+			horde.sound.play("code_entered");
 			this.konamiEntered = true;
 
 			var p = this.getPlayerObject();
