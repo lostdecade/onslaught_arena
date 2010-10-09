@@ -283,6 +283,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("eat_food", "sound/effects/chest_food", false, 20);
 		s.create("coins", "sound/effects/chest_gold", false, 10);
 		s.create("code_entered", "sound/effects/code_entered");
+		s.create("immunity", "sound/effects/immunity", false, 25);
 		
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
@@ -315,7 +316,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_dies");
-		s.create("gel_damage", "sound/effects/gel_damage", false, 50);
+		s.create("gel_damage", "sound/effects/gel_damage", false, 40);
 		//s.create("gel_dies", "sound/effects/gel_dies");
 
 		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
@@ -1908,16 +1909,17 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	) {
 		// Defender is immune/invincible
 		if (
-			attacker.role === "projectile" 
+			attacker.role === "projectile"
 			&& attacker.hitPoints !== Infinity
 		) {
 			if (
-				defender.damageType === "physical" 
+				defender.damageType === "physical"
 				&& attacker.damageType === "physical"
 			) {
 				// deflect if both parties are physical
 				attacker.reverseDirection();
 				attacker.deflect();
+				horde.sound.play("immunity");
 			} else {
 				// otherwise just kill the attacker
 				attacker.die();
