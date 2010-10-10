@@ -7,7 +7,7 @@ html, body {
 	padding: 0;
 }
 
-h1, p {
+.hidden {
 	display: none;
 }
 

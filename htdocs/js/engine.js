@@ -1472,7 +1472,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		} else {
 			this.spawnWaveExtras(actualWave);
 		}
-		var waveTextString = "Wave: " + actualWave;
+		var waveTextString = "Wave " + actualWave;
 		if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
@@ -1487,7 +1487,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			this.currentWaveId = 0;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
-			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName);
+			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName) + "!";
 			if (horde.sound.isPlaying("normal_battle_music")) {
 				horde.sound.stop("normal_battle_music");
 			}
