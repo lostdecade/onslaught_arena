@@ -276,7 +276,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		
 		// UI
 		s.create("move_pointer", "sound/effects/move_pointer");
-		s.create("select_pointer", "sound/effects/_move_pointer");
+		//s.create("select_pointer", "sound/effects/_move_pointer");
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
@@ -313,8 +313,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("imp_dies", "sound/effects/imp_dies");
 
 		// Gel
-		s.create("gel_damage", "sound/effects/gel_damage", false, 40);
-		s.create("gel_dies", "sound/effects/gel_dies", false, 40);
+		s.create("gel_damage", "sound/effects/gel_damage", false, 20);
+		s.create("gel_dies", "sound/effects/gel_dies", false, 20);
 
 		// Flaming Skull
 		s.create("skull_damage", "sound/effects/skull_damage", false, 25);
@@ -505,6 +505,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "wizard", 1);
 	w.addObjects(0, "bat", 1);
 	w.addObjects(1, "bat", 1);
 	w.addObjects(2, "bat", 1);
@@ -2110,7 +2111,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.togglePause();
 					break;
 				case 1: // Quit
-					horde.sound.play("select_pointer");
+					//horde.sound.play("select_pointer");
 					if (this.verifyQuit) {
 						this.verifyQuit = false;
 						this.togglePause();
@@ -2202,7 +2203,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
-			horde.sound.play("select_pointer");
+			//horde.sound.play("select_pointer");
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
