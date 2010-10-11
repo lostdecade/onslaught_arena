@@ -1,3 +1,8 @@
+@font-face {
+	font-family: "Cracked";
+	src: url(../font/cracked.ttf);
+}
+
 html {
 	background: #000 url(../img/frame_background.png);
 }
