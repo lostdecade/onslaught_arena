@@ -1,3 +1,8 @@
+@font-face {
+	font-family: "Cracked";
+	src: url(../font/cracked.ttf);
+}
+
 html {
 	background: #000 url(../img/frame_background.png);
 }
@@ -7,7 +12,7 @@ html, body {
 	padding: 0;
 }
 
-h1, p {
+.hidden {
 	display: none;
 }
 
