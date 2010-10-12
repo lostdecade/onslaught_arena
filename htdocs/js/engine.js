@@ -287,7 +287,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 		// Hero
-		s.create("coins", "sound/effects/chest_gold", false, 40);
+		s.create("coins", "sound/effects/chest_gold", false, 25);
 		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		s.create("hero_attacks", "sound/effects/char_attacks");
@@ -2769,7 +2769,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		// Settings for Total score:
 		increment = 299;
 		nextTimer = 5;
-	} else if (this.statsIndex > 2)  {
+	} else if (this.statsIndex > 2) {
 		displayDamage = object.totalDamageTaken;
 	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
@@ -2780,7 +2780,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	if (this.statsIndex === 3) {
 		displayScore = this.statsCount;
 		max = totalScore;
-	} else if (this.statsIndex > 3)  {
+	} else if (this.statsIndex > 3) {
 		displayScore = totalScore;
 	}
 	ctx.fillStyle = "rgb(250, 116, 26)";
@@ -3515,20 +3515,21 @@ proto.endGame = function () {
 
 proto.sendHighScore = function (highScore) {
 
-  var xhr = new XMLHttpRequest();
-  xhr.open("POST", "/onslaught_arena/high_scores");
-  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "/onslaught_arena/high_scores");
+	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 
-  /*
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == 4) {
-      if (xhr.status == 200) {
-      }
-    }
-  };
-  */
+	/*
+	xhr.onreadystatechange = function () {
+		if (xhr.readyState == 4) {
+			if (xhr.status == 200) {
+				alert("High score saved!");
+			}
+		}
+	};
+	*/
 
-  xhr.send("high_score=" + highScore);
+	xhr.send("high_score=" + highScore);
 
 };
 
