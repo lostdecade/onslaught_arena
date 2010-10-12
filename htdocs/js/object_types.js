@@ -1062,7 +1062,7 @@ o.superclops = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 1000,
 
-	damage: 35,
+	damage: 20,
 	hitPoints: 600,
 	speed: 25,
 	worth: 0,
@@ -1093,13 +1093,67 @@ o.superclops = {
 					this.animDelay = 100;
 					this.phaseInit = true;
 				}
-				if (this.position.y >= 160) {
+				if (this.position.y >= 80) {
 					this.nextPhase();
 				}
 				break;
 			
-			// Wiggle!
+			// Shoot two boulders
 			case 1:
+				if (!this.phaseInit) {
+					this.animDelay = 250;
+					var p = engine.getPlayerObject();
+					this.chase(p);
+					this.stopMoving();
+					var h = this.facing.heading();
+					engine.spawnObject(this, "e_bouncing_boulder", horde.Vector2.fromHeading(
+						h - 0.3
+					));
+					engine.spawnObject(this, "e_bouncing_boulder", horde.Vector2.fromHeading(
+						h + 0.3
+					));
+					this.phaseTimer.start(1500);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+				
+			// Charge down the middle
+			case 2:
+				if (!this.phaseInit) {
+					this.speed = 300;
+					this.animDelay = 100;
+					this.setDirection(this.facing);
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Wander a bit as if stunned by the charge
+			case 3:
+				if (!this.phaseInit) {
+					this.speed = 15;
+					this.animDelay = 400;
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				if (this.phaseTimer.expired()) {
+					if (this.wounds > (this.hitPoints / 2)) {
+						this.nextPhase();
+					} else {
+						this.setPhase(1);
+					}
+				}
+				break;
+			
+			// Wiggle!
+			case 4:
 				if (!this.phaseInit) {
 					this.stopMoving();
 					this.animDelay = 300;
@@ -1114,7 +1168,7 @@ o.superclops = {
 				break;
 			
 			// Shoot bouncing boulders
-			case 2:
+			case 5:
 				if (!this.phaseInit) {
 					this.cooldown = false;
 					this.weapons = [{type: "e_bouncing_boulder", count: null}];
@@ -1126,7 +1180,7 @@ o.superclops = {
 				break;
 			
 			// Chase and shoot energy balls
-			case 3:
+			case 6:
 				if (!this.phaseInit) {
 					this.speed = 50;
 					this.weapons = [{type: "e_energy_ball", count: null}];
@@ -1135,7 +1189,7 @@ o.superclops = {
 					this.phaseInit = true;
 				}
 				if (this.phaseTimer.expired()) {
-					this.setPhase(1);
+					this.setPhase(4);
 				}
 				engine.objectAttack(this);
 				movementTypes.chase.apply(this, arguments);
@@ -1143,6 +1197,12 @@ o.superclops = {
 
 		}
 		
+	},
+	
+	onWallCollide: function () {
+		if (this.phase === 2) {
+			this.nextPhase();
+		}
 	}
 
 };
