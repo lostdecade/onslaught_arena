@@ -2815,6 +2815,8 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 			this.gotNewHighScore = totalScore;
 		}
 
+		this.sendHighScore();
+
 	}
 
 	ctx.restore();
@@ -3529,7 +3531,6 @@ proto.sendHighScore = function (highScore) {
 	xhr.open("POST", "/onslaught_arena/high_scores");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 
-	/*
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
@@ -3537,7 +3538,6 @@ proto.sendHighScore = function (highScore) {
 			}
 		}
 	};
-	*/
 
 	xhr.send("high_score=" + highScore);
 
