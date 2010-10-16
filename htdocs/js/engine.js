@@ -29,7 +29,7 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
-	
+
 	this.gateDirection = ""; // Set to "up" or "down"
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
@@ -2094,6 +2094,32 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.toggleMuted();
 		}
 
+		// Code: lddqd = god mode
+		if (this.keyboard.historyMatch(horde.Keyboard.godModeCode)) {
+			this.keyboard.clearHistory();
+			var p = this.getPlayerObject();
+			p.cheater = true;
+			if (p.hasState(horde.Object.states.INVINCIBLE)) {
+				p.removeState(horde.Object.states.INVINCIBLE);
+			} else {
+				p.addState(horde.Object.states.INVINCIBLE);
+			}
+			horde.sound.play("code_entered");
+		}
+
+		// Code: ldkfa = all weapons
+		if (this.keyboard.historyMatch(horde.Keyboard.allWeaponsCode)) {
+			this.keyboard.clearHistory();
+			var p = this.getPlayerObject();
+			p.cheater = true;
+			p.addWeapon("h_knife", null);
+			p.addWeapon("h_spear", null);
+			p.addWeapon("h_fireball", null);
+			p.addWeapon("h_axe", null);
+			p.addWeapon("h_fire_sword", null);
+			horde.sound.play("code_entered");
+		}
+
 		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
@@ -2101,7 +2127,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
-		// Code: lddebug = toggle debug
+		// Code: ldreset = reset save data
 		if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
 			this.keyboard.clearHistory();
 			this.clearData("checkpoint_wave");
@@ -2145,8 +2171,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			horde.sound.play("code_entered");
 			this.konamiEntered = true;
-
 			var p = this.getPlayerObject();
+			p.cheater = true;
 			p.addWeapon("h_axe", null);
 		}
 
@@ -2704,31 +2730,6 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 };
 
 proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx) {
-	
-	// Calculate weapon accuracy
-	/*
-	if (object.shotsFired > 0) {
-		var accuracy = ((object.shotsLanded / object.shotsFired) * 100).toFixed(0) + "%";
-	} else {
-		var accuracy = "0%";
-	}
-	
-	// Determine favorite weapon
-	var high = 0;
-	var favoredType = null;
-	for (var x in object.shotsPerWeapon) {
-		if (object.shotsPerWeapon[x] > high) {
-			high = object.shotsPerWeapon[x];
-			favoredType = x;
-		}
-	}
-
-	if (favoredType !== null) {
-		favoredType = horde.objectTypes[favoredType].name;
-	} else {
-		favoredType = '';
-	}
-	*/
 
 	var textX = 350;
 	var textHeight = 55;
@@ -2745,7 +2746,8 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	var totalScore = this.getTotalScore(
 		waveReached,
 		object.gold,
-		object.totalDamageTaken
+		object.totalDamageTaken,
+		object.cheater
 	);
 
 	// Wave reached
@@ -2828,12 +2830,16 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	
 };
 
-proto.getTotalScore = function (wave, gold, damage) {
+proto.getTotalScore = function (wave, gold, damage, cheater) {
 	var score = 0;
 
 	score += (wave * 1000);
 	score += gold;
 	score -= (damage * 10);
+
+	if (cheater === true) {
+		score /= 2;
+	}
 
 	return score;
 };

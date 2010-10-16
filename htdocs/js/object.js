@@ -75,6 +75,7 @@ horde.Object = function () {
 	this.shotsLanded = 0;
 	this.shotsPerWeapon = {};
 	this.meatEaten = 0;
+	this.cheater = false;
 	
 	// Behavior phase stuff
 	this.phase = 0;
@@ -118,6 +119,7 @@ proto.load = function horde_Object_load (json) {
 	this.shotsLanded = data.shotsLanded;
 	this.shotsPerWeapon = data.shotsPerWeapon;
 	this.meatEaten = data.meatEaten;
+	this.cheater = data.cheater;
 };
 
 proto.setPhase = function (phase) {

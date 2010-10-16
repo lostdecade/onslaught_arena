@@ -23,10 +23,13 @@ var Keys = {
 	B: 66,
 	D: 68,
 	E: 69,
+	F: 70,
 	G: 71,
+	K: 75,
 	L: 76,
 	M: 77,
 	P: 80,
+	Q: 81,
 	R: 82,
 	S: 83,
 	T: 84,
@@ -68,6 +71,22 @@ Keyboard.resetCode = [
 	Keys.S,
 	Keys.E,
 	Keys.T
+];
+
+Keyboard.godModeCode = [
+	Keys.L,
+	Keys.D,
+	Keys.D,
+	Keys.Q,
+	Keys.D
+];
+
+Keyboard.allWeaponsCode = [
+	Keys.L,
+	Keys.D,
+	Keys.K,
+	Keys.F,
+	Keys.A
 ];
 
 proto.supressKeys = function (e) {

@@ -159,6 +159,7 @@ o.h_fire_sword = {
 	priority: 6,
 	bounce: false,
 	spriteAlign: true,
+	piercing: true,
 	
 	onInit: function () {
 		this.spawnTimer = new horde.Timer();
