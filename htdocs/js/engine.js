@@ -2356,6 +2356,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			var v = this.targetReticle.position.clone().subtract(player.position).normalize();
 			this.objectAttack(player, v);
+			this.heroFiring = true;
+			this.heroFiringDirection = v;
+		} else {
+			this.heroFiring = false;
+			this.heroFiringDirection = null;
 		}
 		
 		// Fire using the keyboard
@@ -2918,8 +2923,12 @@ proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 
 proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	
-	var s = o.getSpriteXY();
-	
+	if (o.role === "hero" && this.heroFiring) {
+		var s = o.getSpriteXY(this.heroFiringDirection);
+	} else {
+		var s = o.getSpriteXY();
+	}
+
 	if (o.alpha <= 0 || o.hasState(horde.Object.states.INVISIBLE)) {
 		return;
 	}
