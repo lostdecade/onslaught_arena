@@ -56,6 +56,10 @@ horde.Engine = function horde_Engine () {
 	this.introTimer = new horde.Timer();
 	this.introPhase = 0;
 	this.introPhaseInit = false;
+	
+	this.wonGame = false;
+	this.wonGamePhase = 0;
+	
 };
 
 var proto = horde.Engine.prototype;
@@ -228,7 +232,7 @@ proto.init = function horde_Engine_proto_init () {
 	}, document.body, this);
 	
 	horde.on("blur", function () {
-		if (this.state != "running") return;
+		if (this.state != "running" || this.wonGame) return;
 		this.keyboard.keyStates = {};
 		if (!this.paused) this.togglePause();
 	}, window, this);
@@ -380,6 +384,9 @@ proto.initGame = function () {
 	this.statsIncrement = 0;
 	this.statsIndex = 0;
 	this.statsTimer = null;
+	
+	this.wonGame = false;
+	this.wonGamePhase = 0;
 
 };
 
@@ -1285,7 +1292,11 @@ proto.update = function horde_Engine_proto_update () {
 			
 		// The game!
 		case "running":
-			this.handleInput();
+			if (this.wonGame) {
+				this.updateWonGame(elapsed);
+			} else {
+				this.handleInput();
+			}
 			if (!this.paused) {
 				this.updateWaves(elapsed);
 				this.updateSpawnPoints(elapsed);
@@ -1303,6 +1314,61 @@ proto.update = function horde_Engine_proto_update () {
 
 	}
 
+};
+
+proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
+	
+	var player = this.getPlayerObject();
+	
+	if (this.roseTimer) {
+		this.roseTimer.update(elapsed);
+	}
+	
+	switch (this.wonGamePhase) {
+		
+		// Move Xam to the center of the room
+		case 0:
+			var center = new horde.Vector2(304, 192);
+			player.moveToward(center);
+			var diff = player.position.clone().subtract(center).abs();
+			if (diff.x <= 5 && diff.y <= 5) {
+				this.wonGamePhase++;
+			}
+			break;
+			
+		case 1:
+			player.setDirection(new horde.Vector2(0, 1));
+			player.stopMoving();
+			player.addState(horde.Object.states.VICTORIOUS);
+			this.roseTimer = new horde.Timer();
+			this.roseTimer.start(100);
+			this.rosesThrown = 0;
+			this.wonGamePhase++;
+			break;
+			
+		case 2:
+			if (this.roseTimer.expired()) {
+				++this.rosesThrown;
+				var rose = horde.makeObject("rose");
+				if (horde.randomRange(1, 2) === 2) {
+					rose.position.x = -32;
+					rose.position.y = horde.randomRange(100, 300);
+					rose.setDirection(new horde.Vector2(1, 0));
+				} else {
+					rose.position.x = 682;
+					rose.position.y = horde.randomRange(100, 300);
+					rose.setDirection(new horde.Vector2(-1, 0));
+				}
+				this.addObject(rose);
+				this.roseTimer.reset();
+			}
+			if (this.rosesThrown > 100) {
+				this.endGame();
+			}
+			break;
+		
+	}
+	
 };
 
 proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
@@ -1462,6 +1528,9 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
  * @return {void}
  */
 proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
+	if (this.wonGame) {
+		return;
+	}
 	this.waveTimer.update(elapsed);
 	var spawnsEmpty = true;
 	for (var x in this.spawnPoints) {
@@ -1471,6 +1540,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 	}
 	// If the timer has expired OR the spawns are empty AND there are no monsters alive
 	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
+		if (this.currentWaveId === (this.waves.length - 1)) {
+			// Player won the game!!
+			this.wonGame = true;
+			horde.sound.stop("normal_battle_music");
+			horde.sound.stop("final_battle_music");
+			horde.sound.play("victory");
+			return;
+		}
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
 		if (this.continuing || this.waveHack) {
@@ -1488,13 +1565,9 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
-
 			if (!this.continuing) {
 				waveTextString = "Game Saved!";
 			}
-		}
-		if (this.currentWaveId >= this.waves.length) {
-			this.currentWaveId = 0;
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName) + "!";
@@ -2572,7 +2645,9 @@ proto.render = function horde_Engine_proto_render () {
 		// The game!
 		case "running":
 			this.drawFloor(ctx);
-			this.drawTargetReticle(ctx);
+			if (!this.wonGame) {
+				this.drawTargetReticle(ctx);
+			}
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
 			this.drawWalls(ctx);
@@ -2674,7 +2749,11 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	ctx.save();
 	ctx.globalAlpha = this.gameOverAlpha;
-	ctx.fillStyle = "rgb(215, 25, 32)"; // red
+	if (this.wonGame) {
+		ctx.fillStyle = "rgb(0, 0, 0)";
+	} else {
+		ctx.fillStyle = "rgb(215, 25, 32)"; // red
+	}
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
 
@@ -3420,8 +3499,9 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			break;
 		
 		case 1:
-			this.drawArena(ctx);
+			this.drawFloor(ctx);
 			this.drawFauxGates(ctx);
+			this.drawWalls(ctx);
 			if (this.introFadeAlpha > 0) {
 				ctx.save();
 				ctx.globalAlpha = this.introFadeAlpha;
@@ -3433,29 +3513,32 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 		
 		case 2:
 		case 3:
-			this.drawArena(ctx);
+			this.drawFloor(ctx);
 			this.drawFauxGates(ctx);
+			this.drawWalls(ctx);
 			break;
 			
 		case 4:
 		case 5:
 		case 9:
-			this.drawArena(ctx);
+			this.drawFloor(ctx);
 			if (this.introHero) {
 				this.drawObject(ctx, this.introHero);
 			}
 			this.drawFauxGates(ctx);
+			this.drawWalls(ctx);
 			break;
 			
 		case 6:
 		case 7:
 		case 8:
-			this.drawArena(ctx);
+			this.drawFloor(ctx);
 			ctx.drawImage(this.images.getImage("characters"),
 				20 * 32, 0, 32, 32,
 				304, 224, 32, 32
 			);
 			this.drawFauxGates(ctx);
+			this.drawWalls(ctx);
 			break;
 	}
 

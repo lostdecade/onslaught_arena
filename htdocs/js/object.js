@@ -96,7 +96,8 @@ horde.Object.states = {
 	INVISIBLE: 6,
 	SPAWNING: 7,
 	DESPAWNING: 8,
-	STUNNED: 9
+	STUNNED: 9,
+	VICTORIOUS: 10
 };
 
 var proto = horde.Object.prototype;
@@ -349,6 +350,11 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY (facingOverride) {
 				if (this.hasState(horde.Object.states.HURTING) && this.size.width <= 32) {
 					return new horde.Vector2(
 						16 * this.size.width, this.spriteY
+					);
+				}
+				if (this.hasState(horde.Object.states.VICTORIOUS)) {
+					return new horde.Vector2(
+						20 * this.size.width, this.spriteY
 					);
 				}
 				if (facingOverride) {
