@@ -2101,7 +2101,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
-		// Code: lddebug = toggle debug
+		// Code: ldreset = reset high score and save point
 		if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
 			this.keyboard.clearHistory();
 			this.clearData("checkpoint_wave");
