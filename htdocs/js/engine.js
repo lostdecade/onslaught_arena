@@ -2906,7 +2906,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 			this.gotNewHighScore = totalScore;
 		}
 
-		this.sendHighScore();
+		this.sendHighScore(totalScore);
 
 	}
 
