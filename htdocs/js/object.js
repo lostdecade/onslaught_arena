@@ -584,25 +584,37 @@ proto.getWeaponInfo = function horde_Object_proto_getWeaponInfo () {
 };
 
 proto.addWeapon = function horde_Object_proto_addWeapon (type, count) {
+	
+	var remIndices = [];
+	
+	// Adjust count if player already has some of this weapon type
+	// Also, store non-infite weapons for later removal
 	for (var x in this.weapons) {
 		var w = this.weapons[x]; // Haha, Weapon X
 		if (typeof(w) !== "undefined" && w.type === type) {
 			if (w.count !== null) {
-				w.count += count;
+				count += w.count;
+			} else {
+				count = null;
 			}
-			return true;
+		}
+		if (w.count !== null) {
+			remIndices.push(x);
 		}
 	}
-	var newWeapon = horde.objectTypes[type];
-	var currentWeapon = horde.objectTypes[this.getWeaponInfo().type];
+	
+	// Remove specified weapons
+	for (var index in remIndices) {
+		this.weapons = this.weapons.splice(index, 1);
+	}
+
 	var len = this.weapons.push({
-		type: type,
+		type: type, 
 		count: count
 	});
-	if (newWeapon.priority > currentWeapon.priority) {
-		// Swap to the new weapon if it's better than the currently selected weapon
-		this.currentWeaponIndex = (len - 1);
-	}
+	
+	this.currentWeaponIndex = (len - 1);
+	
 };
 
 proto.cycleWeapon = function horde_Object_proto_cycleWeapon (reverse) {

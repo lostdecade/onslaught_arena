@@ -137,11 +137,12 @@ o.h_axe = {
 	cooldown: 450,
 	speed: 350,
 	hitPoints: 1,
-	damage: 30,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
+	rotateSpeed: 500,
 	priority: 5,
 	ttl: 10000
 };
@@ -152,7 +153,7 @@ o.h_fire_sword = {
 	cooldown: 450,
 	speed: 350,
 	hitPoints: 1,
-	damage: 40,
+	damage: 35,
 	spriteSheet: "objects",
 	spriteX: 384,
 	spriteY: 0,
@@ -160,6 +161,8 @@ o.h_fire_sword = {
 	bounce: false,
 	spriteAlign: true,
 	piercing: true,
+	soundAttacks: "fire_attack",
+	damageType: "magic",
 	
 	onInit: function () {
 		this.spawnTimer = new horde.Timer();
@@ -371,7 +374,7 @@ o.goblin = {
 	lootTable: [
 		{type: null, weight: 6},
 		{type: "item_coin", weight: 2},
-		{type: "item_weapon_knife", weight: 1},
+		{type: "WEAPON_DROP", weight: 1},
 		{type: "item_food", weight: 1}
 	],
 	
@@ -405,8 +408,8 @@ o.hunter_goblin = {
 	
 	lootTable: [
 		{type: null, weight: 2},
-		{type: "item_coin", weight: 4},
-		{type: "item_weapon_knife", weight: 2},
+		{type: "item_coin", weight: 5},
+		{type: "WEAPON_DROP", weight: 1},
 		{type: "item_food", weight: 2}
 	],
 	
@@ -443,8 +446,8 @@ o.demoblin = {
 	],
 	
 	lootTable: [
-		{type: null, weight: 6},
-		{type: "item_weapon_spear", weight: 2},
+		{type: null, weight: 7},
+		{type: "WEAPON_DROP", weight: 1},
 		{type: "item_chest", weight: 1},
 		{type: "item_food", weight: 1}
 	],
@@ -469,7 +472,7 @@ o.flaming_skull = {
 	
 	speed: 200,
 	hitPoints: 50,
-	damage: 15,
+	damage: 10,
 	worth: 0,
 	
 	spriteSheet: "characters",
@@ -486,8 +489,8 @@ o.flaming_skull = {
 	],
 	
 	lootTable: [
-		{type: null, weight: 6},
-		{type: "item_weapon_fireball", weight: 2},
+		{type: null, weight: 7},
+		{type: "WEAPON_DROP", weight: 1},
 		{type: "item_chest", weight: 2}
 	],
 	
@@ -589,7 +592,7 @@ o.spike_sentry = {
 	
 	speed: 100,
 	hitPoints: Infinity,
-	damage: 25,
+	damage: 10,
 	worth: 0,
 	
 	spriteSheet: "objects",
@@ -694,7 +697,7 @@ o.spikes = {
 	
 	speed: 0,
 	hitPoints: Infinity,
-	damage: 15,
+	damage: 10,
 	worth: 0,
 
 	spriteSheet: "objects",
@@ -852,7 +855,8 @@ o.cyclops = {
 	weapons: [{type: "e_boulder", count: null}],
 
 	lootTable: [
-		{type: "item_food", weight: 1}
+		{type: "item_food", weight: 7},
+		{type: "WEAPON_DROP", weight: 3},
 	],
 
 	onInit: function () {
@@ -936,7 +940,7 @@ o.cube = {
 	},
 	
 	onThreat: function (attacker, engine) {
-		if (attacker.type !== "h_fireball") {
+		if (attacker.damageType !== "magic") {
 			return true;
 		}
 	},
@@ -1075,7 +1079,9 @@ o.superclops = {
 	weapons: [{type: "e_energy_ball", count: null}],
 
 	lootTable: [
-		{type: "item_gold_chest", weight: 1}
+		{type: "item_gold_chest", weight: 4},
+		{type: "item_food", weight: 3},
+		{type: "WEAPON_DROP", weight: 3}
 	],
 
 	onInit: function () {
@@ -1327,7 +1333,7 @@ o.wizard = {
 		{type: null, weight: 6},
 		{type: "item_chest", weight: 2},
 		{type: "item_gold_chest", weight: 1},
-		{type: "item_weapon_fireball", weight: 1}
+		{type: "WEAPON_DROP", weight: 1}
 	],
 	
 	phase: 0,
@@ -1458,7 +1464,8 @@ o.sandworm = {
 	lootTable: [
 		{type: null, weight: 4},
 		{type: "item_chest", weight: 2},
-		{type: "item_food", weight: 4}
+		{type: "WEAPON_DROP", weight: 1},
+		{type: "item_food", weight: 3}
 	],
 	
 	onInit: function () {
@@ -1563,7 +1570,7 @@ o.nega_xam = {
 	spriteSheet: "characters",
 	spriteY: 768,
 	
-	damage: 35,
+	damage: 20,
 	hitPoints: 2500,
 	speed: 200,
 
@@ -1905,7 +1912,7 @@ o.dragon = {
 	moveChangeElapsed: 0,
 	moveChangeDelay: 0,
 
-	damage: 35,
+	damage: 20,
 	hitPoints: 1000,
 	speed: 20,
 	worth: 0,
@@ -1948,8 +1955,20 @@ o.dragon = {
 				}
 				break;
 			
-			// Chase player and shoot fireballs
 			case 1:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.animDelay = 300;
+					this.phaseTimer.start(1000);
+					this.phaseInit = true;
+				}
+				this.position.x += horde.randomRange(-1, 1);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			case 2:
 				if (!this.phaseInit) {
 					this.cooldown = false;
 					this.stopMoving();
@@ -1961,7 +1980,7 @@ o.dragon = {
 				break;
 			
 			// Wiggle it!
-			case 2:
+			case 3:
 				if (!this.phaseInit) {
 					this.speed = 0;
 					this.animDelay = 100;
@@ -1986,7 +2005,7 @@ o.dragon = {
 				break;
 
 			// Charge player
-			case 3:
+			case 4:
 				if (!this.phaseInit) {
 					this.speed = 350;
 					this.animDelay = 100;
@@ -2002,7 +2021,7 @@ o.dragon = {
 				break;
 			
 			// Stand still and spew flames!
-			case 4:
+			case 5:
 				if (!this.phaseInit) {
 					this.speed = 0;
 					this.animDelay = 400;
@@ -2014,7 +2033,7 @@ o.dragon = {
 					this.altTimer.start(750);
 				}
 				if (this.phaseTimer.expired()) {
-					this.phase = 1;
+					this.phase = 2;
 					this.phaseInit = false;
 				}
 				var p = engine.getPlayerObject();
@@ -2026,23 +2045,6 @@ o.dragon = {
 				return "shoot";
 				break;
 			
-			/*
-			// Kinda stunned, allow player to get some shots in
-			case 6:
-				if (!this.phaseInit) {
-					this.speed = 10;
-					this.animDelay = 400;
-					this.phaseTimer.start(3000);
-					this.phaseInit = true;
-				}
-				if (this.phaseTimer.expired()) {
-					this.phase = 1;
-					this.phaseInit = false;
-				}
-				movementTypes.wander.apply(this, arguments);
-				break;
-			*/
-			
 		}
 
 	}
@@ -2053,7 +2055,7 @@ o.dragon = {
 
 o.e_arrow = {
 	role: "projectile",
-	cooldown: 3000,
+	cooldown: 4000,
 	speed: 200,
 	hitPoints: 1,
 	damage: 5,
@@ -2249,7 +2251,7 @@ o.e_shock_wave = {
 	cooldown: 1000,
 	speed: 200,
 	hitPoints: Infinity,
-	damage: 15,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 224,
 	spriteY: 32,
@@ -2499,7 +2501,7 @@ o.item_weapon_knife = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_knife",
-	wepCount: 150
+	wepCount: 100
 };
 
 o.item_weapon_spear = {
@@ -2510,7 +2512,7 @@ o.item_weapon_spear = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_spear",
-	wepCount: 75
+	wepCount: 100
 };
 
 o.item_weapon_fireball = {
@@ -2543,7 +2545,7 @@ o.item_weapon_axe = {
 	spriteY: 32,
 	ttl: 5000,
 	wepType: "h_axe",
-	wepCount: 150
+	wepCount: 100
 };
 
 o.item_weapon_fire_sword = {
@@ -2554,7 +2556,7 @@ o.item_weapon_fire_sword = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fire_sword",
-	wepCount: 25
+	wepCount: 100
 };
 
 }());

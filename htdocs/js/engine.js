@@ -486,14 +486,14 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 		state: "off",
 		alpha: 0
 	};
-
-	/*
+	
 	// Wave testing code...
-	var testWave = 31;
+	/*
+	var testWave = 10;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
-		
+	
 	/*
 	// Test Wave
 	var w = new horde.SpawnWave();
@@ -586,8 +586,19 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(2, "demoblin", 3);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
-	
+
 	// Wave 8
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 5000);
+	w.addSpawnPoint(1, 1500);
+	w.addSpawnPoint(2, 5000);
+	w.addObjects(0, "imp", 5);
+	w.addObjects(1, "imp", 10);
+	w.addObjects(2, "imp", 5);
+	w.nextWaveTime = 45000;
+	this.waves.push(w);
+
+	// Wave 9
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 750);
 	w.addSpawnPoint(1, 750);
@@ -599,53 +610,35 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addObjects(2, "bat", 10);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
-	
-	// Wave 9
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 5000);
-	w.addSpawnPoint(1, 1500);
-	w.addSpawnPoint(2, 5000);
-	w.addObjects(0, "imp", 5);
-	w.addObjects(1, "goblin", 15);
-	w.addObjects(2, "imp", 5);
-	w.nextWaveTime = 45000;
-	this.waves.push(w);
 
-	// Wave 10: Superclops
+	// Wave 10: Gelatinous Cube
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
-	w.addObjects(1, "superclops", 1);
+	w.addObjects(1, "cube", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
-	w.bossName = "Superclops";
+	w.bossName = "Gelatinous Cube";
 	this.waves.push(w);
 
 	// Wave 11: Level 2
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 15000);
-	w.addSpawnPoint(1, 8000);
-	w.addSpawnPoint(2, 15000);
-	w.addObjects(0, "sandworm", 1);
-	w.addObjects(1, "sandworm", 1);
-	w.addObjects(1, "cyclops", 1);
-	w.addObjects(2, "sandworm", 1);
+	w.addSpawnPoint(0, 20000);
+	w.addSpawnPoint(1, 20000);
+	w.addSpawnPoint(2, 20000);
+	w.addObjects(0, "sandworm", 2);
+	w.addObjects(1, "sandworm", 2);
+	w.addObjects(2, "sandworm", 2);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
 	// Wave 12
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "goblin", 3);
-	w.addObjects(1, "goblin", 3);
-	w.addObjects(2, "goblin", 3);
-	w.addObjects(0, "wizard", 1);
-	w.addObjects(1, "wizard", 1);
-	w.addObjects(2, "wizard", 1);
-	w.addObjects(0, "goblin", 3);
-	w.addObjects(1, "goblin", 3);
-	w.addObjects(2, "goblin", 3);
+	w.addSpawnPoint(0, 10000);
+	w.addSpawnPoint(1, 10000);
+	w.addSpawnPoint(2, 10000);
+	w.addObjects(0, "wizard", 2);
+	w.addObjects(1, "wizard", 2);
+	w.addObjects(2, "wizard", 2);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -665,11 +658,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "demoblin", 5);
-	w.addObjects(1, "hunter_goblin", 5);
-	w.addObjects(2, "demoblin", 5);
+	w.addObjects(0, "demoblin", 3);
+	w.addObjects(1, "hunter_goblin", 2);
+	w.addObjects(2, "demoblin", 3);
 	w.addObjects(0, "wizard", 1);
-	w.addObjects(1, "wizard", 2);
+	w.addObjects(1, "wizard", 1);
 	w.addObjects(2, "wizard", 1);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
@@ -680,7 +673,6 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 1500);
 	w.addSpawnPoint(2, 15000);
 	w.addObjects(0, "owlbear", 1);
-	w.addObjects(1, "imp", 15);
 	w.addObjects(2, "owlbear", 1);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
@@ -691,14 +683,14 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 4000);
 	w.addSpawnPoint(2, 500);
 	w.addObjects(0, "dire_bat", 5);
-	w.addObjects(0, "hunter_goblin", 3);
+	w.addObjects(0, "hunter_goblin", 2);
 	w.addObjects(0, "dire_bat", 5);
-	w.addObjects(0, "hunter_goblin", 3);
-	w.addObjects(1, "sandworm", 3);
+	w.addObjects(0, "hunter_goblin", 2);
+	w.addObjects(1, "sandworm", 2);
 	w.addObjects(2, "dire_bat", 5);
-	w.addObjects(2, "hunter_goblin", 3);
+	w.addObjects(2, "hunter_goblin", 2);
 	w.addObjects(2, "dire_bat", 5);
-	w.addObjects(2, "hunter_goblin", 3);
+	w.addObjects(2, "hunter_goblin", 2);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
 
@@ -720,11 +712,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(1, 1500);
 	w.addSpawnPoint(2, 1500);
 	w.addObjects(0, "cyclops", 1);
-	w.addObjects(0, "goblin", 7);
+	w.addObjects(0, "goblin", 5);
 	w.addObjects(1, "demoblin", 3);
-	w.addObjects(1, "cyclops", 1);
-	w.addObjects(1, "demoblin", 7);
-	w.addObjects(2, "goblin", 10);
+	w.addObjects(1, "owlbear", 1);
+	w.addObjects(1, "demoblin", 5);
+	w.addObjects(2, "goblin", 5);
 	w.addObjects(2, "cyclops", 1);
 	w.nextWaveTime = 45000;
 	this.waves.push(w);
@@ -734,20 +726,20 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 3500);
 	w.addSpawnPoint(1, 4000);
 	w.addSpawnPoint(2, 5000);
-	w.addObjects(0, "wizard", 7);
-	w.addObjects(1, "imp", 10);
+	w.addObjects(0, "wizard", 5);
+	w.addObjects(1, "imp", 5);
 	w.addObjects(1, "owlbear", 1);
 	w.addObjects(2, "sandworm", 3);
 	w.nextWaveTime = 90000;
 	this.waves.push(w);
 
-	// Wave 20: Dragon
+	// Wave 20: Demonclops
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
-	w.addObjects(1, "dragon", 1);
+	w.addObjects(1, "superclops", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
-	w.bossName = "Green Dragon"
+	w.bossName = "Demonclops"
 	this.waves.push(w);
 	
 	// Wave 21: Level 3
@@ -755,9 +747,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 100);
 	w.addSpawnPoint(1, 100);
 	w.addSpawnPoint(2, 100);
-	w.addObjects(0, "bat", 30);
-	w.addObjects(1, "dire_bat", 30);
-	w.addObjects(2, "bat", 30);
+	w.addObjects(0, "bat", 15);
+	w.addObjects(1, "dire_bat", 15);
+	w.addObjects(2, "bat", 15);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 
@@ -785,12 +777,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave 24
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 20000);
-	w.addSpawnPoint(1, 20000);
-	w.addSpawnPoint(2, 20000);
-	w.addObjects(0, "cyclops", 3);
-	w.addObjects(1, "cyclops", 3);
-	w.addObjects(2, "cyclops", 3);
+	w.addSpawnPoint(0, 25000);
+	w.addSpawnPoint(1, 25000);
+	w.addSpawnPoint(2, 25000);
+	w.addObjects(0, "cyclops", 2);
+	w.addObjects(1, "cyclops", 2);
+	w.addObjects(2, "cyclops", 2);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 	
@@ -807,12 +799,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave 26
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 20000);
-	w.addSpawnPoint(1, 20000);
-	w.addSpawnPoint(2, 20000);
-	w.addObjects(0, "owlbear", 3);
-	w.addObjects(1, "owlbear", 3);
-	w.addObjects(2, "owlbear", 3);
+	w.addSpawnPoint(0, 25000);
+	w.addSpawnPoint(1, 25000);
+	w.addSpawnPoint(2, 25000);
+	w.addObjects(0, "owlbear", 2);
+	w.addObjects(1, "owlbear", 2);
+	w.addObjects(2, "owlbear", 2);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 	
@@ -821,24 +813,13 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 12000);
 	w.addSpawnPoint(1, 12000);
 	w.addSpawnPoint(2, 12000);
-	w.addObjects(0, "wizard", 7);
-	w.addObjects(1, "wizard", 7);
-	w.addObjects(2, "wizard", 7);
+	w.addObjects(0, "wizard", 4);
+	w.addObjects(1, "wizard", 4);
+	w.addObjects(2, "wizard", 4);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 	
 	// Wave 28
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 15000);
-	w.addSpawnPoint(1, 15000);
-	w.addSpawnPoint(2, 15000);
-	w.addObjects(0, "sandworm", 5);
-	w.addObjects(1, "sandworm", 5);
-	w.addObjects(2, "sandworm", 5);
-	w.nextWaveTime = 120000;
-	this.waves.push(w);
-	
-	// Wave 29
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 15000);
 	w.addSpawnPoint(1, 15000);
@@ -849,13 +830,24 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
 	
-	// Wave 30: Gelatinous Cube
+	// Wave 29
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 15000);
+	w.addSpawnPoint(1, 15000);
+	w.addSpawnPoint(2, 15000);
+	w.addObjects(0, "sandworm", 5);
+	w.addObjects(1, "sandworm", 5);
+	w.addObjects(2, "sandworm", 5);
+	w.nextWaveTime = 120000;
+	this.waves.push(w);
+	
+	// Wave 30: Green Dragon
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
-	w.addObjects(1, "cube", 1);
+	w.addObjects(1, "dragon", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
-	w.bossName = "Gelatinous Cube"
+	w.bossName = "Green Dragon"
 	this.waves.push(w);
 
 	// Wave 31: Level 4
@@ -1033,7 +1025,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(1, "superclops", 1);
+	w.addObjects(1, "cube", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1042,7 +1034,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(1, "dragon", 1);
+	w.addObjects(1, "superclops", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1051,7 +1043,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(1, "cube", 1);
+	w.addObjects(1, "dragon", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1064,13 +1056,13 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
-	// Wave 50: Nega Xam
+	// Wave 50: Doppelganger
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
 	w.addObjects(1, "nega_xam", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
-	w.bossName = "Nega Xam"
+	w.bossName = "Doppelganger"
 	this.waves.push(w);
 
 };
@@ -1751,7 +1743,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 	
 	var speed = object.speed;
 	if (object.hasState(horde.Object.states.SLOWED)) {
-		speed *= 0.15;
+		speed *= 0.20;
 	}
 	
 	var px = ((speed / 1000) * elapsed);
@@ -1847,6 +1839,14 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 		var player = this.getPlayerObject();
 		if (type === "item_food" && player.wounds === 0) {
 			type = "item_chest";
+		}
+		if (type === "WEAPON_DROP") {
+			switch (horde.randomRange(1, 4)) {
+				case 1: type = "item_weapon_knife"; break;
+				case 2: type = "item_weapon_spear"; break;
+				case 3: type = "item_weapon_fireball"; break;
+				case 4: type = "item_weapon_axe"; break;
+			}
 		}
 		this.dropObject(object, type);
 	}
@@ -2184,16 +2184,15 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
-		// Code: ldkfa = all weapons
+		// Code: ldkfa = Infinite fire swords
 		if (this.keyboard.historyMatch(horde.Keyboard.allWeaponsCode)) {
 			this.keyboard.clearHistory();
 			var p = this.getPlayerObject();
 			p.cheater = true;
-			p.addWeapon("h_knife", null);
-			p.addWeapon("h_spear", null);
-			p.addWeapon("h_fireball", null);
-			p.addWeapon("h_axe", null);
-			p.addWeapon("h_fire_sword", null);
+			p.weapons = [{
+				type: "h_fire_sword",
+				count: null
+			}];
 			horde.sound.play("code_entered");
 		}
 
@@ -2244,13 +2243,13 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		usingPointerOptions = true;
 
-		// ZOMG INFINITE AXES!!!111!!
+		// Konomi code! Hit Points *= 3
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			horde.sound.play("code_entered");
 			this.konamiEntered = true;
 			var p = this.getPlayerObject();
 			p.cheater = true;
-			p.addWeapon("h_axe", null);
+			p.hitPoints *= 3;
 		}
 
 		// Accept hover/click with mouse on title screen options [#102]
@@ -2470,7 +2469,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isKeyDown(keys.SPACE)) {
 			this.objectAttack(player);
 		}
-
+		
+		/*
 		// Cycle weapons (Z)
 		if (this.keyboard.isKeyPressed(90)) {
 			player.cycleWeapon();
@@ -2479,6 +2479,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isKeyPressed(88)) {
 			player.cycleWeapon(true);
 		}
+		*/
 		
 		this.keyboard.storeKeyStates();
 	}
@@ -2541,8 +2542,9 @@ proto.objectAttack = function (object, v) {
 
 		case "e_ring_fire":
 			var len = (Math.PI * 2);
-			var step = (len / 12);
-			for (var h = 0; h < len; h += step) {
+			var step = (len / 10);
+			var seed = (step / 2);
+			for (var h = seed; h < len + seed; h += step) {
 				this.spawnObject(
 					object,
 					weaponType,
@@ -2553,9 +2555,8 @@ proto.objectAttack = function (object, v) {
 
 			case "e_ring_fire_blue":
 				var len = (Math.PI * 2);
-				var step = (len / 12);
-				var seed = (step / 2);
-				for (var h = seed; h < len + seed; h += step) {
+				var step = (len / 10);
+				for (var h = 0; h < len; h += step) {
 					this.spawnObject(
 						object,
 						weaponType,
