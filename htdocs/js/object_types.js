@@ -159,6 +159,7 @@ o.h_fire_sword = {
 	priority: 6,
 	bounce: false,
 	spriteAlign: true,
+	piercing: true,
 	
 	onInit: function () {
 		this.spawnTimer = new horde.Timer();
@@ -1564,11 +1565,21 @@ o.nega_xam = {
 	
 	damage: 35,
 	hitPoints: 2500,
-	
 	speed: 200,
 
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
+	},
+	
+	onKilled: function (attacker, engine) {
+		for (var id in engine.objects) {
+			var obj = engine.objects[id];
+			if (obj.role === "monster" && obj.id !== this.id) {
+				obj.wound(obj.hitPoints);
+			} else if (obj.role === "trap") {
+				obj.ttl = 1500;
+			}
+		}
 	},
 
 	onUpdate: function (elapsed, engine) {
@@ -2333,7 +2344,54 @@ o.mini_sword = {
 	
 };
 
-
+o.rose = {
+	
+	role: "fluff",
+	spriteSheet: "objects",
+	collidable: false,
+	rotate: true,
+	
+	spriteX: 192,
+	spriteY: 256,
+	
+	drawIndex: -1,
+	
+	onInit: function () {
+		this.speed = horde.randomRange(150, 200);
+		this.rotateSpeed = horde.randomRange(75, 100);
+		this.phaseTimer = new horde.Timer();
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		
+		switch (this.phase) {
+			
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseInit = true;
+					var rnd = horde.randomRange(0, 5);
+					this.direction.y = -(rnd / 10);
+					this.phaseTimer.start(horde.randomRange(500, 1750));
+				}
+				this.direction.y += 0.01;
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			case 1:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.rotate = false;
+					this.phaseInit = true;
+				}
+				break;
+			
+		}
+		
+	}
+	
+};
 
 o.cloud = {
 	

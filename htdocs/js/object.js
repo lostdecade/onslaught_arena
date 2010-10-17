@@ -75,6 +75,7 @@ horde.Object = function () {
 	this.shotsLanded = 0;
 	this.shotsPerWeapon = {};
 	this.meatEaten = 0;
+	this.cheater = false;
 	
 	// Behavior phase stuff
 	this.phase = 0;
@@ -82,14 +83,6 @@ horde.Object = function () {
 	
 	// Loot tables for enemies
 	this.lootTable = [];
-	
-	/*
-	this.lootTable = [
-		{type: "item_coin", weight: 1},
-		{type: "item_food", weight: 2},
-		{type: null, weight: 7}
-	];
-	*/
 
 };
 
@@ -103,7 +96,8 @@ horde.Object.states = {
 	INVISIBLE: 6,
 	SPAWNING: 7,
 	DESPAWNING: 8,
-	STUNNED: 9
+	STUNNED: 9,
+	VICTORIOUS: 10
 };
 
 var proto = horde.Object.prototype;
@@ -126,6 +120,7 @@ proto.load = function horde_Object_load (json) {
 	this.shotsLanded = data.shotsLanded;
 	this.shotsPerWeapon = data.shotsPerWeapon;
 	this.meatEaten = data.meatEaten;
+	this.cheater = data.cheater;
 };
 
 proto.setPhase = function (phase) {
@@ -332,7 +327,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
  * Returns the XY coordinates of this objects sprite
  * @return {horde.Vector2} XY coordinates of sprite to draw
  */
-proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
+proto.getSpriteXY = function horde_Object_proto_getSpriteXY (facingOverride) {
 	if (this.animated) {
 		switch (this.role) {
 
@@ -357,7 +352,17 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY () {
 						16 * this.size.width, this.spriteY
 					);
 				}
-				var offset = horde.directions.fromVector(this.facing.clone());
+				if (this.hasState(horde.Object.states.VICTORIOUS)) {
+					return new horde.Vector2(
+						20 * this.size.width, this.spriteY
+					);
+				}
+				if (facingOverride) {
+					var f = facingOverride;
+				} else {
+					var f = this.facing.clone();
+				}
+				var offset = horde.directions.fromVector(f);
 				return new horde.Vector2(
 					((offset * 2) + this.animFrameIndex) * this.size.width,
 					this.spriteY
