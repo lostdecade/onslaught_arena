@@ -1538,8 +1538,8 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			spawnsEmpty = false;
 		}
 	}
-	// If the timer has expired OR the spawns are empty AND there are no monsters alive
-	if (this.waveTimer.expired() || (spawnsEmpty === true && this.monstersAlive === 0)) {
+	// If the spawns are empty AND there are no monsters alive
+	if (spawnsEmpty === true && this.monstersAlive === 0) {
 		if (this.currentWaveId === (this.waves.length - 1)) {
 			// Player won the game!!
 			this.wonGame = true;
@@ -2040,10 +2040,14 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 		&& attacker.damageType === "physical"
 		&& defender.damageType === "physical"
 	) {
-		attacker.reverseDirection();
-		attacker.deflect();
-		defender.reverseDirection();
-		defender.deflect();
+		if (attacker.piercing === false) {
+			attacker.reverseDirection();
+			attacker.deflect();
+		}
+		if (defender.piercing === false) {
+			defender.reverseDirection();
+			defender.deflect();
+		}
 		return false;
 	}
 
