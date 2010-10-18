@@ -1102,8 +1102,9 @@ proto.updateLogo = function (elapsed) {
 	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 
-	if (this.keyboard.isAnyKeyPressed()) {
+	if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 		kb.clearKeys();
+		this.mouse.clearButtons();
 		this.initGame();
 	}
 
@@ -2387,8 +2388,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "intro_cinematic") {
-		if (this.keyboard.isAnyKeyPressed()) {
+		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
+			this.mouse.clearButtons();
 			this.state = "running";
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
@@ -2898,7 +2900,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	} else if (this.statsIndex > 3) {
 		displayScore = totalScore;
 	}
-	ctx.fillStyle = "rgb(250, 116, 26)";
+	ctx.fillStyle = "rgb(250, 166, 26)";
 	ctx.fillText(displayScore, textX, 180 + (textHeight * 3));
 
 	if (this.statsCount >= max) {
