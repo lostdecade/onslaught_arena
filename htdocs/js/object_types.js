@@ -153,7 +153,7 @@ o.h_fire_sword = {
 	cooldown: 450,
 	speed: 350,
 	hitPoints: 1,
-	damage: 35,
+	damage: 25,
 	spriteSheet: "objects",
 	spriteX: 384,
 	spriteY: 0,
@@ -373,8 +373,8 @@ o.goblin = {
 	
 	lootTable: [
 		{type: null, weight: 6},
-		{type: "item_coin", weight: 2},
-		{type: "WEAPON_DROP", weight: 1},
+		{type: "item_coin", weight: 1},
+		{type: "WEAPON_DROP", weight: 2},
 		{type: "item_food", weight: 1}
 	],
 	
@@ -408,8 +408,8 @@ o.hunter_goblin = {
 	
 	lootTable: [
 		{type: null, weight: 2},
-		{type: "item_coin", weight: 5},
-		{type: "WEAPON_DROP", weight: 1},
+		{type: "item_coin", weight: 4},
+		{type: "WEAPON_DROP", weight: 2},
 		{type: "item_food", weight: 2}
 	],
 	
@@ -446,8 +446,8 @@ o.demoblin = {
 	],
 	
 	lootTable: [
-		{type: null, weight: 7},
-		{type: "WEAPON_DROP", weight: 1},
+		{type: null, weight: 6},
+		{type: "WEAPON_DROP", weight: 2},
 		{type: "item_chest", weight: 1},
 		{type: "item_food", weight: 1}
 	],
@@ -489,8 +489,8 @@ o.flaming_skull = {
 	],
 	
 	lootTable: [
-		{type: null, weight: 7},
-		{type: "WEAPON_DROP", weight: 1},
+		{type: null, weight: 6},
+		{type: "WEAPON_DROP", weight: 2},
 		{type: "item_chest", weight: 2}
 	],
 	
@@ -533,10 +533,11 @@ o.spike_wall = {
 	speed: 150,
 	hitPoints: Infinity,
 	damage: 20,
-	
+
 	spriteSheet: "objects",
 	spriteX: 32,
 	spriteY: 256,
+	drawIndex: 0,
 	
 	rotate: true,
 	rotateSpeed: 0,
@@ -671,7 +672,7 @@ o.spike_sentry = {
 			// Reseting
 			case 2:
 			 	if (!this.phaseInit) {
-					this.speed = 100;
+					this.speed = 50;
 					this.rotateSpeed = 100;
 					this.phaseInit = true;
 				}
@@ -882,20 +883,68 @@ o.eyelet = {
 	spriteY: 512,
 	
 	damage: 10,
-	hitPoints: 100,
+	hitPoints: 40,
 	speed: 100,
 	worth: 0,
+	
+	collidable: false,
+	
+	lootTable: [
+		{type: null, weight: 18},
+		{type: "item_food", weight: 1},
+		{type: "WEAPON_DROP", weight: 1},
+	],
 	
 	onInit: function () {
 		if (horde.randomRange(1, 10) > 5) {
 			this.spriteY += 32;
 		}
+		this.ownerAngle = 0;
+		this.phaseTimer = new horde.Timer();
 	},
 	
 	onUpdate: function (elapsed, engine) {
-		// TODO: better behavior
-		if (this.position.y >= 50) {
-			this.onUpdate = movementTypes.wander;
+
+		if (!engine.objects[this.ownerId]) {
+			this.wound(this.hitPoints);
+			return;
+		}
+
+		switch (this.phase) {
+			
+			// Snap to the north of the owner
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseTimer.start(10000);
+					this.phaseInit = true;
+				}
+				var owner = engine.objects[this.ownerId];
+				var ownerCenter = owner.position.clone().add(
+					horde.Vector2.fromSize(owner.size).scale(0.5)
+				).subtract(new horde.Vector2(10, 10));
+				var d = horde.Vector2.fromHeading(this.ownerAngle);
+				this.position = ownerCenter.add(d.scale(owner.eyeletOffset));
+				this.ownerAngle += ((1.05 / 1000) * elapsed);
+				if (this.ownerAngle > (Math.PI * 2)) {
+					this.ownerAngle = 0;
+				}
+				if (
+					this.phaseTimer.expired() 
+					&& engine.checkTileCollision(this) === false
+				) {
+					this.nextPhase();
+				}
+				break;
+				
+			case 1:
+				if (!this.phaseInit) {
+					this.collidable = true;
+					this.speed = 175;
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				break;
+			
 		}
 	}
 	
@@ -917,7 +966,7 @@ o.cube = {
 	moveChangeDelay: 1000,
 
 	damage: 35,
-	hitPoints: 500,
+	hitPoints: 750,
 	speed: 15,
 	worth: 0,
 	
@@ -927,8 +976,7 @@ o.cube = {
 
 	lootTable: [
 		{type: "item_chest", weight: 1},
-		{type: "item_weapon_knife", weight: 3},
-		{type: "item_weapon_spear", weight: 3},
+		{type: "WEAPON_DROP", weight: 6},
 		{type: "item_food", weight: 3}
 	],
 
@@ -969,14 +1017,16 @@ o.cube = {
 					this.stopMoving();
 					this.speed = 15;
 					this.animDelay = 400;
-					this.phaseTimer.start(4000);
-					this.gelTimer.start(200);
+					this.phaseTimer.start(6000);
+					this.gelTimer.start(300);
 					this.phaseInit = true;
 				}
 				if (this.phaseTimer.expired()) {
 					this.nextPhase();
 					break;
 				}
+				movementTypes.wander.apply(this, arguments);
+				//this.chase(engine.getPlayerObject());
 				this.position.x += horde.randomRange(-1, 1);
 				if (this.gelTimer.expired()) {
 					engine.spawnObject(this, "gel");
@@ -987,7 +1037,9 @@ o.cube = {
 			
 			case 2:
 				if (!this.phaseInit) {
-					this.phaseTimer.start(5000);
+					this.speed = 30;
+					this.animDelay = 150;
+					this.phaseTimer.start(7500);
 					this.phaseInit = true;
 				}
 				if (this.phaseTimer.expired()) {
@@ -1017,7 +1069,7 @@ o.gel = {
 
 	damage: 5,
 	hitPoints: 10,
-	speed: 200,
+	speed: 150,
 	worth: 0,
 
 	soundDamage: "gel_damage",
@@ -1044,7 +1096,8 @@ o.gel = {
 		// Spawn a fireball scroll if the player is out
 		// AND there aren't any on the screen
 		if (
-			!player.hasWeapon("h_fireball") 
+			!player.hasWeapon("h_fireball")
+			&& !player.hasWeapon("h_fire_sword") 
 			&& engine.getObjectCountByType("item_weapon_fireball") === 0
 		) {
 			engine.dropObject(this, "item_weapon_fireball");
@@ -1241,6 +1294,12 @@ o.imp = {
 	phase: 0,
 	phaseInit: false,
 	
+	lootTable: [
+		{type: null, weight: 7},
+		{type: "item_food", weight: 1},
+		{type: "WEAPON_DROP", weight: 2}
+	],
+	
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
@@ -1331,9 +1390,9 @@ o.wizard = {
 	
 	lootTable: [
 		{type: null, weight: 6},
-		{type: "item_chest", weight: 2},
+		{type: "item_chest", weight: 1},
 		{type: "item_gold_chest", weight: 1},
-		{type: "WEAPON_DROP", weight: 1}
+		{type: "WEAPON_DROP", weight: 2}
 	],
 	
 	phase: 0,
@@ -1464,8 +1523,8 @@ o.sandworm = {
 	lootTable: [
 		{type: null, weight: 4},
 		{type: "item_chest", weight: 2},
-		{type: "WEAPON_DROP", weight: 1},
-		{type: "item_food", weight: 3}
+		{type: "WEAPON_DROP", weight: 2},
+		{type: "item_food", weight: 2}
 	],
 	
 	onInit: function () {
@@ -1571,7 +1630,7 @@ o.nega_xam = {
 	spriteY: 768,
 	
 	damage: 20,
-	hitPoints: 2500,
+	hitPoints: 5000,
 	speed: 200,
 
 	onInit: function () {
@@ -1672,7 +1731,7 @@ o.nega_xam = {
 				if (!this.phaseInit) {
 					this.speed = 100;
 					this.animDelay = 200;
-					this.phaseTimer.start(15000);
+					this.phaseTimer.start(10000);
 					this.phaseInit = true;
 				}
 				var player = engine.getPlayerObject();
@@ -1776,9 +1835,11 @@ o.nega_xam = {
 					this.phaseInit = true;
 					for (var b = 0; b < 60; ++b) {
 						var id = engine.spawnObject(this, "dire_bat");
-						engine.objects[id].setDirection(horde.randomDirection());
+						var o = engine.objects[id];
+						o.setDirection(horde.randomDirection());
+						o.addState(horde.Object.states.INVINCIBLE, 250);
 					}
-					this.phaseTimer.start(10000);
+					this.phaseTimer.start(8000);
 				}
 				if (this.phaseTimer.expired()) {
 					this.setPhase(1);
@@ -1896,6 +1957,115 @@ o.e_nega_spear = {
 	priority: 2,
 	bounce: false,
 	piercing: true
+};
+
+o.beholder = {
+	role: "monster",
+	team: 1,
+	badass: true,
+	
+	size: new horde.Size(128, 128),
+	spriteSheet: "beholder",
+	animated: true,
+	animDelay: 350,
+	
+	damage: 30,
+	hitPoints: 2500,
+	speed: 50,
+	
+	collidable: false,
+	
+	lootTable: [
+		{type: "item_weapon_fire_sword", weight: 1}
+	],
+	
+	onInit: function () {
+		this.phaseTimer = new horde.Timer();
+		this.eyeletOffset = 100;
+		this.eyeletOffsetMod = 1;
+	},
+	
+	onUpdate: function (elapsed, engine) {
+
+		this.eyeletOffset += (((20 / 1000) * elapsed) * this.eyeletOffsetMod);
+		if (this.eyeletOffset > 120) {
+			this.eyeletOffsetMod = -1;
+		}
+		if (this.eyeletOffset < 100) {
+			this.eyeletOffsetMod = 1;
+		}
+
+		switch (this.phase) {
+			
+			// Charge out of the gates (invisible)
+			case 0:
+				if (!this.phaseInit) {
+					this.speed = 200;
+					this.addState(horde.Object.states.INVISIBLE);
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 70) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Phase in
+			case 1:
+				if (!this.phaseInit) {
+					this.speed = 50;
+					this.removeState(horde.Object.states.INVISIBLE);
+					this.addState(horde.Object.states.INVINCIBLE);
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				movementTypes.wander.apply(this, arguments);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Wander and spawn X eyelets (now attackable)
+			case 2:
+				if (!this.phaseInit) {
+					this.removeState(horde.Object.states.INVINCIBLE);
+					this.collidable = true;
+					this.eyeletTimer = new horde.Timer();
+					this.eyeletTimer.start(500);
+					this.eyeletsSpawned = 0;
+					this.phaseInit = true;
+				}
+				this.eyeletTimer.update(elapsed);
+				movementTypes.wander.apply(this, arguments);
+				if (this.eyeletTimer.expired()) {
+					this.eyeletTimer.reset();
+					engine.spawnObject(this, "eyelet");
+					++this.eyeletsSpawned;
+					if (this.eyeletsSpawned >= 12) {
+						this.nextPhase();
+					}
+				}
+				break;
+
+			case 3:
+				if (!this.phaseInit) {
+					this.phaseInit = true;
+				}
+				var hasEyelets = false;
+				for (var id in engine.objects) {
+					if (engine.objects[id].ownerId === this.id) {
+						hasEyelets = true;
+						break;
+					}
+				}
+				if (!hasEyelets) {
+					this.setPhase(2);
+				}
+				movementTypes.wander.apply(this, arguments);
+				break;
+			
+		}	
+	}
+	
 };
 
 o.dragon = {
@@ -2556,7 +2726,7 @@ o.item_weapon_fire_sword = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fire_sword",
-	wepCount: 100
+	wepCount: 1000
 };
 
 }());

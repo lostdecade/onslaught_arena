@@ -284,7 +284,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-	
+
 	if (this.spriteAlign) {
 		this.angle = this.facing.angle();
 	}

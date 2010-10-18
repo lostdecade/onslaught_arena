@@ -248,9 +248,8 @@ proto.init = function horde_Engine_proto_init () {
 	this.images.load({
 		"arena": "img/sheet_arena.png",
 		"characters": "img/sheet_characters.png",
-		"objects": "img/sheet_objects.png"/*,
+		"objects": "img/sheet_objects.png",
 		"beholder": "img/sheet_beholder.png"
-		*/
 	}, this.handleImagesLoaded, this);
 
 	var highScore = this.getData(HIGH_SCORE_KEY);
@@ -489,11 +488,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 10;
+	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
-	
+
 	/*
 	// Test Wave
 	var w = new horde.SpawnWave();
@@ -959,7 +958,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	// Wave 40: Beholder
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
-	w.addObjects(1, "demoblin", 1);
+	w.addObjects(1, "beholder", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
 	w.bossName = "Beholder"
@@ -1022,10 +1021,12 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave 46
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(0, 2500);
 	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
+	w.addSpawnPoint(2, 2500);
+	w.addObjects(0, "wizard", 4);
 	w.addObjects(1, "cube", 1);
+	w.addObjects(2, "wizard", 4);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1034,25 +1035,32 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "demoblin", 5);
 	w.addObjects(1, "superclops", 1);
+	w.addObjects(1, "demoblin", 4);
+	w.addObjects(2, "demoblin", 5);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
 	// Wave 48
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(0, 30000);
 	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
+	w.addSpawnPoint(2, 30000);
+	w.addObjects(0, "owlbear", 2);
 	w.addObjects(1, "dragon", 1);
+	w.addObjects(2, "owlbear", 2);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
 	// Wave 49
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(0, 15000);
 	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
-	w.addObjects(1, "demoblin", 1); // TODO: Beholder here
+	w.addSpawnPoint(2, 15000);
+	w.addObjects(0, "cyclops", 2);
+	w.addObjects(1, "beholder", 1);
+	w.addObjects(2, "cyclops", 2);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1847,6 +1855,12 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 				case 3: type = "item_weapon_fireball"; break;
 				case 4: type = "item_weapon_axe"; break;
 			}
+		}
+		if (
+			type.indexOf("item_weapon") >= 0
+			&& player.hasWeapon("h_fire_sword")
+		) {
+			type = "item_gold_chest";
 		}
 		this.dropObject(object, type);
 	}
