@@ -36,4 +36,18 @@ proto.isButtonDown = function (button) {
 	return this.buttonStates[button];
 };
 
+proto.isAnyButtonDown = function () {
+	for (var key in this.buttonStates) {
+		if (this.buttonStates[key]) {
+			return true;
+		}
+	}
+
+	return false;
+};
+
+proto.clearButtons = function () {
+	this.buttonStates = {};
+};
+
 }());

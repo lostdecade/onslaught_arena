@@ -1094,8 +1094,9 @@ proto.updateLogo = function (elapsed) {
 	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 
-	if (this.keyboard.isAnyKeyPressed()) {
+	if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 		kb.clearKeys();
+		this.mouse.clearButtons();
 		this.initGame();
 	}
 
@@ -2373,8 +2374,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (this.state === "intro_cinematic") {
-		if (this.keyboard.isAnyKeyPressed()) {
+		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
+			this.mouse.clearButtons();
 			this.state = "running";
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
