@@ -278,8 +278,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("victory", "sound/music/victory", true, 20);
 		
 		// UI
-		s.create("move_pointer", "sound/effects/move_pointer");
-		//s.create("select_pointer", "sound/effects/_move_pointer");
+		s.create("move_pointer", "sound/effects/move_pointer", false, 50);
+		s.create("select_pointer", "sound/effects/select_pointer", false, 50);
 		s.create("pause", "sound/effects/pause");
 		s.create("unpause", "sound/effects/unpause");
 		
@@ -290,7 +290,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 		// Hero
-		s.create("coins", "sound/effects/chest_gold", false, 25);
+		s.create("coins", "sound/effects/chest_gold", false, 20);
 		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		s.create("hero_attacks", "sound/effects/char_attacks");
@@ -2237,7 +2237,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					this.togglePause();
 					break;
 				case 1: // Quit
-					//horde.sound.play("select_pointer");
+					horde.sound.play("select_pointer");
 					if (this.verifyQuit) {
 						this.verifyQuit = false;
 						this.togglePause();
@@ -2329,7 +2329,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
-			//horde.sound.play("select_pointer");
+			horde.sound.play("select_pointer");
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
 
@@ -2847,12 +2847,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	var nextTimer = 0;
 
 	var waveReached = (this.currentWaveId + 1);
-	var totalScore = this.getTotalScore(
-		waveReached,
-		object.gold,
-		object.totalDamageTaken,
-		object.cheater
-	);
+	var totalScore = this.getTotalScore(waveReached, object);
 
 	// Wave reached
 	var displayWaveReached = "";
@@ -2866,7 +2861,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayWaveReached = waveReached;
 	}
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText(displayWaveReached, textX, 180);
+	ctx.fillText(displayWaveReached + " x 1000", textX, 180);
 
 	// Gold earned
 	var displayGold = "";
@@ -2894,7 +2889,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayDamage = object.totalDamageTaken;
 	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText(displayDamage, textX, 180 + (textHeight * 2));
+	ctx.fillText("-" + displayDamage, textX, 180 + (textHeight * 2));
 
 	// Total score
 	var displayScore = "";
@@ -2934,16 +2929,18 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	
 };
 
-proto.getTotalScore = function (wave, gold, damage, cheater) {
+proto.getTotalScore = function (wave, player) {
 	var score = 0;
 
 	score += (wave * 1000);
-	score += gold;
-	score -= (damage * 10);
+	score += player.gold;
+	score -= (player.totalDamageTaken * 10);
 
-	if (cheater === true) {
+	if (player.cheater === true) {
 		score /= 2;
 	}
+
+	if (score < 0) score = 0;
 
 	return score;
 };
@@ -3233,13 +3230,15 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold coin
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		64, 32, 32, 32, 603, 443, 32, 32
+		32, 32, 32, 32,
+		603, 443, 32, 32
 	);
 	
 	// Draw Weapon Icon
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		w.spriteX, w.spriteY, 32, 32, 603, 412, 32, 32
+		w.spriteX, w.spriteY, 32, 32,
+		603, 412, 32, 32
 	);
 	
 	// Draw gold amount and weapon count
@@ -3248,8 +3247,10 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 32px Monospace";
 
-	ctx.fillText(o.gold, 603, 469);
-	ctx.fillText(wCount, 603, 439);
+	var totalScore = this.getTotalScore(this.currentWaveId, o);
+
+	ctx.fillText(totalScore, 600, 469);
+	ctx.fillText(wCount, 600, 439);
 	ctx.restore();
 
 };
