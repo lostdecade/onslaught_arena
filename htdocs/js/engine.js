@@ -2764,9 +2764,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		this.gameOverBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
 	}
 	
-	ctx.save();
 	ctx.putImageData(this.gameOverBg, 0, 0);
-	ctx.restore();
 
 	ctx.save();
 	ctx.globalAlpha = this.gameOverAlpha;
@@ -2800,7 +2798,13 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		);
 
 		// Game Over
-		if (this.gotNewHighScore) {
+		if (this.wonGame) {
+			ctx.drawImage(
+				this.preloader.getImage("ui"),
+				564, 2444, 256, 50,
+				192, headerY, 256, 50
+			);
+		} else if (this.gotNewHighScore) {
 			ctx.drawImage(
 				this.preloader.getImage("ui"),
 				564, 2374, 404, 50,
