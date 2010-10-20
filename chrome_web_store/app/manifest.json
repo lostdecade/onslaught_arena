@@ -4,10 +4,10 @@
 	"version": "x.x.x",
 	"app": {
 		"urls": [
-			"http://play-lost-decade.appspot.com/"
+			"http://play.lostdecadegames.com/"
 		],
 		"launch": {
-			"web_url": "http://play-lost-decade.appspot.com/onslaught_arena/",
+			"web_url": "http://play.lostdecadegames.com/onslaught_arena/",
 			"container": "tab"
 		}
 	},
