@@ -857,7 +857,7 @@ o.cyclops = {
 
 	lootTable: [
 		{type: "item_food", weight: 7},
-		{type: "WEAPON_DROP", weight: 3},
+		{type: "WEAPON_DROP", weight: 3}
 	],
 
 	onInit: function () {
@@ -892,7 +892,7 @@ o.eyelet = {
 	lootTable: [
 		{type: null, weight: 18},
 		{type: "item_food", weight: 1},
-		{type: "WEAPON_DROP", weight: 1},
+		{type: "WEAPON_DROP", weight: 1}
 	],
 	
 	onInit: function () {
