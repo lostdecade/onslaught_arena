@@ -134,7 +134,7 @@ o.bomb_smoke = {
 o.h_axe = {
 	name: "Battle Axe",
 	role: "projectile",
-	cooldown: 450,
+	cooldown: 500,
 	speed: 350,
 	hitPoints: 1,
 	damage: 20,
@@ -144,7 +144,7 @@ o.h_axe = {
 	rotate: true,
 	rotateSpeed: 500,
 	priority: 5,
-	ttl: 10000
+	ttl: 3500
 };
 
 o.h_fire_sword = {

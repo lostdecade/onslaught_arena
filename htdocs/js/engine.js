@@ -1451,14 +1451,35 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 		case 1:
 			// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 			var player = this.getPlayerObject();
+
+			// 1. Knife
 			var wep = horde.makeObject("item_weapon_knife");
 			wep.position = player.position.clone();
-			wep.position.x -= 128;
+			wep.position.x -= 96;
+			wep.position.y += 64;
 			this.addObject(wep);
+
+			// 2. Spear
 			var wep = horde.makeObject("item_weapon_spear");
 			wep.position = player.position.clone();
-			wep.position.x += 128;
+			wep.position.x -= 32;
+			wep.position.y += 64;
 			this.addObject(wep);
+
+			// 3. Axe
+			var wep = horde.makeObject("item_weapon_axe");
+			wep.position = player.position.clone();
+			wep.position.x += 32;
+			wep.position.y += 64;
+			this.addObject(wep);
+
+			// 4. Fire
+			var wep = horde.makeObject("item_weapon_fireball");
+			wep.position = player.position.clone();
+			wep.position.x += 96;
+			wep.position.y += 64;
+			this.addObject(wep);
+
 			break;
 		
 		case 11:
@@ -2869,7 +2890,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayGold = this.statsCount;
 		max = object.gold;
 		// Settings for Damage taken:
-		increment = 13;
+		increment = 10;
 		nextTimer = 10;
 	} else if (this.statsIndex > 1) {
 		displayGold = object.gold;
@@ -2889,7 +2910,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayDamage = object.totalDamageTaken;
 	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText("-" + displayDamage, textX, 180 + (textHeight * 2));
+	ctx.fillText("-" + displayDamage + " x 10", textX, 180 + (textHeight * 2));
 
 	// Total score
 	var displayScore = "";
@@ -3658,7 +3679,7 @@ proto.sendHighScore = function (highScore) {
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
-				alert("High score saved!");
+				open("/onslaught_arena/high_scores");
 			}
 		}
 	};
