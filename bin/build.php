@@ -2,7 +2,6 @@
 <?php
 
 define('ROOT', dirname(__FILE__) . '/../');
-define('CLOSURE_COMPILER', '~/closure_compiler/compiler.jar');
 
 // Grab the version, increment it and write it back to disk
 function getVersion () {
@@ -28,7 +27,7 @@ function cleanup () {
 // Compile a bunch of JS files
 function compileJS ($files, $target) {
 	$command = 
-		'java -jar ' . CLOSURE_COMPILER . 
+		'closure ' . 
 		" --js_output_file {$target}" .
 		' --compilation_level SIMPLE_OPTIMIZATIONS';
 	foreach ($files as $filename) {
