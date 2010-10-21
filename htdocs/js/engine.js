@@ -2457,32 +2457,33 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		this.updateTargetReticle();
 
-		// Determine which way we should move the player
 		var move = new horde.Vector2();
+		var shoot = new horde.Vector2();
 
-		if (
-			this.keyboard.isKeyDown(keys.W)
-			|| this.keyboard.isKeyDown(keys.UP)
-		) {
+		if (kb.isKeyDown(keys.W)) {
 			move.y = -1;
 		}
-		if (
-			this.keyboard.isKeyDown(keys.A)
-			|| this.keyboard.isKeyDown(keys.LEFT)
-		) {
+		if (kb.isKeyDown(keys.A)) {
 			move.x = -1;
 		}
-		if (
-			this.keyboard.isKeyDown(keys.S)
-			|| this.keyboard.isKeyDown(keys.DOWN)
-		) {
+		if (kb.isKeyDown(keys.S)) {
 			move.y = 1;
 		}
-		if (
-			this.keyboard.isKeyDown(keys.D)
-			|| this.keyboard.isKeyDown(keys.RIGHT)
-		) {
+		if (kb.isKeyDown(keys.D)) {
 			move.x = 1;
+		}
+		
+		if (kb.isKeyDown(keys.UP)) {
+			shoot.y = -1;
+		}
+		if (kb.isKeyDown(keys.DOWN)) {
+			shoot.y = 1;
+		}
+		if (kb.isKeyDown(keys.LEFT)) {
+			shoot.x = -1;
+		}
+		if (kb.isKeyDown(keys.RIGHT)) {
+			shoot.x = 1;
 		}
 		
 		// Move the player
@@ -2497,6 +2498,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player, v);
 			this.heroFiring = true;
 			this.heroFiringDirection = v;
+		} else if (shoot.x !== 0 || shoot.y !== 0) {
+			this.objectAttack(player, shoot);
+			this.heroFiring = true;
+			this.heroFiringDirection = shoot;
 		} else {
 			this.heroFiring = false;
 			this.heroFiringDirection = null;
