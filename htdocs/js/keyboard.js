@@ -90,7 +90,6 @@ Keyboard.allWeaponsCode = [
 ];
 
 proto.supressKeys = function (e) {
-console.log(e.keyCode);
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
 		case Keys.ENTER:

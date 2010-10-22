@@ -28,6 +28,7 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
+	this.debug = 1; // Debugging toggle
 	this.konamiEntered = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -378,11 +379,12 @@ proto.initGame = function () {
 
 	this.monstersAlive = 0;
 
-	this.gotNewHighScore = 0;
+	this.newHighScore = 0;
 	this.statsCount = 0;
 	this.statsIncrement = 0;
 	this.statsIndex = 0;
 	this.statsTimer = null;
+	this.highScoreSaved = false;
 	
 	this.wonGame = false;
 	this.wonGamePhase = 0;
@@ -1673,6 +1675,23 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 		}
 	}
 
+	if ((this.statsIndex	>= 4) && !this.highScoreSaved) {
+		this.highScoreSaved = true;
+
+		var highScore = Number(this.getData(HIGH_SCORE_KEY));
+		var totalScore = this.getTotalScore();
+
+		if (totalScore > highScore) {
+			this.putData(HIGH_SCORE_KEY, totalScore);
+			horde.sound.play("victory");
+			this.newHighScore = totalScore;
+		}
+
+		if (this.debug || (location.hostname == "play.lostdecadegames.com")) {
+			this.sendHighScore(totalScore);
+		}
+	}
+
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
@@ -2104,7 +2123,7 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 
 	// Deal damage and check for death
 	if (defender.wound(attacker.damage)) {
-		// defender has died 
+		// defender has died
 		
 		// Assign gold/kills etc
 		scorer.gold += defender.worth;
@@ -2372,11 +2391,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						horde.sound.play("imp_damage");
 					}
 					break;
-				case 1: // New Game
+				case 1: // New game
 					this.continuing = false;
 					this.state = "intro_cinematic";
 					break;
-				case 2: // How to Play
+				case 2: // Controls
 					this.state = "how_to_play";
 					break;
 				case 3: // Credits
@@ -2722,7 +2741,7 @@ proto.render = function horde_Engine_proto_render () {
 proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 
 	if (
-		this.waveText.state == "show" 
+		this.waveText.state == "show"
 		|| this.waveText.state == "hide"
 		|| this.waveText.state == "display"
 	) {
@@ -2830,7 +2849,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 				564, 2444, 256, 50,
 				192, headerY, 256, 50
 			);
-		} else if (this.gotNewHighScore) {
+		} else if (this.newHighScore) {
 			ctx.drawImage(
 				this.preloader.getImage("ui"),
 				564, 2374, 404, 50,
@@ -3672,22 +3691,6 @@ proto.endGame = function () {
 	this.gameOverAlpha = 0;
 	this.updateGameOver();
 	this.state = "game_over";
-
-	if (this.debug || (location.hostname == "play.lostdecadegames.com")) {
-
-		var highScore = Number(this.getData(HIGH_SCORE_KEY));
-		var totalScore = this.getTotalScore();
-
-		if (totalScore > highScore) {
-			this.putData(HIGH_SCORE_KEY, totalScore);
-			horde.sound.play("victory");
-			this.gotNewHighScore = totalScore;
-		}
-
-		this.sendHighScore(totalScore);
-
-	}
-
 };
 
 proto.sendHighScore = function (highScore) {
