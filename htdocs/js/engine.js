@@ -526,9 +526,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
+	/*
 	var testWave = 8;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	/*
 	// Test Wave
@@ -2851,7 +2853,7 @@ proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 
 		b.save();
 		b.clearRect(0, 0, bw, bh);
-		b.font = "Bold " + size + "px Cracked";
+		b.font = ("Bold " + size + "px Cracked");
 		b.textBaseline = "top";
 		b.lineWidth = 3;
 		b.strokeStyle = "rgb(0, 0, 0)";
@@ -2980,8 +2982,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	var textHeight = 55;
 	
 	ctx.save();
-
-	ctx.font = "Bold 35px Monospace";
+	ctx.font = "Bold 40px Cracked";
 
 	var increment;
 	var max = 0;
@@ -3005,7 +3006,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayWave = wavesComplete;
 	}
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText(displayWave + " x 1000", textX, 180);
+	ctx.fillText(displayWave + " x 1000", textX, 182);
 
 	// Gold earned
 	var displayGold = 0;
@@ -3019,7 +3020,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayGold = object.gold;
 	}
 	ctx.fillStyle = "rgb(255, 245, 121)";
-	ctx.fillText(displayGold, textX, 180 + textHeight);
+	ctx.fillText(displayGold, textX, (180 + textHeight));
 
 	// Damage taken
 	var displayDamage = 0;
@@ -3045,7 +3046,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayScore = totalScore;
 	}
 	ctx.fillStyle = "rgb(250, 166, 26)";
-	ctx.fillText(displayScore, textX, 180 + (textHeight * 3));
+	ctx.fillText(displayScore, textX, (184 + (textHeight * 3)));
 
 	if (this.statsCount >= max) {
 		this.statsCount = 0;
@@ -3324,7 +3325,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
 	var w = horde.objectTypes[weaponInfo.type];
-	var wCount = (weaponInfo.count === null) ? "\u221E": weaponInfo.count;
+	var wCount = (weaponInfo.count ? weaponInfo.count : "");
 	
 	// Draw health bar
 	var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
@@ -3388,45 +3389,13 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.save();
 	ctx.textAlign = "right";
 	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.font = "Bold 32px Monospace";
+	ctx.font = "Bold 38px Cracked";
 
 	var totalScore = this.getTotalScore();
 
-	ctx.fillText(totalScore, 600, 469);
-	ctx.fillText(wCount, 600, 439);
+	ctx.fillText(wCount, 600, 440);
+	ctx.fillText(totalScore, 600, 472);
 	ctx.restore();
-
-};
-
-/**
- * Draws text, baby. Scales it up 'n stuff.
- * @param {Object} ctx Canvas 2d context to draw on.
- * @param {String} text The string to draw.
- * @param {Number} x The x coordinate.
- * @param {Number} y The y coordinate.
- * @param {Object} params A key/value pair to pass to the drawing context (eg, {globalAlpha : 1}).
- */
-proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) {
-
-	var buffer = this.canvases.buffer.getContext("2d");
-
-	buffer.save();
-	buffer.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	for (var key in params) {
-		buffer[key] = params[key];
-	}
-
-	buffer.fillText(text, 0, TEXT_HEIGHT);
-
-	ctx.drawImage(
-		this.canvases.buffer,
-		0, 0,
-		SCREEN_WIDTH, SCREEN_HEIGHT,
-		x, (y - TEXT_HEIGHT),
-		(SCREEN_WIDTH * 2), (SCREEN_HEIGHT * 2)
-	);
-	buffer.restore();
 
 };
 
@@ -3436,6 +3405,9 @@ proto.drawText = function horde_Engine_proto_drawText (ctx, text, x, y, params) 
  * @return {void}
  */
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
+
+	var black = "rgb(0, 0, 0)";
+	var grey = "rgb(230, 230, 230)";
 	
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
@@ -3444,40 +3416,42 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	);
 	
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
-	this.drawText(ctx, highScore, 218, 424, {
-		fillStyle : "rgb(0, 0, 0)",
-		font : "Bold 10px Monospace"
-	});
-	this.drawText(ctx, highScore, 220, 426, {
-		fillStyle : "rgb(255, 255, 255)",
-		font : "Bold 10px Monospace"
-	});
+
+	ctx.save();
+	ctx.font = "Bold 36px Cracked";
+	ctx.textAlign = "center";
+
+	ctx.fillStyle = black;
+	ctx.fillText(highScore, 322, 456);
+
+	ctx.fillStyle = grey;
+	ctx.fillText(highScore, 320, 454);
+	ctx.restore();
 
 	// Version
 	var version = ("v" + VERSION);
 	ctx.save();
-	ctx.fillStyle = "rgb(150, 150, 150)";
 	ctx.font = "Bold 14px Monospace";
 	ctx.textAlign = "right";
-	ctx.fillText(version, 637, 477);
+
+	ctx.fillStyle = black;
+	ctx.fillText(version, 638, 478);
+
+	ctx.fillStyle = grey;
+	ctx.fillText(version, 636, 476);
 	ctx.restore();
 	
 	// Copyright text
-	var copyright = "\u00A9 Lost Decade Games";
-	this.drawText(ctx, copyright, 200, 448, {
-		fillStyle : "rgb(0, 0, 0)",
-		font : "Bold 10px Monospace"
-	});
-	this.drawText(ctx, copyright, 202, 450, {
-		fillStyle : "rgb(255, 255, 255)",
-		font : "Bold 10px Monospace"
-	});
+	var copyright = "\u00A9 2010 Lost Decade Games";
+	ctx.save();
+	ctx.font = "Bold 14px Monospace";
 
-	var params = {
-		fillStyle : "rgb(0, 0, 0)",
-		font : "Bold 10px Monospace",
-		textAlign : "left"
-	};
+	ctx.fillStyle = black;
+	ctx.fillText(copyright, 6, 478);
+
+	ctx.fillStyle = grey;
+	ctx.fillText(copyright, 4, 476);
+	ctx.restore();
 
 };
 
@@ -3753,7 +3727,7 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	// Debugging info
 	ctx.save();
 	ctx.fillStyle = "rgb(255, 255, 255)";
-	ctx.font = "bold 20px Monospace";
+	ctx.font = "Bold 20px Monospace";
 	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
 	ctx.textAlign = "right";
 	ctx.fillText(Math.round(1000 / this.lastElapsed) + " FPS", 630, 20);
