@@ -11,6 +11,7 @@ var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
+var TUTORIAL_HEIGHT = 48;
 
 /**
  * Creates a new Engine object
@@ -425,6 +426,12 @@ proto.initGame = function () {
 
 	this.showReticle = false;
 	this.hideReticleTimer = null;
+
+	this.showTutorial = true;
+	this.tutorialIndex = 0;
+	this.tutorialY = -TUTORIAL_HEIGHT;
+	this.tutorialDirection = "down";
+	this.hideTutorialTimer = null;
 
 };
 
@@ -1344,6 +1351,9 @@ proto.update = function horde_Engine_proto_update () {
 				this.updateObjects(elapsed);
 				this.updateFauxGates(elapsed);
 			}
+			if (this.showTutorial) {
+				this.updateTutorial(elapsed);
+			}
 			this.render();
 			break;
 
@@ -1360,6 +1370,7 @@ proto.update = function horde_Engine_proto_update () {
 	if (this.mouse.hasMoved) {
 		this.showReticle = true;
 		this.hideReticleTimer.start(5000);
+		this.nextTutorial(3);
 	}
 	this.hideReticleTimer.update(elapsed);
 	if (this.hideReticleTimer.expired()) {
@@ -1783,6 +1794,58 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 		}
 	}
 	
+};
+
+proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
+
+	var speed = 0.1;
+
+	if (this.tutorialDirection === "down") {
+		this.tutorialY += (speed * elapsed);
+		if (this.tutorialY >= 0) {
+			this.tutorialY = 0;
+			this.tutorialDirection = null;
+
+			if (this.tutorialIndex >= 6) {
+				this.hideTutorialTimer.start(5000);
+			}
+		}
+	}
+	
+	if (this.tutorialDirection === "up") {
+		this.tutorialY -= (speed * elapsed);
+		if (this.tutorialY < -TUTORIAL_HEIGHT) {
+			this.tutorialY = -TUTORIAL_HEIGHT;
+			this.tutorialDirection = "down";
+			this.tutorialIndex += 1;
+			if (this.tutorialDirection >= 7) {
+				this.showTutorial = false;
+			}
+		}
+	}
+
+	if (!this.hideTutorialTimer) {
+		this.hideTutorialTimer = new horde.Timer();
+	}
+
+	this.hideTutorialTimer.update(elapsed);
+
+	if (this.hideTutorialTimer.expired()) {
+		this.tutorialDirection = "up";
+	}
+
+};
+
+proto.nextTutorial = function horde_Engine_proto_nextTutorial (index) {
+
+	if (!this.showTutorial || (this.tutorialDirection !== null)) {
+		return;
+	}
+
+	if (this.tutorialIndex === (index - 1)) {
+		this.tutorialDirection = "up";
+	}
+
 };
 
 /**
@@ -2259,6 +2322,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
 			this.togglePause();
 			this.keyboard.clearKeys();
+			this.nextTutorial(6);
 			return;
 		}
 
@@ -2269,6 +2333,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Toggle sound with "M" for "mute".
 		if (this.keyboard.isKeyPressed(77)) {
 			horde.sound.toggleMuted();
+			this.nextTutorial(5);
 		}
 
 		// Code: lddqd = god mode
@@ -2500,18 +2565,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		(this.state === "credits")
 		|| (this.state === "how_to_play")
 	) {
-	/*
-		var mouseDown = false;
-		if (this.mouse.isButtonDown(buttons.LEFT)) {
-			if (this.beenDown) {
-				mouseDown = true;
-				this.beenDown = false;
-			}
-		} else {
-			this.beenDown = true;
-		}
-		*/
-
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
 			this.mouse.clearButtons();
@@ -2527,6 +2580,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
 			this.currentMusic = "normal_battle_music";
+			this.showTutorial = true;
 			horde.sound.play(this.currentMusic);
 		}
 	}
@@ -2578,28 +2632,36 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		if (kb.isKeyDown(keys.W)) {
 			move.y = -1;
+			this.nextTutorial(1);
 		}
 		if (kb.isKeyDown(keys.A)) {
 			move.x = -1;
+			this.nextTutorial(1);
 		}
 		if (kb.isKeyDown(keys.S)) {
 			move.y = 1;
+			this.nextTutorial(1);
 		}
 		if (kb.isKeyDown(keys.D)) {
 			move.x = 1;
+			this.nextTutorial(1);
 		}
 		
 		if (kb.isKeyDown(keys.UP)) {
 			shoot.y = -1;
+			this.nextTutorial(2);
 		}
 		if (kb.isKeyDown(keys.DOWN)) {
 			shoot.y = 1;
+			this.nextTutorial(2);
 		}
 		if (kb.isKeyDown(keys.LEFT)) {
 			shoot.x = -1;
+			this.nextTutorial(2);
 		}
 		if (kb.isKeyDown(keys.RIGHT)) {
 			shoot.x = 1;
+			this.nextTutorial(2);
 		}
 		
 		// Move the player
@@ -2614,6 +2676,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player, v);
 			this.heroFiring = true;
 			this.heroFiringDirection = v;
+			this.nextTutorial(4);
 		} else if (shoot.x !== 0 || shoot.y !== 0) {
 			this.objectAttack(player, shoot);
 			this.heroFiring = true;
@@ -2820,6 +2883,9 @@ proto.render = function horde_Engine_proto_render () {
 				this.drawPaused(ctx);
 				this.drawPointer(ctx);
 				this.drawPausedPointerOptions(ctx);
+			}
+			if (this.showTutorial) {
+				this.drawTutorial(ctx);
 			}
 			break;
 		
@@ -3141,6 +3207,49 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 		38, 38, 564, 404
 	);
 
+	ctx.restore();
+
+};
+
+proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
+
+	ctx.save();
+	ctx.globalAlpha = 0.6;
+	ctx.fillRect(0, this.tutorialY, this.view.width, TUTORIAL_HEIGHT);
+
+	ctx.globalAlpha = 1;
+	ctx.font = "Bold 30px Cracked";
+	ctx.textAlign = "center";
+
+	switch (this.tutorialIndex) {
+		case 0:
+			var tip = "Tip 1/7: Use the WASD keys to move the character.";
+			break;
+		case 1:
+			var tip = "Tip 2/7: Throw weapons with the arrow keys.";
+			break;
+		case 2:
+			var tip = "Tip 3/7: Or use the mouse to aim with the target reticle.";
+			break;
+		case 3:
+			var tip = "Tip 4/7: And throw weapons with the left mouse button.";
+			break;
+		case 4:
+			var tip = "Tip 5/7: Press M to toggle muting.";
+			break;
+		case 5:
+			var tip = "Tip 6/7: Press the escape (ESC) key to pause.";
+			break;
+		case 6:
+			var tip = "Tip 7/7: Collect gold and kill monsters to raise your score!";
+			break;
+	}
+
+	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillText(tip, 322, (this.tutorialY + 36));
+
+	ctx.fillStyle = "rgb(230, 230, 230)";
+	ctx.fillText(tip, 320, (this.tutorialY + 34));
 	ctx.restore();
 
 };
