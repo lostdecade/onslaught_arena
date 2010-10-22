@@ -389,6 +389,9 @@ proto.initGame = function () {
 	this.wonGame = false;
 	this.wonGamePhase = 0;
 
+	this.showReticle = false;
+	this.hideReticleTimer = null;
+
 };
 
 /**
@@ -1315,6 +1318,18 @@ proto.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
+	}
+
+	if (!this.hideReticleTimer) {
+		this.hideReticleTimer = new horde.Timer();
+	}
+	if (this.mouse.hasMoved) {
+		this.showReticle = true;
+		this.hideReticleTimer.start(5000);
+	}
+	this.hideReticleTimer.update(elapsed);
+	if (this.hideReticleTimer.expired()) {
+		this.showReticle = false;
 	}
 
 	this.mouse.hasMoved = false;
@@ -2349,7 +2364,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			if (this.mouse.hasMoved && this.pointerY !== 2) newPointerY = 2;
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
-console.log('firing controls!');
 			}
 		}
 
@@ -3170,6 +3184,9 @@ horde.Engine.prototype.drawObjects = function (ctx) {
  * @return {void}
  */
 proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
+
+	if (!this.showReticle) return;
+
 	ctx.save();
 	ctx.globalAlpha = 0.50;
 	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
