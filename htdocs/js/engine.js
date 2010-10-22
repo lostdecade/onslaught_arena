@@ -2010,12 +2010,6 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.gold += o2.coinAmount;
 						horde.sound.play("coins");
-						for (var j = 0; j < 5; ++j) {
-							var heart = horde.makeObject("mini_sparkle");
-							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
-							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
-							this.addObject(heart);
-						}
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
@@ -2453,9 +2447,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						}
 						this.continuing = true;
 						this.state = "intro_cinematic";
-					} else {
-						// No checkpoint data!
-						horde.sound.play("imp_damage");
 					}
 					break;
 				case 1: // New game
@@ -2767,7 +2758,7 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawTitlePointerOptions(ctx);
 			break;
 
-		// How to Play
+		// Controls
 		case "how_to_play":
 			this.drawTitle(ctx);
 			this.drawHowToPlay(ctx);
@@ -2898,8 +2889,9 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 
 	if (this.gameOverReady === true) {
 		
-		if (this.keyboard.isAnyKeyPressed()) {
+		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			this.keyboard.clearKeys();
+			this.mouse.clearButtons();
 			this.statsIndex += 1;
 			if (this.statsIndex >= 5) {
 				horde.sound.stop("victory");
