@@ -21,6 +21,7 @@ Mouse.Buttons = {
 proto.handleMouseMove = function (e) {
 	this.mouseX = (((e.clientX - this.canvas.offsetLeft) * 640) / this.canvas.offsetWidth);
 	this.mouseY = (((e.clientY - this.canvas.offsetTop) * 480) / this.canvas.offsetHeight);
+	this.hasMoved = true;
 };
 
 proto.handleMouseDown = function (e) {

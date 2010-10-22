@@ -1317,6 +1317,8 @@ proto.update = function horde_Engine_proto_update () {
 
 	}
 
+	this.mouse.hasMoved = false;
+
 };
 
 proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
@@ -2332,7 +2334,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			(mouseV.x >= startX && mouseV.x <= stopX)
 			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
 		) {
-			if (this.pointerY !== 1) newPointerY = 1;
+			if (this.mouse.hasMoved && this.pointerY !== 1) newPointerY = 1;
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
 			}
@@ -2344,9 +2346,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			(mouseV.x >= startX && mouseV.x <= stopX)
 			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
 		) {
-			if (this.pointerY !== 2) newPointerY = 2;
+			if (this.mouse.hasMoved && this.pointerY !== 2) newPointerY = 2;
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
+console.log('firing controls!');
 			}
 		}
 
@@ -2356,7 +2359,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			(mouseV.x >= startX && mouseV.x <= stopX)
 			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
 		) {
-			if (this.pointerY !== 3) newPointerY = 3;
+			if (this.mouse.hasMoved && this.pointerY !== 3) newPointerY = 3;
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
 			}
@@ -2372,6 +2375,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("select_pointer");
 			kb.clearKey(keys.ENTER);
 			kb.clearKey(keys.SPACE);
+			this.mouse.clearButtons();
 
 			switch (this.pointerY) {
 				case 0: // Continue
@@ -2411,6 +2415,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		(this.state === "credits")
 		|| (this.state === "how_to_play")
 	) {
+	/*
 		var mouseDown = false;
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			if (this.beenDown) {
@@ -2420,9 +2425,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		} else {
 			this.beenDown = true;
 		}
+		*/
 
-		if (this.keyboard.isAnyKeyPressed() || mouseDown) {
+		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
+			this.mouse.clearButtons();
 			this.state = "title";
 		}
 	}
