@@ -496,7 +496,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 50;
+	var testWave = 13;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -2654,7 +2654,7 @@ proto.objectAttack = function (object, v) {
 
 		// Spread fire shotgun style
 		case "h_fireball":
-		case "e_fireball_2":
+		case "e_fireball_green":
 			for (var x = -0.25; x <= 0.25; x += 0.25) {
 				var h = v.heading();
 				h += (x + (horde.randomRange(-1, 1) / 10));
@@ -2680,7 +2680,7 @@ proto.objectAttack = function (object, v) {
 			}
 			break;
 
-			case "e_ring_fire_blue":
+			case "e_ring_fire_nega":
 				var len = (Math.PI * 2);
 				var step = (len / 10);
 				for (var h = 0; h < len; h += step) {

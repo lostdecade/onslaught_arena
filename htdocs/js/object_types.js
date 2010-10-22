@@ -2162,7 +2162,7 @@ o.dragon = {
 				if (!this.followUpShot && this.altTimer.expired()) {
 					if (this.wounds > (this.hitPoints / 2)) {
 						this.cooldown = false;
-						this.weapons = [{type: "e_ring_fire_blue", count: null}];
+						this.weapons = [{type: "e_ring_fire_nega", count: null}];
 						engine.objectAttack(this);
 						this.followUpShot = true;
 					}
@@ -2195,7 +2195,7 @@ o.dragon = {
 				if (!this.phaseInit) {
 					this.speed = 0;
 					this.animDelay = 400;
-					this.weapons = [{type: "e_fireball_2", count: null}];
+					this.weapons = [{type: "e_fireball_green", count: null}];
 					this.cooldown = false;
 					this.cooldownElapsed = 0;
 					this.phaseTimer.start(2500);
@@ -2213,7 +2213,6 @@ o.dragon = {
 					this.altTimer.reset();
 				}
 				return "shoot";
-				break;
 			
 		}
 
@@ -2304,15 +2303,15 @@ o.e_ring_fire = {
 	damageType: "magic"
 };
 
-o.e_ring_fire_blue = {
+o.e_ring_fire_nega = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 150,
 	hitPoints: Infinity,
 	damage: 25,
 	spriteSheet: "objects",
-	spriteX: 288,
-	spriteY: 32,
+	spriteX: 352,
+	spriteY: 544,
 	rotate: true,
 	bounce: false,
 	damageType: "magic"
@@ -2325,14 +2324,14 @@ o.e_fireball = {
 	hitPoints: Infinity,
 	damage: 20,
 	spriteSheet: "objects",
-	spriteX: 288,
-	spriteY: 32,
+	spriteX: 352,
+	spriteY: 544,
 	rotate: true,
 	bounce: false,
 	damageType: "magic"
 };
 
-o.e_fireball_2 = {
+o.e_fireball_green = {
 	role: "projectile",
 	cooldown: 75,
 	speed: 350,
