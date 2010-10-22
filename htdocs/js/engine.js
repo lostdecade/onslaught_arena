@@ -1320,11 +1320,6 @@ proto.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
-		case "how_to_play":
-			this.handleInput();
-			this.render();
-			break;
-
 		case "credits":
 			this.handleInput();
 			this.render();
@@ -2499,25 +2494,13 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
-		// Controls
-		startY += POINTER_HEIGHT;
-		if (
-			(mouseV.x >= startX && mouseV.x <= stopX)
-			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
-		) {
-			if (this.mouse.hasMoved && this.pointerY !== 2) newPointerY = 2;
-			if (this.mouse.isButtonDown(buttons.LEFT)) {
-				this.keyboard.keyStates[keys.SPACE] = true;
-			}
-		}
-
 		// Credits
 		startY += POINTER_HEIGHT;
 		if (
 			(mouseV.x >= startX && mouseV.x <= stopX)
 			&& (mouseV.y >= startY && mouseV.y < (startY + 20))
 		) {
-			if (this.mouse.hasMoved && this.pointerY !== 3) newPointerY = 3;
+			if (this.mouse.hasMoved && this.pointerY !== 2) newPointerY = 2;
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
 			}
@@ -2542,17 +2525,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 							player.load(checkpointHero);
 						}
 						this.continuing = true;
+						this.showTutorial = false;
 						this.state = "intro_cinematic";
 					}
 					break;
 				case 1: // New game
 					this.continuing = false;
+					this.showTutorial = true;
 					this.state = "intro_cinematic";
 					break;
-				case 2: // Controls
-					this.state = "how_to_play";
-					break;
-				case 3: // Credits
+				case 2: // Credits
 					this.state = "credits";
 					break;
 			}
@@ -2563,7 +2545,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (
 		(this.state === "credits")
-		|| (this.state === "how_to_play")
+		//|| (this.state === "how_to_play")
 	) {
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
@@ -2580,7 +2562,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
 			this.currentMusic = "normal_battle_music";
-			this.showTutorial = true;
 			horde.sound.play(this.currentMusic);
 		}
 	}
@@ -2677,6 +2658,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.heroFiring = true;
 			this.heroFiringDirection = v;
 			this.nextTutorial(4);
+			this.showReticle = true;
 		} else if (shoot.x !== 0 || shoot.y !== 0) {
 			this.objectAttack(player, shoot);
 			this.heroFiring = true;
@@ -2850,12 +2832,6 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawTitle(ctx);
 			this.drawPointer(ctx);
 			this.drawTitlePointerOptions(ctx);
-			break;
-
-		// Controls
-		case "how_to_play":
-			this.drawTitle(ctx);
-			this.drawHowToPlay(ctx);
 			break;
 
 		// Credits
@@ -3604,27 +3580,19 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	);
 
 	// New game
-	spriteY = ((this.pointerY == 1) ? 655 : 456);
+	spriteY = ((this.pointerY == 1) ? 656 : 456);
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		640, spriteY, 132, 26,
 		POINTER_X, (startY + POINTER_HEIGHT), 132, 26
 	);
 
-	// Controls
-	spriteY = ((this.pointerY == 2) ? 681 : 482);
-	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		640, spriteY, 106, 22,
-		POINTER_X, (startY + (POINTER_HEIGHT * 2)), 106, 22
-	);
-
 	// Credits
-	spriteY = ((this.pointerY == 3) ? 708 : 508);
+	spriteY = ((this.pointerY == 2) ? 682 : 482);
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		640, spriteY, 90, 22,
-		POINTER_X, (startY + (POINTER_HEIGHT * 3)), 90, 22
+		POINTER_X, (startY + (POINTER_HEIGHT * 2)), 90, 22
 	);
 
 };
@@ -3680,11 +3648,11 @@ proto.initOptions = function () {
 
 			if (this.canContinue()) {
 				this.pointerY = 0;
-				this.numPointerOptions = 3;
+				this.numPointerOptions = 2;
 				this.pointerOptionsStart = 0;
 			} else {
 				this.pointerY = 1;
-				this.numPointerOptions = 3;
+				this.numPointerOptions = 2;
 				this.pointerOptionsStart = 1;
 			}
 			break;
