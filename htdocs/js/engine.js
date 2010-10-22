@@ -28,7 +28,6 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
-	this.debug = 1; // Debugging toggle
 	this.konamiEntered = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -113,6 +112,10 @@ proto.togglePause = (function horde_Engine_proto_togglePause () {
 	var isMuted = false;
 
 	return function horde_Engine_proto_togglePause () {
+
+		if (this.getPlayerObject().hasState(horde.Object.states.DYING)) {
+			return;
+		}
 
 		if (this.paused) {
 			this.paused = false;
@@ -2222,9 +2225,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var kb = this.keyboard;
 	var keys = horde.Keyboard.Keys;
 	var buttons = horde.Mouse.Buttons;
-	var usingPointerOptions = false;
-
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
+	var newPointerY;
+	var usingPointerOptions = false;
 
 	if (this.state == "running") {
 		// Press "p" to pause.
@@ -2284,29 +2287,81 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
-		if (this.paused && (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE))) {
+		if (this.paused) {
 
-			kb.clearKey(keys.ENTER);
-			kb.clearKey(keys.SPACE);
+			var startY = (this.pointerYStart - 22);
 
-			switch (this.pointerY) {
-				case 0: // Resume
-					this.togglePause();
-					break;
-				case 1: // Quit
-					horde.sound.play("select_pointer");
-					if (this.verifyQuit) {
-						this.verifyQuit = false;
-						this.togglePause();
-						var p = this.getPlayerObject();
-						p.wound(100);
-					} else {
-						this.pointerY = 0;
-						this.verifyQuit = true;
+			if (this.verifyQuit) {
+				// Nevermind
+				if (
+					(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 192))
+					&& (mouseV.y > startY && mouseV.y < (startY + (POINTER_HEIGHT - 1)))
+				) {
+					if (this.mouse.hasMoved && this.pointerY !== 0) newPointerY = 0;
+					if (this.mouse.isButtonDown(buttons.LEFT)) {
+						this.keyboard.keyStates[keys.SPACE] = true;
 					}
-					break;
-			}
+				}
 
+				// Quit, seriously
+				if (
+					(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 192))
+					&& (mouseV.y > (startY + POINTER_HEIGHT) && mouseV.y < ((startY + POINTER_HEIGHT) + 36))
+				) {
+					if (this.mouse.hasMoved && this.pointerY !== 1) newPointerY = 1;
+					if (this.mouse.isButtonDown(buttons.LEFT)) {
+						this.keyboard.keyStates[keys.SPACE] = true;
+					}
+				}
+			} else {
+				// Resume
+				if (
+					(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 106))
+					&& (mouseV.y > startY && mouseV.y < (startY + (POINTER_HEIGHT - 1)))
+				) {
+					if (this.mouse.hasMoved && this.pointerY !== 0) newPointerY = 0;
+					if (this.mouse.isButtonDown(buttons.LEFT)) {
+						this.keyboard.keyStates[keys.SPACE] = true;
+					}
+				}
+
+				// Quit
+				if (
+					(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 106))
+					&& (mouseV.y > (startY + POINTER_HEIGHT) && mouseV.y < ((startY + POINTER_HEIGHT) + 36))
+				) {
+					if (this.mouse.hasMoved && this.pointerY !== 1) newPointerY = 1;
+					if (this.mouse.isButtonDown(buttons.LEFT)) {
+						this.keyboard.keyStates[keys.SPACE] = true;
+					}
+				}
+			}
+			
+			if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+
+				kb.clearKey(keys.ENTER);
+				kb.clearKey(keys.SPACE);
+				this.mouse.clearButtons();
+
+				switch (this.pointerY) {
+					case 0: // Resume
+						this.togglePause();
+						break;
+					case 1: // Quit
+						horde.sound.play("select_pointer");
+						if (this.verifyQuit) {
+							this.verifyQuit = false;
+							this.togglePause();
+							var p = this.getPlayerObject();
+							p.wound(100);
+						} else {
+							this.pointerY = 0;
+							this.verifyQuit = true;
+						}
+						break;
+				}
+
+			}
 		}
 
 	}
@@ -2328,7 +2383,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		var startX = (POINTER_X - 40);
 		var stopX = (POINTER_X + 130);
 		var startY = (this.pointerYStart - 22);
-		var newPointerY;
 
 		// Continue
 		if (this.canContinue()) {
@@ -2336,7 +2390,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				(mouseV.x >= startX && mouseV.x <= stopX)
 				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
 			) {
-				if (this.pointerY !== 0) newPointerY = 0;
+				if (this.mouse.hasMoved && this.pointerY !== 0) newPointerY = 0;
 				if (this.mouse.isButtonDown(buttons.LEFT)) {
 					this.keyboard.keyStates[keys.SPACE] = true;
 				}
@@ -2377,11 +2431,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			if (this.mouse.isButtonDown(buttons.LEFT)) {
 				this.keyboard.keyStates[keys.SPACE] = true;
 			}
-		}
-
-		if (newPointerY !== undefined) {
-			horde.sound.play("move_pointer");
-			this.pointerY = newPointerY;
 		}
 
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
@@ -2484,6 +2533,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		this.keyboard.storeKeyStates();
+
+		if (newPointerY !== undefined) {
+			horde.sound.play("move_pointer");
+			this.pointerY = newPointerY;
+		}
 
 	}
 
