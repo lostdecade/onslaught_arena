@@ -26,6 +26,7 @@ proto.handleMouseMove = function (e) {
 proto.handleMouseDown = function (e) {
 	this.buttonStates[e.button] = true;
 	horde.stopEvent(e);
+	if (window.focus) window.focus();
 };
 
 proto.handleMouseUp = function (e) {

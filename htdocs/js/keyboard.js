@@ -90,6 +90,7 @@ Keyboard.allWeaponsCode = [
 ];
 
 proto.supressKeys = function (e) {
+console.log(e.keyCode);
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
 		case Keys.ENTER:
@@ -107,6 +108,7 @@ proto.supressKeys = function (e) {
 		case Keys.W:
 		case Keys.S:
 		case Keys.D:
+		case 191: // The "/" key to prevent searching in Firefox (#125)
 			horde.stopEvent(e);
 			break;
 	}

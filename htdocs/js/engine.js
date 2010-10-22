@@ -2872,25 +2872,28 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	var max = 0;
 	var nextTimer = 0;
 
-	var waveReached = (this.currentWaveId + 1);
-	var totalScore = this.getTotalScore(waveReached, object);
+	var wavesComplete = this.currentWaveId;
 
-	// Wave reached
-	var displayWaveReached = "";
+	if (this.wonGame) {
+		wavesComplete += 1;
+	}
+
+	// Waves
+	var displayWave = 0;
 	if (this.statsIndex === 0) {
-		displayWaveReached = this.statsCount;
-		max = waveReached;
+		displayWave = this.statsCount;
+		max = wavesComplete;
 		// Settings for Gold earned:
 		increment = 199;
 		nextTimer = 10;
 	} else {
-		displayWaveReached = waveReached;
+		displayWave = wavesComplete;
 	}
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText(displayWaveReached + " x 1000", textX, 180);
+	ctx.fillText(displayWave + " x 1000", textX, 180);
 
 	// Gold earned
-	var displayGold = "";
+	var displayGold = 0;
 	if (this.statsIndex === 1) {
 		displayGold = this.statsCount;
 		max = object.gold;
@@ -2904,7 +2907,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	ctx.fillText(displayGold, textX, 180 + textHeight);
 
 	// Damage taken
-	var displayDamage = "";
+	var displayDamage = 0;
 	if (this.statsIndex === 2) {
 		displayDamage = this.statsCount;
 		max = object.totalDamageTaken;
@@ -2919,6 +2922,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 
 	// Total score
 	var displayScore = "";
+	var totalScore = this.getTotalScore();
 	if (this.statsIndex === 3) {
 		displayScore = this.statsCount;
 		max = totalScore;
@@ -2935,30 +2939,23 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		this.statsTimer.start(nextTimer);
 	}
 
-	// All done! Run this once
-	if (this.statsIndex == 4) {
-		this.statsIndex += 1;
-
-		var highScore = Number(this.getData(HIGH_SCORE_KEY));
-
-		if (totalScore > highScore) {
-			this.putData(HIGH_SCORE_KEY, totalScore);
-			horde.sound.play("victory");
-			this.gotNewHighScore = totalScore;
-		}
-
-		this.sendHighScore(totalScore);
-
-	}
-
 	ctx.restore();
 	
 };
 
-proto.getTotalScore = function (wave, player) {
-	var score = 0;
+/**
+ * Calculates the player's total score
+ */
+proto.getTotalScore = function () {
 
-	score += (wave * 1000);
+	var player = this.getPlayerObject();
+	var wavesComplete = this.currentWaveId;
+
+	if (this.wonGame) {
+		wavesComplete += 1;
+	}
+
+	var score = (wavesComplete * 1000);
 	score += player.gold;
 	score -= (player.totalDamageTaken * 10);
 
@@ -2966,7 +2963,9 @@ proto.getTotalScore = function (wave, player) {
 		score /= 2;
 	}
 
-	if (score < 0) score = 0;
+	if (score < 0) {
+		score = 0;
+	}
 
 	return score;
 };
@@ -3273,7 +3272,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillStyle = "rgb(255, 255, 255)";
 	ctx.font = "Bold 32px Monospace";
 
-	var totalScore = this.getTotalScore(this.currentWaveId, o);
+	var totalScore = this.getTotalScore();
 
 	ctx.fillText(totalScore, 600, 469);
 	ctx.fillText(wCount, 600, 439);
@@ -3673,6 +3672,22 @@ proto.endGame = function () {
 	this.gameOverAlpha = 0;
 	this.updateGameOver();
 	this.state = "game_over";
+
+	if (this.debug || (location.hostname == "play.lostdecadegames.com")) {
+
+		var highScore = Number(this.getData(HIGH_SCORE_KEY));
+		var totalScore = this.getTotalScore();
+
+		if (totalScore > highScore) {
+			this.putData(HIGH_SCORE_KEY, totalScore);
+			horde.sound.play("victory");
+			this.gotNewHighScore = totalScore;
+		}
+
+		this.sendHighScore(totalScore);
+
+	}
+
 };
 
 proto.sendHighScore = function (highScore) {
