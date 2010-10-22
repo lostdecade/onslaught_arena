@@ -294,7 +294,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("spike_attack", "sound/effects/spike_attacks");
 		
 		// Hero
-		s.create("coins", "sound/effects/chest_gold", false, 20);
+		s.create("coins", "sound/effects/chest_gold", false, 10);
 		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		s.create("hero_attacks", "sound/effects/char_attacks");
@@ -495,9 +495,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	var testWave = 40;
+	/*
+	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	/*
 	// Test Wave
@@ -3690,9 +3692,18 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
  */
 proto.drawFauxGates = function horde_Engine_proto_drawFauxGates (ctx) {
 	for (var g = 0; g < NUM_GATES; g++) {
+		var spriteX = 0;
+		var spriteY = 192;
+
+		if (g > 0) {
+			spriteX = 320;
+			spriteY = ((g == 1) ? 288 : 352);
+		}
+
 		ctx.drawImage(
 			this.images.getImage("objects"),
-			0, 192, 64, 64, this.gatesX + 96 + (g * 192), this.gatesY, 64, 64
+			spriteX, spriteY, 64, 64,
+			(this.gatesX + 96 + (g * 192)), this.gatesY, 64, 64
 		);
 	}
 };
