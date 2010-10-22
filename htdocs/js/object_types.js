@@ -886,6 +886,9 @@ o.eyelet = {
 	hitPoints: 40,
 	speed: 100,
 	worth: 0,
+
+	soundDamage: "eyelet_damage",
+	soundDies: "eyelet_dies",
 	
 	collidable: false,
 	

@@ -292,18 +292,22 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("gate_opens", "sound/effects/gate_opens");
 		s.create("gate_closes", "sound/effects/gate_closes");
 		s.create("spike_attack", "sound/effects/spike_attacks");
+
+		// Misc
+		s.create("immunity", "sound/effects/immunity", false, 25);
+		s.create("coins", "sound/effects/coins", false, 10);
+		s.create("eat_food", "sound/effects/eat_food", false, 20);
+		s.create("pickup_weapon", "sound/effects/pickup_weapon");
+		// TODO: s.create("weapon_wall", "sound/effects/weapon_wall");
 		
 		// Hero
-		s.create("coins", "sound/effects/chest_gold", false, 10);
-		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
 		s.create("hero_attacks", "sound/effects/char_attacks");
 		s.create("hero_damage", "sound/effects/char_damage_3");
 		s.create("hero_dies", "sound/effects/char_dies");
-		s.create("immunity", "sound/effects/immunity", false, 25);
-		s.create("pickup_weapon", "sound/effects/pickup_weapon");
 		
 		// Bat
+		// Attack: not needed
 		s.create("bat_damage", "sound/effects/bat_damage");
 		s.create("bat_dies", "sound/effects/bat_dies");
 		
@@ -314,26 +318,34 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		// Demoblin
 		s.create("demoblin_attacks", "sound/effects/demoblin_attacks", false, 80);
+		// Damage: goblin_damage
+		// Dies: goblin_dies
 
 		// Imp
-		s.create("imp_damage", "sound/effects/imp_damage");
-		s.create("imp_dies", "sound/effects/imp_dies");
+		// Attack: not needed
+		s.create("imp_damage", "sound/effects/imp_damage", false, 50);
+		s.create("imp_dies", "sound/effects/imp_dies", false, 50);
 
 		// Gel
+		// Attack: not needed
 		s.create("gel_damage", "sound/effects/gel_damage", false, 20);
 		s.create("gel_dies", "sound/effects/gel_dies", false, 20);
 
 		// Flaming Skull
+		// Attack: not needed
 		s.create("skull_damage", "sound/effects/skull_damage", false, 25);
 		s.create("skull_dies", "sound/effects/skull_dies", false, 5);
 	
 		// Wizard
 		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 25);
+		// Damage: goblin_damage
+		// Dies: goblin_dies
 		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 50);
 		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 50);
 
 		// Sandworm
 		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 75);
+		// Damage: goblin_damage
 		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 40);
 
 		// Cyclops
@@ -342,19 +354,38 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cyclops_dies", "sound/effects/cyclops_dies");
 
 		// Owlbear
-		//s.create("owlbear_attacks", "sound/effects/owlbear_attacks");
+		// Attack: TODO
 		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 25);
 		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 75);
 
-		// Boss: Green Dragon
+		// Boss 1/5: Gelatinous Cube
+		s.create("cube_attacks", "sound/effects/cube_attacks");
+		s.create("cube_damage", "sound/effects/cube_damage");
+		s.create("cube_dies", "sound/effects/cube_dies");
+
+		// Demonclops
+		// Attack: TODO
+		// Damage: TODO
+		// Dies: TODO
+
+		// Boss 3/5: Green Dragon
 		s.create("dragon_attacks", "sound/effects/dragon_attacks");
 		s.create("dragon_damage", "sound/effects/dragon_damage");
 		s.create("dragon_dies", "sound/effects/dragon_dies");
 
-		// Boss: Gelatinous Cube
-		s.create("cube_attacks", "sound/effects/cube_attacks");
-		s.create("cube_damage", "sound/effects/cube_damage");
-		s.create("cube_dies", "sound/effects/cube_dies");
+		// Boss 4/5: Beholder
+		// Attack: TODO
+		// Damage: TODO
+		// Dies: TODO
+		// Add: Eyelet
+		// Attack: TODO
+		// Damage: TODO
+		// Dies: TODO
+
+		// Boss 5/5: Doppelganger
+		// Attack: TODO
+		// Damage: TODO
+		// Dies: TODO
 			
 	});
 	
@@ -495,11 +526,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
-	var testWave = 13;
+	var testWave = 8;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	/*
 	// Test Wave
