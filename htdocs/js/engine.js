@@ -11,7 +11,7 @@ var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
-var TUTORIAL_HEIGHT = 48;
+var TUTORIAL_HEIGHT = 52;
 
 /**
  * Creates a new Engine object
