@@ -2589,6 +2589,7 @@ o.cloud = {
 				break;
 
 			case 2:
+				this.size = new horde.Size(128, 96);
 				this.spriteX = 192;
 				this.spriteY = 288;
 				break;
@@ -2599,6 +2600,7 @@ o.cloud = {
 				break;
 				
 			case 4:
+				this.size = new horde.Size(160, 128);
 				this.spriteX = 192;
 				this.spriteY = 416;
 				break;

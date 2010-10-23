@@ -534,7 +534,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 8;
+	var testWave = 49;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1093,9 +1093,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 30000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 30000);
-	w.addObjects(0, "owlbear", 2);
+	w.addObjects(0, "sandworm", 1);
+	w.addObjects(0, "owlbear", 1);
 	w.addObjects(1, "dragon", 1);
-	w.addObjects(2, "owlbear", 2);
+	w.addObjects(2, "sandworm", 1);
+	w.addObjects(2, "owlbear", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -1104,9 +1106,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.addSpawnPoint(0, 15000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 15000);
-	w.addObjects(0, "cyclops", 2);
+	w.addObjects(0, "wizard", 1);
+	w.addObjects(0, "cyclops", 1);
 	w.addObjects(1, "beholder", 1);
-	w.addObjects(2, "cyclops", 2);
+	w.addObjects(2, "wizard", 1);
+	w.addObjects(2, "cyclops", 1);
 	w.nextWaveTime = 120000;
 	this.waves.push(w);
 
@@ -3197,35 +3201,21 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	ctx.font = "Bold 30px Cracked";
 	ctx.textAlign = "center";
 
-	switch (this.tutorialIndex) {
-		case 0:
-			var tip = "Tip 1/7: Use the WASD keys to move the character.";
-			break;
-		case 1:
-			var tip = "Tip 2/7: Throw weapons with the arrow keys.";
-			break;
-		case 2:
-			var tip = "Tip 3/7: Or use the mouse to aim with the target reticle.";
-			break;
-		case 3:
-			var tip = "Tip 4/7: And throw weapons with the left mouse button.";
-			break;
-		case 4:
-			var tip = "Tip 5/7: Press M to toggle muting.";
-			break;
-		case 5:
-			var tip = "Tip 6/7: Press the escape (ESC) key to pause.";
-			break;
-		case 6:
-			var tip = "Tip 7/7: Collect gold and kill monsters to raise your score!";
-			break;
-	}
+	var tips = [
+		"Tip 1/6: Use the WASD keys to move the character.",
+		"Tip 2/6: Throw weapons with the arrow keys.",
+		"Tip 3/6: Or use the mouse to aim with the target reticle.",
+		"Tip 4/6: And throw weapons with the left mouse button.",
+		"Tip 5/6: Press M to toggle muting.",
+		"Tip 6/6: Press the escape (ESC) key to pause.",
+		"Collect gold and kill monsters to raise your score. Have fun!"
+	];
 
 	ctx.fillStyle = "rgb(0, 0, 0)";
-	ctx.fillText(tip, 322, (this.tutorialY + 36));
+	ctx.fillText(tips[this.tutorialIndex], 322, (this.tutorialY + 36));
 
 	ctx.fillStyle = "rgb(230, 230, 230)";
-	ctx.fillText(tip, 320, (this.tutorialY + 34));
+	ctx.fillText(tips[this.tutorialIndex], 320, (this.tutorialY + 34));
 	ctx.restore();
 
 };
