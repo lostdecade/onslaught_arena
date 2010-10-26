@@ -22,9 +22,9 @@ var proto = horde.SpawnPoint.prototype;
  * @param {number} elapsed Elapsed time in milliseconds since last update
  * @return {mixed} Returns an object to spawn if necessary otherwise false
  */
-proto.update = function horde_SpawnPoint_proto_update (elapsed) {
+proto.update = function horde_SpawnPoint_proto_update (elapsed, force) {
 	this.lastSpawnElapsed += elapsed;
-	if (this.lastSpawnElapsed >= this.delay) {
+	if (this.lastSpawnElapsed >= this.delay || force === true) {
 		this.lastSpawnElapsed = 0;
 		if (this.queue.length < 1) {
 			return false;

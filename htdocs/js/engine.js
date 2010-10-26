@@ -534,7 +534,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 49;
+	var testWave = 26;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1497,7 +1497,7 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 			closeGates = false;
 		}
 		// Spawn points can return an object to spawn
-		var o = this.spawnPoints[x].update(elapsed);
+		var o = this.spawnPoints[x].update(elapsed, (this.monstersAlive === 0));
 		if (o !== false) {
 			// We need to spawn an object
 			this.addObject(o);
