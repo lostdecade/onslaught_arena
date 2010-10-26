@@ -1589,8 +1589,8 @@ o.sandworm = {
 				this.attackTimer.update(elapsed);
 				if (this.phaseAttacks < 1 && this.attackTimer.expired()) {
 					this.phaseAttacks++;
-					this.chase(engine.getPlayerObject());
-					//this.setDirection(horde.randomDirection());
+					//this.chase(engine.getPlayerObject());
+					this.setDirection(horde.randomDirection());
 					engine.spawnObject(this, "e_worm_spit");
 					horde.sound.play(this.soundAttacks);
 					this.attackTimer.reset();
