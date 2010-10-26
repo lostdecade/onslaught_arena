@@ -534,7 +534,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 26;
+	var testWave = 11;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -2527,6 +2527,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						if (checkpointHero !== null) {
 							var player = this.getPlayerObject();
 							player.load(checkpointHero);
+							// Start the player at full life but ding him for the amount of wounds he had
+							player.totalDamageTaken += player.wounds;
+							player.wounds = 0;
 						}
 						this.continuing = true;
 						this.showTutorial = false;
