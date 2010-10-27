@@ -2696,6 +2696,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player, v);
 			this.heroFiring = true;
 			this.heroFiringDirection = v;
+			this.nextTutorial(2);
 			this.nextTutorial(4);
 			this.showReticle = true;
 		} else if (shoot.x !== 0 || shoot.y !== 0) {
@@ -3212,8 +3213,10 @@ proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
 proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	ctx.save();
+
 	ctx.globalAlpha = 0.5;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
+
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
@@ -3221,11 +3224,38 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 		38, 38, 564, 404
 	);
 
+	var player = this.getPlayerObject();
+
+	ctx.font = "Bold 30px Cracked";
+	ctx.textAlign = "left";
+
+	ctx.fillStyle = "rgb(237, 28, 36)";
+	ctx.fillText(player.kills, 390, 160);
+
+	ctx.fillStyle = "rgb(145, 102, 0)";
+	ctx.fillText(player.meatEaten, 390, 210);
+
+	ctx.fillStyle = "rgb(199, 234, 251)";
+	ctx.fillText(player.shotsFired, 390, 264);
+
+	ctx.fillStyle = "rgb(250, 166, 26)";
+	ctx.fillText(this.getAccuracy(player) + "%", 390, 320);
+
 	ctx.restore();
 
 };
 
+proto.getAccuracy = function horde_Engine_proto_getAccuracy (player) {
+
+	if (player.shotsFired === 0) return 0;
+
+	return Math.round((player.shotsLanded / player.shotsFired) * 100);
+
+};
+
 proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
+
+	if (this.paused) return;
 
 	ctx.save();
 	ctx.globalAlpha = 0.6;
@@ -3886,22 +3916,11 @@ proto.endGame = function () {
 	this.state = "game_over";
 };
 
-proto.sendScore = function (highScore) {
+proto.sendHighScore = function (highScore) {
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "/onslaught_arena/high_scores");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-
-	/*
-	xhr.onreadystatechange = function () {
-		if (xhr.readyState == 4) {
-			if (xhr.status == 200) {
-				open("/onslaught_arena/high_scores");
-			}
-		}
-	};
-	*/
-
 	xhr.send("high_score=" + highScore);
 
 };
