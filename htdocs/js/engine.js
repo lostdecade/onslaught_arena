@@ -2570,6 +2570,18 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
+	// Want to see all high scores? Click here!
+	if (this.state === "high_scores") {
+		if (this.mouse.isButtonDown(buttons.LEFT)) {
+			if ((mouseV.x > 76) && (mouseV.x < 560)) {
+				if ((mouseV.y > 392) && (mouseV.y < 416)) {
+					open("/onslaught_arena/high_scores");
+					return;
+				}
+			}
+		}
+	}
+
 	if (
 		(this.state === "credits")
 		|| (this.state === "high_scores")
@@ -3874,12 +3886,13 @@ proto.endGame = function () {
 	this.state = "game_over";
 };
 
-proto.sendHighScore = function (highScore) {
+proto.sendScore = function (highScore) {
 
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "/onslaught_arena/high_scores");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 
+	/*
 	xhr.onreadystatechange = function () {
 		if (xhr.readyState == 4) {
 			if (xhr.status == 200) {
@@ -3887,6 +3900,7 @@ proto.sendHighScore = function (highScore) {
 			}
 		}
 	};
+	*/
 
 	xhr.send("high_score=" + highScore);
 
