@@ -2660,7 +2660,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Fire using the targeting reticle
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
-			var v = this.targetReticle.position.clone().subtract(player.position).normalize();
+			var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
 			this.objectAttack(player, v);
 			this.heroFiring = true;
 			this.heroFiringDirection = v;
