@@ -13,6 +13,9 @@ var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
 var TUTORIAL_HEIGHT = 52;
 
+var COLOR_BLACK = "rgb(0, 0, 0)";
+var COLOR_WHITE = "rgb(241, 241, 242)";
+
 /**
  * Creates a new Engine object
  * @constructor
@@ -29,6 +32,7 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
+	this.showHighScores = true;
 	this.konamiEntered = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -1309,10 +1313,6 @@ proto.update = function horde_Engine_proto_update () {
 
 	switch (this.state) {
 
-		case "loading":
-			this.render();
-			break;
-		
 		case "intro":
 			this.updateLogo(elapsed);
 			this.render();
@@ -1325,6 +1325,11 @@ proto.update = function horde_Engine_proto_update () {
 			break;
 
 		case "credits":
+			this.handleInput();
+			this.render();
+			break;
+
+		case "high_scores":
 			this.handleInput();
 			this.render();
 			break;
@@ -1805,8 +1810,8 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 			this.tutorialY = 0;
 			this.tutorialDirection = null;
 
-			if (this.tutorialIndex >= 6) {
-				this.hideTutorialTimer.start(5000);
+			if (this.tutorialIndex >= 4) {
+				this.hideTutorialTimer.start(4000);
 			}
 		}
 	}
@@ -2321,7 +2326,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
 			this.togglePause();
 			this.keyboard.clearKeys();
-			this.nextTutorial(6);
 			return;
 		}
 
@@ -2332,7 +2336,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Toggle sound with "M" for "mute".
 		if (this.keyboard.isKeyPressed(77)) {
 			horde.sound.toggleMuted();
-			this.nextTutorial(5);
 		}
 
 		// Code: lddqd = god mode
@@ -2459,7 +2462,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		usingPointerOptions = true;
 
-		// Konomi code! Hit Points *= 3
+		// Konami code! Hit Points *= 3
 		if (!this.konamiEntered && this.keyboard.historyMatch(horde.Keyboard.konamiCode)) {
 			horde.sound.play("code_entered");
 			this.konamiEntered = true;
@@ -2510,6 +2513,20 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
+		// High scores
+		if (this.showHighScores) {
+			startY += POINTER_HEIGHT;
+			if (
+				(mouseV.x >= startX && mouseV.x <= stopX)
+				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
+			) {
+				if (this.mouse.hasMoved && this.pointerY !== 3) newPointerY = 3;
+				if (this.mouse.isButtonDown(buttons.LEFT)) {
+					this.keyboard.keyStates[keys.SPACE] = true;
+				}
+			}
+		}
+
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 			horde.sound.play("select_pointer");
@@ -2544,6 +2561,9 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				case 2: // Credits
 					this.state = "credits";
 					break;
+				case 3: // High scores
+					this.state = "high_scores";
+					break;
 			}
 
 		}
@@ -2552,7 +2572,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	if (
 		(this.state === "credits")
-		//|| (this.state === "how_to_play")
+		|| (this.state === "high_scores")
 	) {
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
@@ -2822,13 +2842,6 @@ proto.render = function horde_Engine_proto_render () {
 
 	switch (this.state) {
 
-		case "loading":
-			ctx.save();
-			ctx.fillStyle = "rgb(255, 0, 0)";
-			ctx.fillRect(0, 0, this.view.width, this.view.height);
-			ctx.restore();
-			break;
-		
 		// Company Logo
 		case "intro":
 			this.drawLogo(ctx);
@@ -2845,6 +2858,12 @@ proto.render = function horde_Engine_proto_render () {
 		case "credits":
 			this.drawTitle(ctx);
 			this.drawCredits(ctx);
+			break;
+
+		// High Scores
+		case "high_scores":
+			this.drawTitle(ctx);
+			this.drawHighScores(ctx);
 			break;
 
 		case "intro_cinematic":
@@ -2905,7 +2924,7 @@ proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 		b.font = ("Bold " + size + "px Cracked");
 		b.textBaseline = "top";
 		b.lineWidth = 3;
-		b.strokeStyle = "rgb(0, 0, 0)";
+		b.strokeStyle = COLOR_BLACK;
 		b.fillStyle = "rgb(230, 103, 8)";
 
 		var metrics = b.measureText(text);
@@ -2960,7 +2979,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	ctx.save();
 	ctx.globalAlpha = this.gameOverAlpha;
 	if (this.wonGame) {
-		ctx.fillStyle = "rgb(0, 0, 0)";
+		ctx.fillStyle = COLOR_BLACK;
 	} else {
 		ctx.fillStyle = "rgb(215, 25, 32)"; // red
 	}
@@ -3139,7 +3158,7 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 
 	// Clear the screen
 	ctx.save();
-	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
 		
@@ -3205,16 +3224,14 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	ctx.textAlign = "center";
 
 	var tips = [
-		"Tip 1/6: Use the WASD keys to move the character.",
-		"Tip 2/6: Throw weapons with the arrow keys.",
-		"Tip 3/6: Or use the mouse to aim with the target reticle.",
-		"Tip 4/6: And throw weapons with the left mouse button.",
-		"Tip 5/6: Press M to toggle muting.",
-		"Tip 6/6: Press the escape (ESC) key to pause.",
+		"Tip 1/4: Use the WASD keys to move the character.",
+		"Tip 2/4: Throw weapons with the arrow keys.",
+		"Tip 3/4: Or use the mouse to aim with the target reticle.",
+		"Tip 4/4: And throw weapons with the left mouse button.",
 		"Collect gold and kill monsters to raise your score. Have fun!"
 	];
 
-	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillText(tips[this.tutorialIndex], 322, (this.tutorialY + 36));
 
 	ctx.fillStyle = "rgb(230, 230, 230)";
@@ -3312,9 +3329,9 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 		var hpHeight = 8;
 		var width = (hpWidth - Math.round((hpWidth * o.wounds) / o.hitPoints));
 
-		ctx.fillStyle = "rgb(255, 255, 255)";
+		ctx.fillStyle = COLOR_WHITE;
 		ctx.fillRect(-(o.size.width / 2), (o.size.height / 2), o.size.width, hpHeight);
-		ctx.fillStyle = "rgb(0, 0, 0)";
+		ctx.fillStyle = COLOR_BLACK;
 		ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), (o.size.width - 2), (hpHeight - 2));
 		ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
 		ctx.fillRect(-(o.size.width / 2) + 1, ((o.size.height / 2) + 1), width, (hpHeight - 2));
@@ -3419,10 +3436,10 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 	// Outside border
 	ctx.save();
-	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillStyle = COLOR_WHITE;
 	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
 	ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
-	ctx.fillStyle = "rgb(0, 0, 0)";
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
 
 	// The bar itself
@@ -3466,7 +3483,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "right";
-	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillStyle = COLOR_WHITE;
 	ctx.font = "Bold 38px Cracked";
 
 	var totalScore = this.getTotalScore();
@@ -3484,7 +3501,6 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
  */
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
-	var black = "rgb(0, 0, 0)";
 	var grey = "rgb(230, 230, 230)";
 	
 	ctx.drawImage(
@@ -3499,7 +3515,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.font = "Bold 36px Cracked";
 	ctx.textAlign = "center";
 
-	ctx.fillStyle = black;
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillText(highScore, 322, 456);
 
 	ctx.fillStyle = grey;
@@ -3512,7 +3528,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.font = "Bold 14px Monospace";
 	ctx.textAlign = "right";
 
-	ctx.fillStyle = black;
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillText(version, 638, 478);
 
 	ctx.fillStyle = grey;
@@ -3524,7 +3540,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 
-	ctx.fillStyle = black;
+	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillText(copyright, 6, 478);
 
 	ctx.fillStyle = grey;
@@ -3562,9 +3578,9 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 
 	// Continue
 	if (this.canContinue()) {
-		spriteY = ((this.pointerY == 0) ? 630 : 430);
+		spriteY = ((this.pointerY == 0) ? 638 : 430);
 	} else {
-		spriteY = 530;
+		spriteY = 538;
 	}
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
@@ -3573,7 +3589,7 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	);
 
 	// New game
-	spriteY = ((this.pointerY == 1) ? 656 : 456);
+	spriteY = ((this.pointerY == 1) ? 664 : 456);
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		640, spriteY, 132, 26,
@@ -3581,12 +3597,22 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	);
 
 	// Credits
-	spriteY = ((this.pointerY == 2) ? 682 : 482);
+	spriteY = ((this.pointerY == 2) ? 690 : 482);
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		640, spriteY, 90, 22,
 		POINTER_X, (startY + (POINTER_HEIGHT * 2)), 90, 22
 	);
+
+	// High scores
+	if (this.showHighScores) {
+		spriteY = ((this.pointerY == 3) ? 714 : 506);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			640, spriteY, 146, 28,
+			POINTER_X, (startY + (POINTER_HEIGHT * 3)), 146, 28
+		);
+	}
 
 };
 
@@ -3641,12 +3667,15 @@ proto.initOptions = function () {
 
 			if (this.canContinue()) {
 				this.pointerY = 0;
-				this.numPointerOptions = 2;
 				this.pointerOptionsStart = 0;
 			} else {
 				this.pointerY = 1;
-				this.numPointerOptions = 2;
 				this.pointerOptionsStart = 1;
+			}
+			if (this.showHighScores) {
+				this.numPointerOptions = 3;
+			} else {
+				this.numPointerOptions = 2;
 			}
 			break;
 		case "running":
@@ -3660,7 +3689,7 @@ proto.initOptions = function () {
 
 };
 
-proto.drawHowToPlay = function horde_Engine_proto_drawHowToPlay (ctx) {
+proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 	ctx.save();
 	ctx.globalAlpha = 0.5;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
@@ -3796,7 +3825,7 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	
 	// Debugging info
 	ctx.save();
-	ctx.fillStyle = "rgb(255, 255, 255)";
+	ctx.fillStyle = COLOR_WHITE;
 	ctx.font = "Bold 20px Monospace";
 	ctx.fillText("Elapsed: " + this.lastElapsed, 10, 20);
 	ctx.textAlign = "right";
