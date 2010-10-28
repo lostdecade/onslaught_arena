@@ -32,7 +32,6 @@ horde.Engine = function horde_Engine () {
 	this.view = new horde.Size(SCREEN_WIDTH, SCREEN_HEIGHT);
 	this.images = null;
 	this.debug = false; // Debugging toggle
-	this.showHighScores = true;
 	this.konamiEntered = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -1753,11 +1752,18 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 			this.newHighScore = totalScore;
 		}
 
-		if (this.debug || (location.hostname == "play.lostdecadegames.com")) {
+		if (this.debug || this.showHighScores()) {
 			this.sendHighScore(totalScore);
 		}
 	}
 
+};
+
+proto.showHighScores = function horde_Engine_proto_showHighScores () {
+	return (
+		(location.hostname == "play.lostdecadegames.com")
+		|| (Number(location.port) > 9000) // It's over NINE THOUSAAAANDDDDD!!
+	);
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
@@ -2514,7 +2520,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// High scores
-		if (this.showHighScores) {
+		if (this.showHighScores()) {
 			startY += POINTER_HEIGHT;
 			if (
 				(mouseV.x >= startX && mouseV.x <= stopX)
@@ -3622,7 +3628,7 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	if (this.canContinue()) {
 		spriteY = ((this.pointerY == 0) ? 638 : 430);
 	} else {
-		spriteY = 538;
+		spriteY = 534;
 	}
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
@@ -3647,7 +3653,7 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	);
 
 	// High scores
-	if (this.showHighScores) {
+	if (this.showHighScores()) {
 		spriteY = ((this.pointerY == 3) ? 714 : 506);
 		ctx.drawImage(
 			this.preloader.getImage("ui"),
@@ -3714,7 +3720,7 @@ proto.initOptions = function () {
 				this.pointerY = 1;
 				this.pointerOptionsStart = 1;
 			}
-			if (this.showHighScores) {
+			if (this.showHighScores()) {
 				this.numPointerOptions = 3;
 			} else {
 				this.numPointerOptions = 2;
