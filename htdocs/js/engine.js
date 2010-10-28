@@ -3751,11 +3751,12 @@ proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 	try {
 		var scores = JSON.parse(window.onslaughtScores);
 	} catch (e) {
+		var scores = null;
 	}
 
 	ctx.font = "Bold 40px Cracked";
 
-	if (scores) {
+	if (scores && scores.length) {
 		var height = 50;
 
 		for (var i = 0, l = scores.length; i < l; ++i) {
