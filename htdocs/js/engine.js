@@ -3340,7 +3340,6 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	}
 
 	if (o.role === "powerup_weapon") {
-		ctx.fillStyle = "rgb(255, 0, 255)";
 		// Draw a scroll behind the weapon
 		ctx.drawImage(
 			this.images.getImage("objects"),
@@ -3741,12 +3740,42 @@ proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 	ctx.save();
 	ctx.globalAlpha = 0.5;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
+
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		0, 910, 564, 404,
 		38, 38, 564, 404
 	);
+
+	try {
+		var scores = JSON.parse(window.onslaughtScores);
+	} catch (e) {
+	}
+
+	ctx.font = "Bold 40px Cracked";
+
+	if (scores) {
+		var height = 50;
+
+		for (var i = 0, l = scores.length; i < l; ++i) {
+			var score = scores[i];
+			var name = ((i+1) + ".   " + score.name);
+
+			ctx.fillStyle = COLOR_WHITE;
+			ctx.textAlign = "left";
+			ctx.fillText(name, 100, (160 + (i * height)));
+
+			ctx.fillStyle = "rgb(255, 203, 5)";
+			ctx.textAlign = "right";
+			ctx.fillText(score.value, 500, (160 + (i * height)));
+		}
+	} else {
+		ctx.fillStyle = COLOR_WHITE;
+		ctx.textAlign = "center";
+		ctx.fillText("None yet. Submit yours!", 320, 240);
+	}
+
 	ctx.restore();
 };
 
@@ -3772,7 +3801,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 				this.introFadeOutBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
 				this.introFadeAlpha = 0;
 			}
-			ctx.fillStyle = "rgb(0,0,0)";
+			ctx.fillStyle = COLOR_BLACK;
 			ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 			ctx.save();
 			ctx.fillStyle = "rgb(0, 0, 255)";
@@ -3782,7 +3811,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			if (this.introFadeAlpha > 0) {
 				ctx.save();
 				ctx.globalAlpha = this.introFadeAlpha;
-				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillStyle = COLOR_BLACK;
 				ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 				ctx.restore();
 			}
@@ -3795,7 +3824,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			if (this.introFadeAlpha > 0) {
 				ctx.save();
 				ctx.globalAlpha = this.introFadeAlpha;
-				ctx.fillStyle = "rgb(0,0,0)";
+				ctx.fillStyle = COLOR_BLACK;
 				ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 				ctx.restore();
 			}
