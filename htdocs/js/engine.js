@@ -2698,13 +2698,24 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		// Fire using the targeting reticle
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
-			var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
-			this.objectAttack(player, v);
-			this.heroFiring = true;
-			this.heroFiringDirection = v;
-			this.nextTutorial(2);
-			this.nextTutorial(4);
-			this.showReticle = true;
+
+			// Toggle mute?
+			if (
+				((mouseV.x >= 380) && (mouseV.x <= 380+96))
+				&& ((mouseV.y >= 416) && (mouseV.y <= 416+58))
+			) {
+				horde.sound.toggleMuted();
+				this.mouse.clearButtons();
+			} else {
+				var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
+				this.objectAttack(player, v);
+				this.heroFiring = true;
+				this.heroFiringDirection = v;
+				this.nextTutorial(2);
+				this.nextTutorial(4);
+				this.showReticle = true;
+			}
+
 		} else if (shoot.x !== 0 || shoot.y !== 0) {
 			this.objectAttack(player, shoot);
 			this.heroFiring = true;
@@ -3511,6 +3522,13 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		spriteX, 64, 42, 42, 18, 424, 42, 42
+	);
+
+	// Mute button
+	ctx.drawImage(
+		this.images.getImage("objects"),
+		(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
+		380, 416, 96, 58
 	);
 	
 	// Draw gold coin
