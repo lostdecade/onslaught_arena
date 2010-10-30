@@ -74,20 +74,52 @@ o.h_spear = {
 o.h_fireball = {
 	name: "Fireball",
 	role: "projectile",
-	cooldown: 600,
-	speed: 100,
-	rotateSpeed: 250,
+	cooldown: 1000,
+	speed: 250,
+	rotateSpeed: 300,
+	hitPoints: 1,
+	damage: 10,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 0,
+	rotate: true,
+	soundAttacks: "fire_attack",
+	priority: 3,
+	bounce: false,
+	pierce: true,
+	damageType: "magic",
+	
+	onInit: function () {
+		this.trailTimer = new horde.Timer();
+		this.trailTimer.start(75);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.trailTimer.update(elapsed);
+		if (this.trailTimer.expired()) {
+			engine.spawnObject(this, "h_fireball_trail");
+			this.trailTimer.reset();
+		}
+	}
+	
+};
+
+o.h_fireball_trail = {
+	name: "Fireball",
+	role: "projectile",
+	speed: 0,
+	rotateSpeed: 150,
 	hitPoints: 1,
 	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
 	rotate: true,
-	soundAttacks: "fire_attack",
-	ttl: 3000,
+	ttl: 1500,
 	priority: 3,
 	bounce: false,
-	damageType: "magic"
+	damageType: "magic",
+	drawIndex: 0
 };
 
 o.h_bomb = {
