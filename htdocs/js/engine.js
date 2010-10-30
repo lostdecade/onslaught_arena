@@ -1934,9 +1934,11 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			if (tile !== false) {
 				axis.push("x");
 				collisionX = true;
-				if (object.direction.x > 0) { // moving right
+				var objCenterX = (object.position.x + (object.size.width / 2));
+				var tileCenterX = ((tile.x * this.tileSize.width) + (this.tileSize.width / 2));
+				if (objCenterX < tileCenterX) {
 					object.position.x = tile.x * this.tileSize.width - object.size.width;
-				} else { // moving left
+				} else {
 					object.position.x = tile.x * this.tileSize.width + this.tileSize.width;
 				}
 			}
@@ -1952,9 +1954,11 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			if (tile !== false) {
 				axis.push("y");
 				collisionY = true;
-				if (object.direction.y > 0) { // moving down
+				var objCenterY = (object.position.y + (object.size.height / 2));
+				var tileCenterY = ((tile.y * this.tileSize.height) + (this.tileSize.height / 2));
+				if (objCenterY < tileCenterY) {
 					object.position.y = tile.y * this.tileSize.height - object.size.height;
-				} else { // moving up
+				} else {
 					object.position.y = tile.y * this.tileSize.height + this.tileSize.height;
 				}
 			}
