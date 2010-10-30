@@ -237,7 +237,7 @@ o.h_fire_knife = {
 	cooldown: 200,
 	speed: 350,
 	hitPoints: 1,
-	damage: 5,
+	damage: 10,
 	spriteSheet: "objects",
 	spriteX: 128,
 	spriteY: 0,
