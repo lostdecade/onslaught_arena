@@ -1971,6 +1971,7 @@ o.beholder = {
 	spriteSheet: "beholder",
 	animated: true,
 	animDelay: 350,
+	drawIndex: 3,
 	
 	damage: 30,
 	hitPoints: 2500,
@@ -2051,6 +2052,7 @@ o.beholder = {
 
 			case 3:
 				if (!this.phaseInit) {
+					this.phaseTimer.start(20000);
 					this.phaseInit = true;
 				}
 				var hasEyelets = false;
@@ -2060,13 +2062,57 @@ o.beholder = {
 						break;
 					}
 				}
-				if (!hasEyelets) {
-					this.setPhase(2);
+				if (this.phaseTimer.expired() || !hasEyelets) {
+					this.nextPhase();
 				}
 				movementTypes.wander.apply(this, arguments);
 				break;
+				
+			case 4:
+				for (var n = 0; n < 2; ++n) {
+					engine.spawnObject(this, "gas_cloud");
+				}
+				this.setPhase(2);
+				break;
 			
 		}	
+	}
+	
+};
+
+o.gas_cloud = {
+	role: "trap",
+	team: 1,
+	
+	animated: true,
+	size: new horde.Size(128, 128),
+	spriteSheet: "characters",
+	spriteX: 640,
+	spriteY: 416,
+	drawIndex: 2,
+	animDelay: 400,
+	
+	damage: 20,
+	hitPoints: 9999,
+	speed: 10,
+	ttl: 120000,
+	
+	onInit: function () {
+		this.setDirection(horde.randomDirection());
+		this.moveChangeDelay = horde.randomRange(5000, 10000);
+	},
+	
+	onUpdate: function (elasped, engine) {
+		if (!engine.objects[this.ownerId] && (this.ttl - this.ttlElapsed > 2000)) {
+			this.ttlElapsed = (this.ttl - 2000);
+		}
+		movementTypes.wander.apply(this, arguments);
+	},
+	
+	onObjectCollide: function (object, engine) {
+		if (object.team !== this.team && object.role !== "projectile") {
+			object.addState(horde.Object.states.SLOWED, 300);
+		}
 	}
 	
 };

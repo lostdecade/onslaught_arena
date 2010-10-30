@@ -411,6 +411,12 @@ proto.boundingBox = function horde_Object_proto_boundingBox () {
 		rect.height -= (this.size.height / 2);
 		rect.width -= 10;
 	}
+	if (this.type === "gas_cloud") {
+		rect.y += 32;
+		rect.x += 32;
+		rect.height -= 32;
+		rect.width -= 32;
+	}
 	return rect;
 };
 
