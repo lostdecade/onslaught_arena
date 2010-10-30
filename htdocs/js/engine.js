@@ -2808,15 +2808,23 @@ proto.objectAttack = function (object, v) {
 
 		case "h_fireball":
 			var h = v.heading();
-			var span = (Math.PI / 2.5);
-			for (var x = (h - span); x < (h + span); x += 0.25) {
-				this.spawnObject(
-					object, 
-					weaponType,
-					horde.Vector2.fromHeading(x)
-				);
-				object.shotsFired += 1;
-			}
+
+			var vh = horde.Vector2.fromHeading(h);
+
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(horde.Vector2.fromHeading(h - (Math.PI / 2)).scale(16));
+			o.position.add(vh.clone().scale(32));
+			
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(vh.clone().scale(32));
+			
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(horde.Vector2.fromHeading(h + (Math.PI / 2)).scale(16));
+			o.position.add(vh.clone().scale(32));
+
 			break;
 
 		case "e_ring_fire":
