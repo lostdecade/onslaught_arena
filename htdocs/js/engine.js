@@ -2734,17 +2734,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player);
 		}
 		
-		/*
-		// Cycle weapons (Z)
-		if (this.keyboard.isKeyPressed(90)) {
-			player.cycleWeapon();
-		}
-		// X
-		if (this.keyboard.isKeyPressed(88)) {
-			player.cycleWeapon(true);
-		}
-		*/
-		
 		this.keyboard.storeKeyStates();
 	}
 
@@ -2790,7 +2779,6 @@ proto.objectAttack = function (object, v) {
 			break;
 
 		// Spread fire shotgun style
-		case "h_fireball":
 		case "e_fireball_green":
 			for (var x = -0.25; x <= 0.25; x += 0.25) {
 				var h = v.heading();
@@ -2802,6 +2790,19 @@ proto.objectAttack = function (object, v) {
 				);
 			}
 			object.shotsFired += 3;
+			break;
+
+		case "h_fireball":
+			var h = v.heading();
+			var span = (Math.PI / 2.5);
+			for (var x = (h - span); x < (h + span); x += 0.25) {
+				this.spawnObject(
+					object, 
+					weaponType,
+					horde.Vector2.fromHeading(x)
+				);
+				object.shotsFired += 1;
+			}
 			break;
 
 		case "e_ring_fire":

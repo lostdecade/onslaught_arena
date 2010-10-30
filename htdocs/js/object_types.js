@@ -74,16 +74,17 @@ o.h_spear = {
 o.h_fireball = {
 	name: "Fireball",
 	role: "projectile",
-	cooldown: 75,
-	speed: 400,
+	cooldown: 600,
+	speed: 100,
+	rotateSpeed: 250,
 	hitPoints: 1,
-	damage: 2,
+	damage: 5,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
 	rotate: true,
 	soundAttacks: "fire_attack",
-	ttl: 350,
+	ttl: 3000,
 	priority: 3,
 	bounce: false,
 	damageType: "magic"
@@ -2721,7 +2722,7 @@ o.item_weapon_knife = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_knife",
-	wepCount: 100
+	wepCount: 150
 };
 
 o.item_weapon_spear = {
@@ -2743,7 +2744,7 @@ o.item_weapon_fireball = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fireball",
-	wepCount: 100
+	wepCount: 150
 };
 
 o.item_weapon_bomb = {
