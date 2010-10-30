@@ -6,12 +6,14 @@ var GATE_CUTOFF_Y = 64;
 var HIGH_SCORE_KEY = "high_score";
 var DEFAULT_HIGH_SCORE = 1000;
 var NUM_GATES = 3;
+var OVERLAY_ALPHA = 0.7;
 var POINTER_X = 270;
 var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
 var TUTORIAL_HEIGHT = 70;
+var TUTORIAL_NUM_TIPS = 4;
 
 var COLOR_BLACK = "rgb(0, 0, 0)";
 var COLOR_WHITE = "rgb(241, 241, 242)";
@@ -431,7 +433,7 @@ proto.initGame = function () {
 	this.showReticle = false;
 	this.hideReticleTimer = null;
 
-	this.showTutorial = true;
+	this.showTutorial = false;
 	this.tutorialIndex = 0;
 	this.tutorialY = -TUTORIAL_HEIGHT;
 	this.tutorialDirection = "down";
@@ -1817,7 +1819,7 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 			this.tutorialY = 0;
 			this.tutorialDirection = null;
 
-			if (this.tutorialIndex >= 4) {
+			if (this.tutorialIndex >= TUTORIAL_NUM_TIPS) {
 				this.hideTutorialTimer.start(4000);
 			}
 		}
@@ -1829,7 +1831,7 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 			this.tutorialY = -TUTORIAL_HEIGHT;
 			this.tutorialDirection = "down";
 			this.tutorialIndex += 1;
-			if (this.tutorialDirection >= 7) {
+			if (this.tutorialIndex > TUTORIAL_NUM_TIPS) {
 				this.showTutorial = false;
 			}
 		}
@@ -2739,8 +2741,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.objectAttack(player, v);
 				this.heroFiring = true;
 				this.heroFiringDirection = v;
-				this.nextTutorial(2);
-				this.nextTutorial(4);
+				if (this.tutorialIndex < 3) {
+					this.tutorialIndex = 3;
+					this.nextTutorial(4);
+				}
 				this.showReticle = true;
 			}
 
@@ -2818,6 +2822,24 @@ proto.objectAttack = function (object, v) {
 			break;
 
 		case "h_fireball":
+			var h = v.heading();
+			var vh = horde.Vector2.fromHeading(h);
+
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(horde.Vector2.fromHeading(h - (Math.PI / 2)).scale(16));
+			o.position.add(vh.clone().scale(16));
+
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(vh.clone().scale(32));
+
+			var id = this.spawnObject(object, weaponType, vh.clone());
+			var o = this.objects[id];
+			o.position.add(horde.Vector2.fromHeading(h + (Math.PI / 2)).scale(16));
+			o.position.add(vh.clone().scale(16));
+
+		/*
 			var rv = this.targetReticle.position.clone();
 			var len = (Math.PI * 2);
 			var step = (len / 20);
@@ -2830,6 +2852,7 @@ proto.objectAttack = function (object, v) {
 				o.team = object.team;
 				this.addObject(o);
 			}
+			*/
 			break;
 
 		case "e_ring_fire":
@@ -3263,7 +3286,7 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	ctx.save();
 
-	ctx.globalAlpha = 0.5;
+	ctx.globalAlpha = OVERLAY_ALPHA;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 
 	ctx.globalAlpha = 1;
@@ -3307,7 +3330,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	if (this.paused) return;
 
 	ctx.save();
-	ctx.globalAlpha = 0.6;
+	ctx.globalAlpha = OVERLAY_ALPHA;
 	ctx.fillRect(0, this.tutorialY, this.view.width, TUTORIAL_HEIGHT);
 
 	ctx.globalAlpha = 1;
@@ -3457,7 +3480,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	if (!this.showReticle) return;
 
 	ctx.save();
-	ctx.globalAlpha = 0.50;
+	ctx.globalAlpha = 0.5;
 	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
@@ -3796,7 +3819,7 @@ proto.initOptions = function () {
 
 proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 	ctx.save();
-	ctx.globalAlpha = 0.5;
+	ctx.globalAlpha = OVERLAY_ALPHA;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 
 	ctx.globalAlpha = 1;
@@ -3840,7 +3863,7 @@ proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 
 proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 	ctx.save();
-	ctx.globalAlpha = 0.5;
+	ctx.globalAlpha = OVERLAY_ALPHA;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.globalAlpha = 1;
 	ctx.drawImage(
