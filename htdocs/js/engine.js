@@ -379,12 +379,13 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		// Boss 4/5: Beholder
 		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		s.create("beholder_damage", "sound/effects/beholder_damage", false, 25);
+		s.create("beholder_dies", "sound/effects/beholder_dies", false, 25);
+
 		// Add: Eyelet
 		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		s.create("eyelet_damage", "sound/effects/eyelet_damage", false, 25);
+		s.create("eyelet_dies", "sound/effects/eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
 		// Attack: TODO
@@ -536,11 +537,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
-	var testWave = 11;
+	var testWave = 40;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	/*
 	// Test Wave
@@ -2373,6 +2372,18 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
+		// Code: awesm = Infinite fire knives
+		if (this.keyboard.historyMatch(horde.Keyboard.awesmCode)) {
+			this.keyboard.clearHistory();
+			var p = this.getPlayerObject();
+			p.cheater = true;
+			p.weapons = [{
+				type: "h_fire_knife",
+				count: null
+			}];
+			horde.sound.play("code_entered");
+		}
+
 		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
@@ -2734,17 +2745,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.objectAttack(player);
 		}
 		
-		/*
-		// Cycle weapons (Z)
-		if (this.keyboard.isKeyPressed(90)) {
-			player.cycleWeapon();
-		}
-		// X
-		if (this.keyboard.isKeyPressed(88)) {
-			player.cycleWeapon(true);
-		}
-		*/
-		
 		this.keyboard.storeKeyStates();
 	}
 
@@ -2779,6 +2779,7 @@ proto.objectAttack = function (object, v) {
 		
 		// Shoot 2 knives in a spread pattern
 		case "h_knife":
+		case "h_fire_knife":
 			var h = v.heading();
 			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
 				h - 0.1
@@ -2790,7 +2791,6 @@ proto.objectAttack = function (object, v) {
 			break;
 
 		// Spread fire shotgun style
-		case "h_fireball":
 		case "e_fireball_green":
 			for (var x = -0.25; x <= 0.25; x += 0.25) {
 				var h = v.heading();
@@ -2802,6 +2802,19 @@ proto.objectAttack = function (object, v) {
 				);
 			}
 			object.shotsFired += 3;
+			break;
+
+		case "h_fireball":
+			var h = v.heading();
+			var span = (Math.PI / 2.5);
+			for (var x = (h - span); x < (h + span); x += 0.25) {
+				this.spawnObject(
+					object, 
+					weaponType,
+					horde.Vector2.fromHeading(x)
+				);
+				object.shotsFired += 1;
+			}
 			break;
 
 		case "e_ring_fire":
