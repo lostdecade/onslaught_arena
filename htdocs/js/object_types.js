@@ -264,6 +264,25 @@ o.h_fire_knife = {
 	
 };
 
+o.h_firebomb = {
+	name: "Firebomb",
+	role: "projectile",
+	cooldown: 500,
+	speed: 150,
+	rotateSpeed: 300,
+	hitPoints: 1,
+	damage: 2,
+	spriteSheet: "objects",
+	spriteX: 192,
+	spriteY: 0,
+	rotate: true,
+	ttl: 550,
+	soundAttacks: "fire_attack",
+	priority: 3,
+	bounce: false,
+	damageType: "magic"
+};
+
 // ENEMIES
 
 var movementTypes = {

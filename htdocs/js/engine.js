@@ -539,11 +539,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
-	var testWave = 40;
+	var testWave = 8;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	/*
 	// Test Wave
@@ -2392,6 +2390,18 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
+		// Code: ldbomb = Infinite firebombs
+		if (this.keyboard.historyMatch(horde.Keyboard.bombCode)) {
+			this.keyboard.clearHistory();
+			var p = this.getPlayerObject();
+			p.cheater = true;
+			p.weapons = [{
+				type: "h_firebomb",
+				count: null
+			}];
+			horde.sound.play("code_entered");
+		}
+
 		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
@@ -2838,6 +2848,22 @@ proto.objectAttack = function (object, v) {
 			var o = this.objects[id];
 			o.position.add(horde.Vector2.fromHeading(h + (Math.PI / 2)).scale(16));
 			o.position.add(vh.clone().scale(16));
+			break;
+
+		case "h_firebomb":
+			var rv = this.targetReticle.position.clone();
+			var len = (Math.PI * 2);
+			var step = (len / 20);
+
+			for (var h = 0; h < len; h += step) {
+				var o = horde.makeObject("h_fireball");
+				o.position.x = rv.x - 16;
+				o.position.y = rv.y - 16;
+				o.setDirection(horde.Vector2.fromHeading(h));
+				o.ownerId = object.id;
+				o.team = object.team;
+				this.addObject(o);
+			}
 			break;
 
 		case "e_ring_fire":

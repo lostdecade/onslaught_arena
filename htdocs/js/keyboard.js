@@ -28,6 +28,7 @@ var Keys = {
 	K: 75,
 	L: 76,
 	M: 77,
+	O: 79,
 	P: 80,
 	Q: 81,
 	R: 82,
@@ -95,6 +96,15 @@ Keyboard.awesmCode = [
 	Keys.E,
 	Keys.S,
 	Keys.M
+];
+
+Keyboard.bombCode = [
+	Keys.L,
+	Keys.D,
+	Keys.B,
+	Keys.O,
+	Keys.M,
+	Keys.B
 ];
 
 proto.supressKeys = function (e) {

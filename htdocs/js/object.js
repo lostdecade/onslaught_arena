@@ -435,7 +435,11 @@ proto.centerOn = function horde_Object_proto_centerOn (v) {
  * @return {boolean} True if the object has died; otherwise false
  */
 proto.wound = function horde_Object_proto_wound (damage) {
-	if (damage < 1) {
+	if (
+		(damage < 1)
+		|| this.hasState(horde.Object.states.DYING)
+		|| this.isDead()
+	) {
 		return false;
 	}
 	this.removeState(horde.Object.states.STUNNED);
