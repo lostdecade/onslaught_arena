@@ -86,7 +86,7 @@ o.h_fireball = {
 	soundAttacks: "fire_attack",
 	priority: 3,
 	bounce: false,
-	pierce: true,
+	piercing: true,
 	damageType: "magic",
 	
 	onInit: function () {
