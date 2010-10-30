@@ -89,6 +89,14 @@ Keyboard.allWeaponsCode = [
 	Keys.A
 ];
 
+Keyboard.awesmCode = [
+	Keys.A,
+	Keys.W,
+	Keys.E,
+	Keys.S,
+	Keys.M
+];
+
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.

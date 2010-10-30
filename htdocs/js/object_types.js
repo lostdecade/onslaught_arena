@@ -122,6 +122,7 @@ o.h_fireball_trail = {
 	drawIndex: 0
 };
 
+/*
 o.h_bomb = {
 	name: "Bomb",
 	role: "projectile",
@@ -163,21 +164,22 @@ o.bomb_smoke = {
 	}
 	
 };
+*/
 
 o.h_axe = {
 	name: "Battle Axe",
 	role: "projectile",
 	cooldown: 500,
-	speed: 350,
+	speed: 225,
 	hitPoints: 1,
-	damage: 20,
+	damage: 25,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
-	rotateSpeed: 500,
+	rotateSpeed: 700,
 	priority: 5,
-	ttl: 3500
+	ttl: 4000
 };
 
 o.h_fire_sword = {
@@ -226,6 +228,39 @@ o.fire_sword_trail = {
 	bounce: false,
 	drawIndex: 0,
 	damageType: "magic"
+};
+
+o.h_fire_knife = {
+	name: "Flame Knife",
+	role: "projectile",
+	size: new horde.Size(32, 30),
+	cooldown: 200,
+	speed: 350,
+	hitPoints: 1,
+	damage: 5,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 0,
+	priority: 6,
+	bounce: false,
+	spriteAlign: true,
+	piercing: true,
+	soundAttacks: "fire_attack",
+	damageType: "magic",
+	
+	onInit: function () {
+		this.spawnTimer = new horde.Timer();
+		this.spawnTimer.start(50);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.spawnTimer.update(elapsed);
+		if (this.spawnTimer.expired()) {
+			engine.spawnObject(this, "fire_sword_trail");
+			this.spawnTimer.reset();
+		}
+	}
+	
 };
 
 // ENEMIES
@@ -1133,7 +1168,7 @@ o.gel = {
 		// AND there aren't any on the screen
 		if (
 			!player.hasWeapon("h_fireball")
-			&& !player.hasWeapon("h_fire_sword") 
+			&& !player.hasWeapon("h_fire_sword")
 			&& engine.getObjectCountByType("item_weapon_fireball") === 0
 		) {
 			engine.dropObject(this, "item_weapon_fireball");
@@ -2009,6 +2044,10 @@ o.beholder = {
 	damage: 30,
 	hitPoints: 2500,
 	speed: 50,
+
+	//soundAttacks: "_attacks",
+	soundDamage: "beholder_damage",
+	soundDies: "beholder_dies",
 	
 	collidable: false,
 	
@@ -2754,7 +2793,7 @@ o.item_weapon_knife = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_knife",
-	wepCount: 150
+	wepCount: 125
 };
 
 o.item_weapon_spear = {
@@ -2779,6 +2818,7 @@ o.item_weapon_fireball = {
 	wepCount: 150
 };
 
+/*
 o.item_weapon_bomb = {
 	role: "powerup_weapon",
 	speed: 0,
@@ -2789,6 +2829,7 @@ o.item_weapon_bomb = {
 	wepType: "h_bomb",
 	wepCount: 10
 };
+*/
 
 o.item_weapon_axe = {
 	role: "powerup_weapon",
@@ -2809,6 +2850,17 @@ o.item_weapon_fire_sword = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fire_sword",
+	wepCount: 1000
+};
+
+o.item_weapon_fire_knife = {
+	role: "powerup_weapon",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 384,
+	spriteY: 0,
+	ttl: 5000,
+	wepType: "h_fire_knife",
 	wepCount: 1000
 };
 

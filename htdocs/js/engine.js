@@ -379,12 +379,13 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		// Boss 4/5: Beholder
 		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		s.create("beholder_damage", "sound/effects/beholder_damage", false, 25);
+		s.create("beholder_dies", "sound/effects/beholder_dies", false, 25);
+
 		// Add: Eyelet
 		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		s.create("eyelet_damage", "sound/effects/eyelet_damage", false, 25);
+		s.create("eyelet_dies", "sound/effects/eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
 		// Attack: TODO
@@ -536,11 +537,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
-	var testWave = 11;
+	var testWave = 40;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	/*
 	// Test Wave
@@ -2373,6 +2372,18 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			horde.sound.play("code_entered");
 		}
 
+		// Code: awesm = Infinite fire knives
+		if (this.keyboard.historyMatch(horde.Keyboard.awesmCode)) {
+			this.keyboard.clearHistory();
+			var p = this.getPlayerObject();
+			p.cheater = true;
+			p.weapons = [{
+				type: "h_fire_knife",
+				count: null
+			}];
+			horde.sound.play("code_entered");
+		}
+
 		// Code: lddebug = toggle debug
 		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
 			this.keyboard.clearHistory();
@@ -2768,6 +2779,7 @@ proto.objectAttack = function (object, v) {
 		
 		// Shoot 2 knives in a spread pattern
 		case "h_knife":
+		case "h_fire_knife":
 			var h = v.heading();
 			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
 				h - 0.1
@@ -3300,7 +3312,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 		"Tip 2/4: Throw weapons with the arrow keys.",
 		"Tip 3/4: Or use the mouse to aim with the target reticle.",
 		"Tip 4/4: And throw weapons with the left mouse button.",
-		"Collect gold and kill monsters to raise your score. Have fun!"
+		"Kill monsters and collect gold to raise your score!"
 	];
 
 	ctx.fillStyle = COLOR_BLACK;
