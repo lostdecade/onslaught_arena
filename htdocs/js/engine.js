@@ -539,9 +539,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
+	/*
 	var testWave = 8;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	/*
 	// Test Wave
@@ -3309,20 +3311,20 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	var player = this.getPlayerObject();
 
-	ctx.font = "Bold 30px Cracked";
+	ctx.font = "Bold 36px Cracked";
 	ctx.textAlign = "left";
 
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText(player.kills, 390, 160);
+	ctx.fillText(player.kills, 390, 164);
 
 	ctx.fillStyle = "rgb(145, 102, 0)";
-	ctx.fillText(player.meatEaten, 390, 210);
+	ctx.fillText(player.meatEaten, 390, 216);
 
 	ctx.fillStyle = "rgb(199, 234, 251)";
-	ctx.fillText(player.shotsFired, 390, 264);
+	ctx.fillText(player.shotsFired, 390, 270);
 
 	ctx.fillStyle = "rgb(250, 166, 26)";
-	ctx.fillText(this.getAccuracy(player) + "%", 390, 320);
+	ctx.fillText(this.getAccuracy(player) + "%", 390, 324);
 
 	ctx.restore();
 
