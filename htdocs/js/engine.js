@@ -3291,7 +3291,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 		"Tip 2/4: Throw weapons with the arrow keys.",
 		"Tip 3/4: Or use the mouse to aim with the target reticle.",
 		"Tip 4/4: And throw weapons with the left mouse button.",
-		"Collect gold and kill monsters to raise your score. Have fun!"
+		"Kill monsters and collect gold to raise your score!"
 	];
 
 	ctx.fillStyle = COLOR_BLACK;

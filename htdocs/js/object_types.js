@@ -89,6 +89,7 @@ o.h_fireball = {
 	damageType: "magic"
 };
 
+/*
 o.h_bomb = {
 	name: "Bomb",
 	role: "projectile",
@@ -130,21 +131,22 @@ o.bomb_smoke = {
 	}
 	
 };
+*/
 
 o.h_axe = {
 	name: "Battle Axe",
 	role: "projectile",
 	cooldown: 500,
-	speed: 350,
+	speed: 225,
 	hitPoints: 1,
-	damage: 20,
+	damage: 25,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
-	rotateSpeed: 500,
+	rotateSpeed: 700,
 	priority: 5,
-	ttl: 3500
+	ttl: 4000
 };
 
 o.h_fire_sword = {
@@ -2721,7 +2723,7 @@ o.item_weapon_knife = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_knife",
-	wepCount: 100
+	wepCount: 125
 };
 
 o.item_weapon_spear = {
@@ -2743,9 +2745,10 @@ o.item_weapon_fireball = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fireball",
-	wepCount: 100
+	wepCount: 150
 };
 
+/*
 o.item_weapon_bomb = {
 	role: "powerup_weapon",
 	speed: 0,
@@ -2756,6 +2759,7 @@ o.item_weapon_bomb = {
 	wepType: "h_bomb",
 	wepCount: 10
 };
+*/
 
 o.item_weapon_axe = {
 	role: "powerup_weapon",
