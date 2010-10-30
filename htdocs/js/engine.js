@@ -11,7 +11,7 @@ var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
-var TUTORIAL_HEIGHT = 52;
+var TUTORIAL_HEIGHT = 70;
 
 var COLOR_BLACK = "rgb(0, 0, 0)";
 var COLOR_WHITE = "rgb(241, 241, 242)";
@@ -2335,9 +2335,13 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	if (this.state == "running") {
 		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
-			this.togglePause();
-			this.keyboard.clearKeys();
-			return;
+			if (this.showTutorial) {
+				this.showTutorial = false;
+			} else {
+				this.togglePause();
+				this.keyboard.clearKeys();
+				return;
+			}
 		}
 
 		if (this.paused) {
@@ -2716,14 +2720,21 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Fire using the targeting reticle
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 
-			// Toggle mute?
+			// Where did the click take place?
 			if (
+				this.showTutorial
+				&& (mouseV.y <= (TUTORIAL_HEIGHT + this.tutorialY))
+			) {
+				this.showTutorial = false;
+			} else if (
 				((mouseV.x >= 380) && (mouseV.x <= 380+96))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 416+58))
 			) {
+				// Toggle mute
 				horde.sound.toggleMuted();
 				this.mouse.clearButtons();
 			} else {
+				// Anywhere else: ATTACK!
 				var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
 				this.objectAttack(player, v);
 				this.heroFiring = true;
@@ -3316,6 +3327,14 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 
 	ctx.fillStyle = "rgb(230, 230, 230)";
 	ctx.fillText(tips[this.tutorialIndex], 320, (this.tutorialY + 34));
+
+	ctx.font = "20px Cracked";
+
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText("press here or ESC to skip", 322, (this.tutorialY + 62));
+
+	ctx.fillStyle = "rgb(118, 151, 183)";
+	ctx.fillText("press here or ESC to skip", 320, (this.tutorialY + 60));
 	ctx.restore();
 
 };
@@ -3844,8 +3863,6 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			ctx.fillStyle = COLOR_BLACK;
 			ctx.fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 			ctx.save();
-			ctx.fillStyle = "rgb(0, 0, 255)";
-			ctx.fillRect(0, 0, this.view.width, this.view.height);
 			ctx.putImageData(this.introFadeOutBg, 0, 0);
 			ctx.restore();
 			if (this.introFadeAlpha > 0) {
