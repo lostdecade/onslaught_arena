@@ -642,6 +642,7 @@ o.huge_skull = {
 	],
 	
 	onInit: function () {
+		this.phaseTimer = new horde.Timer();
 		switch (horde.randomRange(1, 2)) {
 			case 1:
 				this.speed *= 0.5;
@@ -655,16 +656,55 @@ o.huge_skull = {
 	},
 	
 	onUpdate: function (elapsed, engine) {
-		if (!this.setDir && this.position.y >= 50) {
-			var d = this.direction.clone();
-			d.x = Math.random();
-			if (Math.random() >= 0.5) {
-				d.x *= -1;
-			}
-			this.setDirection(d);
-			this.setDir = true;
+		switch (this.phase) {
+			
+			// Come out of the gates
+			case 0:
+				if (!this.phaseInit) {
+					this.phaseInit = true;
+				}
+				if (this.position.y >= 50) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Choose a random direction
+			case 1:
+				if (!this.phaseInit) {
+					var d = this.direction.clone();
+					d.x = Math.random();
+					if (Math.random() >= 0.5) {
+						d.x *= -1;
+					}
+					this.setDirection(d);
+					this.phaseTimer.start(horde.randomRange(2000, 4000));
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Charge the player just for a half second
+			case 2:
+				if (!this.phaseInit) {
+					this.speed *= 2;
+					this.animDelay *= 2;
+					this.phaseTimer.start(horde.randomRange(250, 500));
+					this.phaseInit = true;
+				}
+				if (this.phaseTimer.expired()) {
+					this.speed /= 2;
+					this.animDelay /= 2;
+					this.setPhase(1);
+				}
+				this.chase(engine.getPlayerObject());
+				break;
+			
 		}
+		
 		return "shoot";
+
 	}
 	
 };

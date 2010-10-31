@@ -540,20 +540,20 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 13;
+	var testWave = 28;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
 
-	/*
 	// Test Wave
+	/*
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "owlbear", 1);
-	w.addObjects(1, "owlbear", 1);
-	w.addObjects(2, "owlbear", 1);
+	w.addObjects(0, "huge_skull", 1);
+	w.addObjects(1, "huge_skull", 1);
+	w.addObjects(2, "huge_skull", 1);
 	w.nextWaveTime = Infinity;
 	this.waves.push(w);
 	*/
@@ -706,26 +706,22 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 
 	// Wave 14
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 1000);
-	w.addSpawnPoint(1, 1000);
-	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "demoblin", 3);
-	w.addObjects(1, "hunter_goblin", 2);
-	w.addObjects(2, "demoblin", 3);
-	w.addObjects(0, "wizard", 1);
-	w.addObjects(1, "wizard", 1);
-	w.addObjects(2, "wizard", 1);
-	w.nextWaveTime = 45000;
-	this.waves.push(w);
-
-	// Wave 15
-	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 15000);
 	w.addSpawnPoint(1, 1500);
 	w.addSpawnPoint(2, 15000);
 	w.addObjects(0, "owlbear", 1);
 	w.addObjects(2, "owlbear", 1);
 	w.nextWaveTime = 45000;
+	this.waves.push(w);
+
+	// Wave 15
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 1000);
+	w.addSpawnPoint(1, 1000);
+	w.addSpawnPoint(2, 1000);
+	w.addObjects(0, "huge_skull", 1);
+	w.addObjects(1, "huge_skull", 1);
+	w.addObjects(2, "huge_skull", 1);
 	this.waves.push(w);
 
 	// Wave 16
@@ -873,10 +869,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	// Wave 28
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 15000);
-	w.addSpawnPoint(1, 15000);
+	w.addSpawnPoint(1, 20000);
 	w.addSpawnPoint(2, 15000);
 	w.addObjects(0, "flaming_skull", 5);
-	w.addObjects(1, "flaming_skull", 5);
+	w.addObjects(1, "huge_skull", 3);
 	w.addObjects(2, "flaming_skull", 5);
 	w.nextWaveTime = 60000;
 	this.waves.push(w);
