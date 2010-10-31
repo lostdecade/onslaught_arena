@@ -547,9 +547,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
+	/*
 	var testWave = 15;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	// Test Wave
 	/*
@@ -3398,7 +3400,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 		"Tip 1/4: Use the WASD keys to move the character.",
 		"Tip 2/4: Throw weapons with the arrow keys.",
 		"Tip 3/4: Or use the mouse to aim with the target reticle.",
-		"Tip 4/4: And throw weapons with the left mouse button.",
+		"Tip 4/4: Throw weapons with the left mouse button.",
 		"Kill monsters and collect gold to raise your score!"
 	];
 
