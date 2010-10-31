@@ -723,6 +723,13 @@ o.spike_wall = {
 	spriteY: 256,
 	drawIndex: 0,
 	
+	animated: true,
+	animNumFrames: 1,
+	
+	spawnFramesX: 96,
+	spawnFramesY: 576,
+	spawnFrameCount: 2,
+	
 	rotate: true,
 	rotateSpeed: 0,
 	
@@ -730,6 +737,7 @@ o.spike_wall = {
 		this.phaseTimer = new horde.Timer();
 		this.spinUpTime = 7500;
 		this.wallDirection = new horde.Vector2(0, 1);
+		this.addState(horde.Object.states.SPAWNING);
 	},
 	
 	onDamage: function (defender, engine) {
@@ -784,11 +792,23 @@ o.spike_sentry = {
 	spriteX: 64,
 	spriteY: 256,
 	
+	animated: true,
+	animNumFrames: 1,
+	
+	spawnFramesX: 0,
+	spawnFramesY: 576,
+	spawnFrameCount: 2,
+	
+	
 	rotate: true,
 	rotateSpeed: 100,
 
 	phase: 0,
 	phaseInit: false,
+	
+	onInit: function () {
+		this.addState(horde.Object.states.SPAWNING);
+	},
 	
 	onDamage: function (defender, engine) {
 
