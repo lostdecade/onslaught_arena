@@ -66,6 +66,14 @@ horde.Engine = function horde_Engine () {
 	this.wonGame = false;
 	this.wonGamePhase = 0;
 	
+	this.weaponPickup = {
+		type: null,
+		state: "off",
+		alpha: 1,
+		scale: 1,
+		position: new horde.Vector2()
+	};
+		
 };
 
 var proto = horde.Engine.prototype;
@@ -1350,6 +1358,7 @@ proto.update = function horde_Engine_proto_update () {
 				this.updateClouds(elapsed);
 				this.updateObjects(elapsed);
 				this.updateFauxGates(elapsed);
+				this.updateWeaponPickup(elapsed);
 			}
 			if (this.showTutorial) {
 				this.updateTutorial(elapsed);
@@ -1379,6 +1388,19 @@ proto.update = function horde_Engine_proto_update () {
 
 	this.mouse.hasMoved = false;
 
+};
+
+proto.updateWeaponPickup = function horde_Engine_proto_updateWeaponPickup (elapsed) {
+	var w = this.weaponPickup;
+	if (w.state === "on") {
+		w.scale += ((6 / 1000) * elapsed);
+		w.alpha -= ((2 / 1000) * elapsed);
+		if (w.alpha <= 0) {
+			w.alpha = 1;
+			w.scale = 1;
+			w.state = "off";
+		}
+	}
 };
 
 proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
@@ -2119,12 +2141,12 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
 						horde.sound.play("pickup_weapon");
-						for (var j = 0; j < 5; ++j) {
-							var heart = horde.makeObject("mini_sword");
-							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
-							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
-							this.addObject(heart);
-						}
+						var w = this.weaponPickup;
+						w.type = o2.type;
+						w.scale = 1;
+						w.alpha = 1;
+						w.position = o2.position.clone();
+						w.state = "on";
 					}
 				}
 				if (
@@ -2971,6 +2993,7 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawObjects(ctx);
 			this.drawFauxGates(ctx);
 			this.drawWalls(ctx);
+			this.drawWeaponPickup(ctx);
 			this.drawWaveText(ctx);
 			this.drawUI(ctx);
 			if (this.paused) {
@@ -2993,6 +3016,33 @@ proto.render = function horde_Engine_proto_render () {
 		this.drawDebugInfo(ctx);
 	}
 	
+};
+
+proto.drawWeaponPickup = function horde_Engine_proto_drawWeaponPickup (ctx) {
+	var w = this.weaponPickup;
+	if (w.state === "on") {
+		var type = horde.makeObject(w.type);
+		ctx.save();
+		ctx.translate(
+			w.position.x + (type.size.width / 2),
+			w.position.y + (type.size.height / 2)
+		);
+		ctx.globalAlpha = w.alpha;
+		// Draw scroll
+		ctx.drawImage(
+			this.images.getImage("objects"),
+			128, 192, 48, 48,
+			-22 * w.scale, -20 * w.scale, 48 * w.scale, 48 * w.scale
+		);
+		// Draw weapon
+		ctx.drawImage(
+			this.images.getImage(type.spriteSheet),
+			type.spriteX, type.spriteY + 1, type.size.width - 1, type.size.height - 1,
+			-((type.size.width / 2) * w.scale), -((type.size.height / 2) * w.scale),
+			type.size.width * w.scale, type.size.height * w.scale
+		);
+		ctx.restore();
+	}
 };
 
 proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
