@@ -1395,11 +1395,9 @@ proto.update = function horde_Engine_proto_update () {
 proto.updateWeaponPickup = function horde_Engine_proto_updateWeaponPickup (elapsed) {
 	var w = this.weaponPickup;
 	if (w.state === "on") {
-		w.scale += ((6 / 1000) * elapsed);
-		w.alpha -= ((2 / 1000) * elapsed);
+		w.scale += ((4.5 / 1000) * elapsed);
+		w.alpha -= ((2.5 / 1000) * elapsed);
 		if (w.alpha <= 0) {
-			w.alpha = 1;
-			w.scale = 1;
 			w.state = "off";
 		}
 	}
@@ -2146,7 +2144,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						var w = this.weaponPickup;
 						w.type = o2.type;
 						w.scale = 1;
-						w.alpha = 1;
+						w.alpha = 0.9;
 						w.position = o2.position.clone();
 						w.state = "on";
 					}
