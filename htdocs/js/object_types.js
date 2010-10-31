@@ -583,7 +583,7 @@ o.flaming_skull = {
 	],
 	
 	onInit: function () {
-		switch (horde.randomRange(1, 3)) {
+		switch (horde.randomRange(1, 2)) {
 			case 1:
 				this.speed *= 0.5;
 				this.animDelay *= 0.5;
@@ -592,8 +592,64 @@ o.flaming_skull = {
 				this.speed *= 0.75;
 				this.animDelay *= 0.75;
 				break;
-			case 3:
-				// Nothing
+		}
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		if (!this.setDir && this.position.y >= 50) {
+			var d = this.direction.clone();
+			d.x = Math.random();
+			if (Math.random() >= 0.5) {
+				d.x *= -1;
+			}
+			this.setDirection(d);
+			this.setDir = true;
+		}
+		return "shoot";
+	}
+	
+};
+
+o.huge_skull = {
+	
+	role: "monster",
+	team: 1,
+	badass: true,
+	
+	speed: 150,
+	hitPoints: 200,
+	damage: 20,
+	worth: 0,
+	
+	spriteSheet: "characters",
+	spriteY: 864,
+	animated: true,
+	size: new horde.Size(64, 64),
+	
+	setDir: false,
+
+	soundDamage: "skull_damage",
+	soundDies: "skull_dies",
+	
+	weapons: [
+		{type: "e_static_green_fire", count: null}
+	],
+	
+	lootTable: [
+		{type: null, weight: 4},
+		{type: "WEAPON_DROP", weight: 3},
+		{type: "item_chest", weight: 3}
+	],
+	
+	onInit: function () {
+		switch (horde.randomRange(1, 2)) {
+			case 1:
+				this.speed *= 0.5;
+				this.animDelay *= 0.5;
+				break;
+			case 2:
+				this.speed *= 0.75;
+				this.animDelay *= 0.75;
 				break;
 		}
 	},
@@ -2499,6 +2555,24 @@ o.e_static_blue_fire = {
 	rotate: true,
 	rotateSpeed: 100,
 	ttl: 1000,
+	bounce: false,
+	drawIndex: 0,
+	damageType: "magic"
+};
+
+o.e_static_green_fire = {
+	role: "projectile",
+	cooldown: 100,
+	speed: 0,
+	hitPoints: Infinity,
+	damage: 10,
+	size: new horde.Size(64, 64),
+	spriteSheet: "objects",
+	spriteX: 64,
+	spriteY: 192,
+	rotate: true,
+	rotateSpeed: 150,
+	ttl: 2000,
 	bounce: false,
 	drawIndex: 0,
 	damageType: "magic"
