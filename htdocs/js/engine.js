@@ -14,6 +14,8 @@ var SCREEN_HEIGHT = 480;
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
 var TUTORIAL_HEIGHT = 70;
 var TUTORIAL_NUM_TIPS = 4;
+var URL_HIGH_SCORES = "/onslaught_arena/high_scores";
+var URL_STORE = "http://www.google.com/chrome/intl/en/landing_chrome_mac.html?hl=en"; // TODO
 
 var COLOR_BLACK = "rgb(0, 0, 0)";
 var COLOR_WHITE = "rgb(241, 241, 242)";
@@ -44,7 +46,7 @@ horde.Engine = function horde_Engine () {
 	// Sword pointer
 	this.pointerY = 0;
 	this.pointerYStart = 0;
-	this.numPointerOptions = 0;
+	this.maxPointerY = 0;
 	this.pointerOptionsStart = 0;
 	
 	this.targetReticle = {
@@ -1373,6 +1375,11 @@ proto.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
+		case "buy_now":
+			this.handleInput();
+			this.render();
+			break;
+
 	}
 
 	if (!this.hideReticleTimer) {
@@ -2533,8 +2540,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		var stopX = (POINTER_X + 130);
 		var startY = (this.pointerYStart - 22);
 
-		// Continue
-		if (this.canContinue()) {
+		// Buy Now! or Continue
+		if (DEMO || this.canContinue()) {
 			if (
 				(mouseV.x >= startX && mouseV.x <= stopX)
 				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
@@ -2592,22 +2599,28 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.mouse.clearButtons();
 
 			switch (this.pointerY) {
-				case 0: // Continue
-					var checkpointWave = this.getData("checkpoint_wave");
-					if (checkpointWave !== null) {
-						// Checkpoint data exists
-						this.currentWaveId = (checkpointWave - 1);
-						var checkpointHero = this.getData("checkpoint_hero");
-						if (checkpointHero !== null) {
-							var player = this.getPlayerObject();
-							player.load(checkpointHero);
-							// Start the player at full life but ding him for the amount of wounds he had
-							player.totalDamageTaken += player.wounds;
-							player.wounds = 0;
+				case 0:
+					if (DEMO) {
+						// Buy Now!
+						open(URL_STORE);
+					} else {
+						// Continue
+						var checkpointWave = this.getData("checkpoint_wave");
+						if (checkpointWave !== null) {
+							// Checkpoint data exists
+							this.currentWaveId = (checkpointWave - 1);
+							var checkpointHero = this.getData("checkpoint_hero");
+							if (checkpointHero !== null) {
+								var player = this.getPlayerObject();
+								player.load(checkpointHero);
+								// Start the player at full life but ding him for the amount of wounds he had
+								player.totalDamageTaken += player.wounds;
+								player.wounds = 0;
+							}
+							this.continuing = true;
+							this.showTutorial = false;
+							this.state = "intro_cinematic";
 						}
-						this.continuing = true;
-						this.showTutorial = false;
-						this.state = "intro_cinematic";
 					}
 					break;
 				case 1: // New game
@@ -2627,12 +2640,63 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
+	if (this.state == "buy_now") {
+
+		usingPointerOptions = true;
+
+		var startY = (this.pointerYStart - 22);
+
+		// Buy Now!!
+		if (
+			(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 106))
+			&& (mouseV.y > startY && mouseV.y < (startY + (POINTER_HEIGHT - 1)))
+		) {
+			if (this.mouse.hasMoved && this.pointerY !== 0) newPointerY = 0;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				this.keyboard.keyStates[keys.SPACE] = true;
+			}
+		}
+
+		// No thanks
+		if (
+			(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 106))
+			&& (mouseV.y > (startY + POINTER_HEIGHT) && mouseV.y < ((startY + POINTER_HEIGHT) + 36))
+		) {
+			if (this.mouse.hasMoved && this.pointerY !== 1) newPointerY = 1;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				this.keyboard.keyStates[keys.SPACE] = true;
+			}
+		}
+		
+		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
+
+			kb.clearKey(keys.ENTER);
+			kb.clearKey(keys.SPACE);
+			this.mouse.clearButtons();
+
+			horde.sound.play("select_pointer");
+
+			switch (this.pointerY) {
+				case 0: // Buy Now!!
+					open(URL_STORE);
+					break;
+				case 1: // No thanks
+					this.initGame();
+					break;
+			}
+
+			this.initGame();
+
+		}
+
+	}
+
 	// Want to see all high scores? Click here!
 	if (this.state === "high_scores") {
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			if ((mouseV.x > 76) && (mouseV.x < 560)) {
 				if ((mouseV.y > 392) && (mouseV.y < 416)) {
-					open("/onslaught_arena/high_scores");
+					open(URL_HIGH_SCORES);
 					return;
 				}
 			}
@@ -2671,7 +2735,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.keyStates[keys.W] = false;
 			this.keyboard.keyStates[keys.UP] = false;
 			this.pointerY--;
-			if (this.pointerY < this.pointerOptionsStart) this.pointerY = this.numPointerOptions;
+			if (this.pointerY < this.pointerOptionsStart) this.pointerY = this.maxPointerY;
 			horde.sound.play("move_pointer");
 		}
 		if (
@@ -2681,7 +2745,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.keyboard.keyStates[keys.S] = false;
 			this.keyboard.keyStates[keys.DOWN] = false;
 			this.pointerY++;
-			if (this.pointerY > this.numPointerOptions) this.pointerY = this.pointerOptionsStart;
+			if (this.pointerY > this.maxPointerY) this.pointerY = this.pointerOptionsStart;
 			horde.sound.play("move_pointer");
 		}
 
@@ -3009,6 +3073,11 @@ proto.render = function horde_Engine_proto_render () {
 		case "game_over":
 			this.drawGameOver(ctx);
 			break;
+
+		case "buy_now":
+			this.drawBuyNow(ctx);
+			this.drawPointer(ctx);
+			break;
 		
 	}
 
@@ -3135,8 +3204,12 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 			this.mouse.clearButtons();
 			this.statsIndex += 1;
 			if (this.statsIndex >= 5) {
-				horde.sound.stop("victory");
-				this.initGame();
+				if (DEMO) {
+					this.state = "buy_now";
+				} else {
+					horde.sound.stop("victory");
+					this.initGame();
+				}
 				return;
 			}
 		}
@@ -3184,6 +3257,43 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		
 	}
 	
+};
+
+proto.drawBuyNow = function horde_Engine_proto_drawBuyNow (ctx) {
+
+	ctx.save();
+
+	ctx.globalAlpha = OVERLAY_ALPHA;
+	ctx.fillRect(0, 0, this.view.width, this.view.height);
+
+	ctx.globalAlpha = 1;
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		370, 0, 564, 404,
+		38, 38, 564, 404
+	);
+	ctx.restore();
+
+	var startY = (this.pointerYStart - 22);
+	var spriteX;
+
+	// Buy Now!!
+	spriteX = ((this.pointerY == 0) ? 260 : 0);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		spriteX, 2122, 200, 40,
+		POINTER_X, startY, 200, 40
+	);
+
+	// Quit
+	spriteX = ((this.pointerY == 1) ? 260 : 0);
+	startY += POINTER_HEIGHT;
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		spriteX, 2182, 200, 40,
+		POINTER_X, startY, 200, 40
+	);
+
 };
 
 proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx) {
@@ -3709,6 +3819,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	// Version
 	var version = ("v" + VERSION);
+	if (DEMO) version += " demo";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 	ctx.textAlign = "right";
@@ -3761,17 +3872,27 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	var startY = (this.pointerYStart - 22);
 	var spriteY;
 
-	// Continue
-	if (this.canContinue()) {
+	if (DEMO) {
+		// Buy now!!
 		spriteY = ((this.pointerY == 0) ? 638 : 430);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			800, spriteY, 128, 26,
+			POINTER_X, startY, 128, 26
+		);
 	} else {
-		spriteY = 534;
+		// Continue
+		if (this.canContinue()) {
+			spriteY = ((this.pointerY == 0) ? 638 : 430);
+		} else {
+			spriteY = 534;
+		}
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			640, spriteY, 116, 20,
+			POINTER_X, startY, 116, 20
+		);
 	}
-	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		640, spriteY, 116, 20,
-		POINTER_X, startY, 116, 20
-	);
 
 	// New game
 	spriteY = ((this.pointerY == 1) ? 664 : 456);
@@ -3850,7 +3971,7 @@ proto.initOptions = function () {
 		case "title":
 			this.pointerYStart = 300;
 
-			if (this.canContinue()) {
+			if (DEMO || this.canContinue()) {
 				this.pointerY = 0;
 				this.pointerOptionsStart = 0;
 			} else {
@@ -3858,17 +3979,23 @@ proto.initOptions = function () {
 				this.pointerOptionsStart = 1;
 			}
 			if (this.showHighScores()) {
-				this.numPointerOptions = 3;
+				this.maxPointerY = 3;
 			} else {
-				this.numPointerOptions = 2;
+				this.maxPointerY = 2;
 			}
 			break;
 		case "running":
 			this.pointerYStart = 378;
 			this.pointerY = 0;
-			this.numPointerOptions = 1;
+			this.maxPointerY = 1;
 			this.pointerOptionsStart = 0;
 			this.verifyQuit = false;
+			break;
+		case "buy_now":
+			this.pointerYStart = 378;
+			this.pointerY = 0;
+			this.maxPointerY = 1;
+			this.pointerOptionsStart = 0;
 			break;
 	}
 

@@ -78,7 +78,7 @@ o.h_fireball = {
 	speed: 400,
 	rotateSpeed: 350,
 	hitPoints: 1,
-	damage: 2,
+	damage: 3,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 0,
