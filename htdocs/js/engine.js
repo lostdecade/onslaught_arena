@@ -2,23 +2,27 @@
 
 var VERSION = "{{VERSION}}";
 var DEMO = false;
-var GATE_CUTOFF_Y = 64;
-var HIGH_SCORE_KEY = "high_score";
-var DEFAULT_HIGH_SCORE = 1000;
-var NUM_GATES = 3;
-var OVERLAY_ALPHA = 0.7;
-var POINTER_X = 270;
-var POINTER_HEIGHT = 24;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
-var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
-var TUTORIAL_HEIGHT = 70;
-var TUTORIAL_NUM_TIPS = 4;
 var URL_HIGH_SCORES = "/onslaught_arena/high_scores";
 var URL_STORE = "http://www.google.com/chrome/intl/en/landing_chrome_mac.html?hl=en"; // TODO
 
+var DEFAULT_HIGH_SCORE = 1000;
+var HIGH_SCORE_KEY = "high_score";
+
 var COLOR_BLACK = "rgb(0, 0, 0)";
 var COLOR_WHITE = "rgb(241, 241, 242)";
+var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
+
+var OVERLAY_ALPHA = 0.7;
+var POINTER_HEIGHT = 24;
+var POINTER_X = 270;
+
+var TUTORIAL_HEIGHT = 70;
+var TUTORIAL_NUM_TIPS = 4;
+
+var GATE_CUTOFF_Y = 64;
+var NUM_GATES = 3;
 
 /**
  * Creates a new Engine object
