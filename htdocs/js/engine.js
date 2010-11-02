@@ -1971,6 +1971,12 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		// the object is moving along the "x" axis
 		object.position.x += (object.direction.x * px);
 		if (object.collidable) {
+			if (object.position.x < 16) {
+				object.position.x = 16;
+			}
+			if ((object.position.x + object.size.width) > 624) {
+				object.position.x = (624 - object.size.width);
+			}
 			var tile = this.checkTileCollision(object);
 			if (tile !== false) {
 				axis.push("x");
@@ -1991,6 +1997,9 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		// the object is moving along the "y" axis
 		object.position.y += (object.direction.y * px);
 		if (object.collidable) {
+			if ((object.position.y + object.size.height) > 400) {
+				object.position.y = (400 - object.size.height);
+			}
 			var tile = this.checkTileCollision(object);
 			if (tile !== false) {
 				axis.push("y");
