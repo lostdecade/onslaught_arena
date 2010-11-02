@@ -1790,10 +1790,13 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 };
 
 proto.showHighScores = function horde_Engine_proto_showHighScores () {
+	return !DEMO;
+/*
 	return (
 		(location.hostname == "play.lostdecadegames.com")
 		|| (Number(location.port) > 9000) // It's over NINE THOUSAAAANDDDDD!!
 	);
+	*/
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
