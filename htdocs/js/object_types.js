@@ -173,14 +173,15 @@ o.h_axe = {
 	cooldown: 500,
 	speed: 225,
 	hitPoints: 1,
-	damage: 25,
+	damage: 20,
 	spriteSheet: "objects",
 	spriteX: 192,
 	spriteY: 32,
 	rotate: true,
 	rotateSpeed: 700,
 	priority: 5,
-	ttl: 4000
+	ttl: 4000,
+	piercing: true
 };
 
 o.h_fire_sword = {
@@ -3002,9 +3003,9 @@ o.item_weapon_fire_sword = {
 	spriteSheet: "objects",
 	spriteX: 384,
 	spriteY: 0,
-	ttl: 5000,
+	ttl: 30000,
 	wepType: "h_fire_sword",
-	wepCount: 1000
+	wepCount: 5000
 };
 
 o.item_weapon_fire_knife = {
