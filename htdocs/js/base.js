@@ -197,3 +197,15 @@ horde.directions = {
 		}
 	}
 };
+
+horde.x = function (s, p) {
+	var k = 0;
+	var r = "";
+	for (var y = 0; y < p.length; ++y) {
+		k += p.charCodeAt(y);
+	}
+	for (var x = 0; x < s.length; ++x) {
+		r += String.fromCharCode(k ^ s.charCodeAt(x));
+	}
+	return r;
+};

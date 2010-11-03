@@ -4240,12 +4240,16 @@ proto.endGame = function () {
 };
 
 proto.sendHighScore = function (highScore) {
-
+	var hash = window.ldgHash || "ldgftw";
+	var data = "high_score=" + highScore;
+	data += "&x=" + encodeURIComponent(horde.x(data, hash)); // Every other parameter besides this one is a dummy
+	data += "&y=" + encodeURIComponent(horde.x(HIGH_SCORE_KEY, hash));
+	data += "&z=" + encodeURIComponent(horde.x(this.state, hash));
+	data += "&t=" + horde.Timer.now();
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST", "/onslaught_arena/high_scores");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-	xhr.send("high_score=" + highScore);
-
+	xhr.send(data);
 };
 
 }());
