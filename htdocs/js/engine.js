@@ -2845,6 +2845,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.showTutorial
 				&& (mouseV.y <= (TUTORIAL_HEIGHT + this.tutorialY))
 			) {
+				// Press here or ESC to skip
 				this.showTutorial = false;
 			} else if (
 				((mouseV.x >= 380) && (mouseV.x <= 380+96))
@@ -2859,10 +2860,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.objectAttack(player, v);
 				this.heroFiring = true;
 				this.heroFiringDirection = v;
-				if (this.tutorialIndex < 3) {
-					this.tutorialIndex = 3;
-					this.nextTutorial(4);
-				}
+				this.nextTutorial(4);
 				this.showReticle = true;
 			}
 
@@ -3546,11 +3544,12 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 
 	ctx.font = "20px Cracked";
 
+	var pressHere = "Press here or ESC to skip";
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText("press here or ESC to skip", 322, (this.tutorialY + 62));
+	ctx.fillText(pressHere, 322, (this.tutorialY + 62));
 
 	ctx.fillStyle = "rgb(118, 151, 183)";
-	ctx.fillText("press here or ESC to skip", 320, (this.tutorialY + 60));
+	ctx.fillText(pressHere, 320, (this.tutorialY + 60));
 	ctx.restore();
 
 };
