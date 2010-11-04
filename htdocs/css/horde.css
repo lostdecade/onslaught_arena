@@ -1,5 +1,5 @@
 @font-face {
-	font-family: "Cracked";
+	font-family: Cracked;
 	src: url(../font/cracked.ttf);
 }
 
@@ -22,21 +22,24 @@ html, body {
 
 canvas {
 	border: solid 1px #111;
-	position: absolute;
-	top: 50%;
-	left: 50%;
 	margin-top: -240px;
 	margin-left: -320px;
+
+	position: absolute;
+	left: 50%;
+	top: 50%;
+
 	width: 640px;
 	height: 480px;
+
 	background: #000;
-	color: #fff;
+	color: #f1f1f2;
 }
 
 .fallback {
 	background: #000;
-	color: #fff;
-	font-family: tahoma, arial, sans;
+	color: #f1f1f2;
+	font-family: Tahoma, Arial, Sans;
 	text-align: center;
 }
 
@@ -45,40 +48,43 @@ canvas {
 }
 
 .fallback a {
+	color: #7c51a1;
 	font-weight: bold;
-	color: #BE81F7;
 }
 
 .nav {
+	border-bottom: solid 2px #3c3533;
   margin-bottom: 5px;
 	padding: 5px 10px;
+
 	overflow: hidden;
-	border-bottom: solid 2px #333;
-	font-family: Cracked, tahoma, arial;
+
+	background: #636467;
+	font-family: Cracked, Tahoma, Arial;
 	font-size: 24px;
-	background: #666;
 }
 
 .nav > ul {
   float: right;
 	margin: 0;
 	padding: 0;
+
 	overflow: hidden;
 }
 
 .nav > ul li {
 	float: left;
-	margin-right: 30px;
 	list-style: none;
+	margin-right: 30px;
 }
 
 .nav a {
-	color: #fff;
+	color: #f1f1f2;
 	text-decoration: none;
 	text-shadow: #000 1px 1px 1px;
 	font-weight: bold;
 }
 
 .nav a:hover {
-	color: #FFA824;
+	color: #faa61a;
 }
