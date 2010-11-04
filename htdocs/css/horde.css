@@ -16,19 +16,8 @@ html, body {
 	display: none;
 }
 
-#site_link {
-	position: absolute;
-	bottom: 10px;
-	left: 10px;
-	font-family: tahoma, arial, sans;
-	font-size: 12px;
-	font-weight: bold;
-	color: #e1e1e1;
-	text-decoration: none;
-}
-
-#site_link:hover {
-	text-decoration: underline;
+#stage {
+  position: relative;
 }
 
 canvas {
@@ -58,4 +47,38 @@ canvas {
 .fallback a {
 	font-weight: bold;
 	color: #BE81F7;
+}
+
+.nav {
+  margin-bottom: 5px;
+	padding: 5px 10px;
+	overflow: hidden;
+	border-bottom: solid 2px #333;
+	font-family: Cracked, tahoma, arial;
+	font-size: 24px;
+	background: #666;
+}
+
+.nav > ul {
+  float: right;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+}
+
+.nav > ul li {
+	float: left;
+	margin-right: 30px;
+	list-style: none;
+}
+
+.nav a {
+	color: #fff;
+	text-decoration: none;
+	text-shadow: #000 1px 1px 1px;
+	font-weight: bold;
+}
+
+.nav a:hover {
+	color: #FFA824;
 }

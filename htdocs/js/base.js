@@ -72,7 +72,7 @@ horde.now = function horde_now () {
  * @param {string} id Element ID attribute
  * @param {number} width Width of the canvas in pixels
  * @param {number} height Height of the canvas in pixels
- * @hidden {boolean} Whether or not this canvas is visible
+ * @param {boolean} hidden Whether or not this canvas is visible
  * @return {object} <canvas> element
  */
 horde.makeCanvas = function horde_makeCanvas (id, width, height, hidden) {
@@ -82,9 +82,30 @@ horde.makeCanvas = function horde_makeCanvas (id, width, height, hidden) {
 	canvas.height = Number(height) || 0;
 	if (hidden !== true) {
 		canvas.innerHTML = horde.canvasFallbackContent;
-		document.body.appendChild(canvas);
+		var stage = document.getElementById("stage");
+		stage.appendChild(canvas);
 	}
 	return canvas;
+};
+
+/**
+ * Returns the x,y offset of an element on the page
+ * @param {DOMElement} node DOM Element
+ * @return {object} x,y offset
+ */
+horde.getOffset = function horde_getOffset (node) {
+	var offset = {
+		x: node.offsetLeft, y: node.offsetTop
+	};
+	while (true) {
+		node = node.parentNode;
+		if (node === document.body) {
+			break;
+		}
+		offset.x += node.offsetLeft;
+		offset.y += node.offsetTop;
+	}
+	return offset;
 };
 
 /**

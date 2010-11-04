@@ -89,7 +89,7 @@ proto.resize = function horde_Engine_proto_resize () {
 		return;
 	}
 	var height = window.innerHeight;
-	height -= 40; // Some buffer around the game
+	height -= 80; // Some buffer around the game
 	if (height < 480) {
 		height = 480;
 	}
@@ -102,6 +102,8 @@ proto.resize = function horde_Engine_proto_resize () {
 	c.style.height = height + "px";
 	c.style.marginLeft = -(width / 2) + "px";
 	c.style.marginTop = -(height / 2) + "px";
+	var stage = document.getElementById("stage");
+	stage.style.height = height + "px";
 };
 
 /**

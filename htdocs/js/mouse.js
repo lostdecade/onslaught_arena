@@ -19,8 +19,9 @@ Mouse.Buttons = {
 };
 
 proto.handleMouseMove = function (e) {
-	this.mouseX = (((e.clientX - this.canvas.offsetLeft) * 640) / this.canvas.offsetWidth);
-	this.mouseY = (((e.clientY - this.canvas.offsetTop) * 480) / this.canvas.offsetHeight);
+	var offset = horde.getOffset(this.canvas);
+	this.mouseX = (((e.clientX - offset.x) * 640) / this.canvas.offsetWidth);
+	this.mouseY = (((e.clientY - offset.y) * 480) / this.canvas.offsetHeight);
 	this.hasMoved = true;
 };
 
