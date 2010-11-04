@@ -2956,6 +2956,7 @@ proto.objectAttack = function (object, v) {
 			var o = this.objects[id];
 			o.position.add(horde.Vector2.fromHeading(h + (Math.PI / 2)).scale(16));
 			o.position.add(vh.clone().scale(16));
+			object.shotsFired += 3;
 			break;
 
 		case "h_firebomb":
@@ -2971,6 +2972,7 @@ proto.objectAttack = function (object, v) {
 				o.ownerId = object.id;
 				o.team = object.team;
 				this.addObject(o);
+				object.shotsFired += 1;
 			}
 			break;
 
@@ -3511,11 +3513,9 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 };
 
 proto.getAccuracy = function horde_Engine_proto_getAccuracy (player) {
-
 	if (player.shotsFired === 0) return 0;
 
 	return Math.round((player.shotsLanded / player.shotsFired) * 100);
-
 };
 
 proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
