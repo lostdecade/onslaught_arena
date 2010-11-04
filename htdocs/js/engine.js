@@ -117,19 +117,21 @@ proto.run = function horde_Engine_proto_run () {
 };
 
 /**
- * Stops the engine
- * @return {void}
- */
-proto.stop = function horde_Engine_proto_stop () {
-	clearInterval(this.interval);
-};
-
-/**
  * Starts the engine
  * @return {void}
  */
 proto.start = function horde_Engine_proto_start () {
+console.log('starting ...');
 	this.interval = horde.setInterval(0, this.update, this);
+};
+
+/**
+ * Stops the engine
+ * @return {void}
+ */
+proto.stop = function horde_Engine_proto_stop () {
+console.log('stopping ...');
+	clearInterval(this.interval);
 };
 
 /**
@@ -266,15 +268,15 @@ proto.init = function horde_Engine_proto_init () {
 	}, document.body, this);
 	
 	horde.on("blur", function () {
+		this.stop();
 		if (this.state != "running" || this.wonGame) return;
 		this.keyboard.keyStates = {};
 		if (!this.paused) this.togglePause();
-		this.stop();
 	}, window, this);
 
 	horde.on("focus", function () {
 		this.start();
-	});
+	}, window, this);
 
 	// Load just the logo
 	this.preloader = new horde.ImageLoader();
