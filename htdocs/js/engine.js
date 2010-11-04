@@ -2628,7 +2628,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				case 0:
 					if (DEMO) {
 						// Buy Now!
-						open(URL_STORE);
+						location.href = URL_STORE;
 					} else {
 						// Continue
 						var checkpointWave = this.getData("checkpoint_wave");
@@ -2704,7 +2704,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 			switch (this.pointerY) {
 				case 0: // Buy Now!!
-					open(URL_STORE);
+					location.href = URL_STORE;
 					break;
 				case 1: // No thanks
 					this.initGame();
@@ -2722,7 +2722,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			if ((mouseV.x > 76) && (mouseV.x < 560)) {
 				if ((mouseV.y > 392) && (mouseV.y < 416)) {
-					open(URL_HIGH_SCORES);
+					location.href = URL_HIGH_SCORES;
 					return;
 				}
 			}
