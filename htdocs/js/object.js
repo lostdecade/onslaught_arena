@@ -489,6 +489,9 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
 			d[axis[i]] *= -1;
 		}
 		this.setDirection(d);
+		if (this.role === "projectile") {
+			horde.sound.play("weapon_wall");
+		}
 	} else {
 		if (this.damageType === "physical") {
 			this.deflect();

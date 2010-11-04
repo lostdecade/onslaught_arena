@@ -2018,7 +2018,6 @@ o.nega_xam = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				return "shoot";
-				break;
 			
 			// Dash to center
 			case 9:

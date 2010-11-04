@@ -335,7 +335,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("coins", "sound/effects/coins", false, 10);
 		s.create("eat_food", "sound/effects/eat_food", false, 20);
 		s.create("pickup_weapon", "sound/effects/pickup_weapon");
-		// TODO: s.create("weapon_wall", "sound/effects/weapon_wall");
+		s.create("weapon_wall", "sound/effects/weapon_wall", false, 25);
 		
 		// Hero
 		s.create("fire_attack", "sound/effects/char_attacks_fire");
