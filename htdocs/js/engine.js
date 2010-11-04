@@ -2050,6 +2050,9 @@ proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
 
 proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 
+	// Don't spawn stuff out of reach
+	if (object.position.y < 44) return;
+
 	var table = object.lootTable;
 	var len = table.length;
 	
@@ -3857,7 +3860,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.restore();
 	
 	// Copyright text
-	var copyright = "\u00A9 2010 Lost Decade Games";
+	var copyright = "Lost Decade Games \u00A9 2010";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 
