@@ -5,7 +5,7 @@ var DEMO = false;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var URL_HIGH_SCORES = "/onslaught_arena/high_scores";
-var URL_STORE = "http://www.google.com/chrome/intl/en/landing_chrome_mac.html?hl=en"; // TODO
+var URL_STORE = "https://chrome.google.com/extensions/detail/khodnfbkbanejphecblcofbghjdgfaih";
 
 var DEFAULT_HIGH_SCORE = 1000;
 var HIGH_SCORE_KEY = "high_score";
@@ -121,7 +121,6 @@ proto.run = function horde_Engine_proto_run () {
  * @return {void}
  */
 proto.start = function horde_Engine_proto_start () {
-console.log('starting ...');
 	this.interval = horde.setInterval(0, this.update, this);
 };
 
@@ -130,7 +129,6 @@ console.log('starting ...');
  * @return {void}
  */
 proto.stop = function horde_Engine_proto_stop () {
-console.log('stopping ...');
 	clearInterval(this.interval);
 };
 
@@ -1807,21 +1805,15 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 			this.newHighScore = totalScore;
 		}
 
-		if (this.debug || this.showHighScores()) {
+		if (this.saveHighScores()) {
 			this.sendHighScore(totalScore);
 		}
 	}
 
 };
 
-proto.showHighScores = function horde_Engine_proto_showHighScores () {
+proto.saveHighScores = function horde_Engine_proto_saveHighScores () {
 	return !DEMO;
-/*
-	return (
-		(location.hostname == "play.lostdecadegames.com")
-		|| (Number(location.port) > 9000) // It's over NINE THOUSAAAANDDDDD!!
-	);
-	*/
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
@@ -2622,7 +2614,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// High scores
-		if (this.showHighScores()) {
+		if (this.saveHighScores()) {
 			startY += POINTER_HEIGHT;
 			if (
 				(mouseV.x >= startX && mouseV.x <= stopX)
@@ -2701,7 +2693,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
-		// No thanks
+		// Maybe later
 		if (
 			(mouseV.x >= POINTER_X && mouseV.x <= (POINTER_X + 106))
 			&& (mouseV.y > (startY + POINTER_HEIGHT) && mouseV.y < ((startY + POINTER_HEIGHT) + 36))
@@ -2724,12 +2716,10 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				case 0: // Buy Now!!
 					location.href = URL_STORE;
 					break;
-				case 1: // No thanks
+				case 1: // Maybe later
 					this.initGame();
 					break;
 			}
-
-			this.initGame();
 
 		}
 
@@ -3250,6 +3240,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 			if (this.statsIndex >= 5) {
 				if (DEMO) {
 					this.state = "buy_now";
+					this.initOptions();
 				} else {
 					horde.sound.stop("victory");
 					this.initGame();
@@ -3329,7 +3320,7 @@ proto.drawBuyNow = function horde_Engine_proto_drawBuyNow (ctx) {
 		POINTER_X, startY, 200, 40
 	);
 
-	// Quit
+	// Maybe later
 	spriteX = ((this.pointerY == 1) ? 260 : 0);
 	startY += POINTER_HEIGHT;
 	ctx.drawImage(
@@ -3954,14 +3945,16 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	);
 
 	// High scores
-	if (this.showHighScores()) {
+	if (this.saveHighScores()) {
 		spriteY = ((this.pointerY == 3) ? 714 : 506);
-		ctx.drawImage(
-			this.preloader.getImage("ui"),
-			640, spriteY, 146, 28,
-			POINTER_X, (startY + (POINTER_HEIGHT * 3)), 146, 28
-		);
+	} else {
+		spriteY = 610;
 	}
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		640, spriteY, 146, 28,
+		POINTER_X, (startY + (POINTER_HEIGHT * 3)), 146, 28
+	);
 
 };
 
@@ -4021,7 +4014,7 @@ proto.initOptions = function () {
 				this.pointerY = 1;
 				this.pointerOptionsStart = 1;
 			}
-			if (this.showHighScores()) {
+			if (this.saveHighScores()) {
 				this.maxPointerY = 3;
 			} else {
 				this.maxPointerY = 2;
@@ -4064,10 +4057,28 @@ proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
 
 	ctx.font = "Bold 40px Cracked";
 
+	/*
+	// Debug data
+	scores = [
+		{name: "test1", value: 1000},
+		{name: "test2", value: 900},
+		{name: "test3", value: 800},
+		{name: "test4", value: 700},
+		{name: "test5", value: 600},
+		{name: "test6", value: 200},
+		{name: "test7", value: 500},
+		{name: "test8", value: 400},
+		{name: "test9", value: 300},
+		{name: "test10", value: 100}
+	];
+	*/
+
 	if (scores && scores.length) {
 		var height = 50;
+		var max = 5;
+		if (scores.length < max) max = scores.length;
 
-		for (var i = 0, l = scores.length; i < l; ++i) {
+		for (var i = 0; i < max; ++i) {
 			var score = scores[i];
 			var name = ((i+1) + ".   " + score.name);
 
@@ -4259,7 +4270,11 @@ proto.endGame = function () {
 };
 
 proto.sendHighScore = function (highScore) {
-	var hash = window.ldgHash || "ldgftw";
+	if (window.ldgHash) {
+		var hash = decodeURIComponent(window.ldgHash);
+	} else {
+		var hash = ["l", "d", "g", "f", "t", "w"].join("");
+	}
 	var data = "high_score=" + highScore;
 	data += "&x=" + encodeURIComponent(horde.x(data, hash)); // Every other parameter besides this one is a dummy
 	data += "&y=" + encodeURIComponent(horde.x(HIGH_SCORE_KEY, hash));
