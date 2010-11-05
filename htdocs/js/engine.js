@@ -389,9 +389,10 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cyclops_dies", "sound/effects/cyclops_dies");
 
 		// Owlbear
-		// Attack: TODO
-		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 25);
-		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 75);
+		s.create("owlbear_alarm", "sound/effects/owlbear_alarm", false, 15);
+		s.create("owlbear_attacks", "sound/effects/owlbear_attacks", false, 15);
+		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 10);
+		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 20);
 
 		// Boss 1/5: Gelatinous Cube
 		s.create("cube_attacks", "sound/effects/cube_attacks");
@@ -399,9 +400,11 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cube_dies", "sound/effects/cube_dies");
 
 		// Demonclops
-		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		/*
+		s.create("_attacks", "sound/effects/_attacks");
+		s.create("_damage", "sound/effects/_damage");
+		s.create("_dies", "sound/effects/_dies");
+		*/
 
 		// Boss 3/5: Green Dragon
 		s.create("dragon_attacks", "sound/effects/dragon_attacks");
@@ -409,19 +412,19 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("dragon_dies", "sound/effects/dragon_dies");
 
 		// Boss 4/5: Beholder
-		// Attack: TODO
-		s.create("beholder_damage", "sound/effects/beholder_damage", false, 25);
+		s.create("beholder_damage", "sound/effects/beholder_damage", false, 50);
 		s.create("beholder_dies", "sound/effects/beholder_dies", false, 25);
 
 		// Add: Eyelet
-		// Attack: TODO
 		s.create("eyelet_damage", "sound/effects/eyelet_damage", false, 25);
 		s.create("eyelet_dies", "sound/effects/eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
-		// Attack: TODO
-		// Damage: TODO
-		// Dies: TODO
+		/*
+		s.create("doppleganger_attacks", "sound/effects/doppleganger_attacks");
+		s.create("doppleganger_damage", "sound/effects/doppleganger_damage");
+		s.create("doppleganger_dies", "sound/effects/doppleganger_dies");
+		*/
 			
 	});
 	
@@ -568,11 +571,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
 	var testWave = 40;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	// Test Wave
 	/*

@@ -945,6 +945,7 @@ o.owlbear = {
 	hitPoints: 250,
 	speed: 75,
 
+	soundAlarm: "owlbear_alarm",
 	soundAttacks: "owlbear_attacks",
 	soundDamage: "owlbear_damage",
 	soundDies: "owlbear_dies",
@@ -992,6 +993,7 @@ o.owlbear = {
 			// Spotted the player, prepare to charge	
 			case 2:
 				if (!this.phaseInit) {
+					horde.sound.play(this.soundAlarm);
 					this.speed = 0;
 					this.animDelay = 150;
 					this.phaseTimer.start(500);
@@ -1006,6 +1008,7 @@ o.owlbear = {
 			// Charge!
 			case 3:
 				if (!this.phaseInit) {
+					horde.sound.play(this.soundAttacks);
 					this.speed = 350;
 					this.animDelay = 75;
 					this.phaseTimer.start(2000);
