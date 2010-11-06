@@ -1842,6 +1842,8 @@ o.doppelganger = {
 	animated: true,
 	spriteSheet: "characters",
 	spriteY: 0,
+	spriteY: 768,
+	spriteYOverlay: 928,
 	
 	damage: 20,
 	hitPoints: 5000,

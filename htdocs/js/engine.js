@@ -583,11 +583,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
 	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	// Test Wave
 	/*
@@ -3661,6 +3659,18 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 		s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
 		-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
 	);
+
+	if (o.spriteYOverlay) {
+		ctx.save();
+		var alpha = (1 - (o.wounds / o.hitPoints)) + 0.3;
+		ctx.globalAlpha = percentage;
+		ctx.drawImage(
+			this.images.getImage(o.spriteSheet),
+			s.x, o.spriteYOverlay + 1, o.size.width - 1, o.size.height - 1,
+			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height
+		);
+		ctx.restore();
+	}
 
 	// Boss pain!
 	if (
