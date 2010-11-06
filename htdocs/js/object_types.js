@@ -820,6 +820,10 @@ o.spike_sentry = {
 	
 	onUpdate: function (elapsed, engine) {
 		
+		if (this.hasState(horde.Object.states.SPAWNING)) {
+			return;
+		}
+		
 		switch (this.phase) {
 			
 			// Wait for player to get near X or Y axis
