@@ -19,13 +19,21 @@ o.hero = {
 	soundDies: "hero_dies",
 	weapons: [
 		{type: "h_sword", count: null}
-	]
+	],
+	onKilled: function (attacker, engine) {
+		var num = 10;
+		for (var i = 0; i < num; ++i) {
+			var skull = horde.makeObject("mini_skull");
+			skull.position.x = (this.position.x + (i * (this.size.width / num)));
+			skull.position.y = (this.position.y + this.size.height - horde.randomRange(0, this.size.height));
+			engine.addObject(skull);
+		}
+	}
 };
 
 // HERO WEAPONS
 
 o.h_sword = {
-	name: "Sword",
 	role: "projectile",
 	cooldown: 300,
 	speed: 250,
@@ -40,7 +48,6 @@ o.h_sword = {
 };
 
 o.h_knife = {
-	name: "Knife",
 	role: "projectile",
 	size: new horde.Size(32, 30),
 	cooldown: 200,
@@ -56,7 +63,6 @@ o.h_knife = {
 };
 
 o.h_spear = {
-	name: "Spear",
 	role: "projectile",
 	cooldown: 350,
 	speed: 500,
@@ -72,7 +78,6 @@ o.h_spear = {
 };
 
 o.h_fireball = {
-	name: "Fireball",
 	role: "projectile",
 	cooldown: 300,
 	speed: 400,
@@ -105,7 +110,6 @@ o.h_fireball = {
 };
 
 o.h_fireball_trail = {
-	name: "Fireball",
 	role: "projectile",
 	speed: 0,
 	rotateSpeed: 150,
@@ -125,7 +129,6 @@ o.h_fireball_trail = {
 
 /*
 o.h_bomb = {
-	name: "Bomb",
 	role: "projectile",
 	cooldown: 750,
 	speed: 200,
@@ -168,7 +171,6 @@ o.bomb_smoke = {
 */
 
 o.h_axe = {
-	name: "Battle Axe",
 	role: "projectile",
 	cooldown: 500,
 	speed: 225,
@@ -185,7 +187,6 @@ o.h_axe = {
 };
 
 o.h_fire_sword = {
-	name: "Flame Sword",
 	role: "projectile",
 	cooldown: 450,
 	speed: 350,
@@ -233,7 +234,6 @@ o.fire_sword_trail = {
 };
 
 o.h_fire_knife = {
-	name: "Flame Knife",
 	role: "projectile",
 	size: new horde.Size(32, 30),
 	cooldown: 200,
@@ -266,7 +266,6 @@ o.h_fire_knife = {
 };
 
 o.h_firebomb = {
-	name: "Firebomb",
 	role: "projectile",
 	cooldown: 500,
 	speed: 150,
@@ -1831,14 +1830,14 @@ o.sandworm = {
 	
 };
 
-o.nega_xam = {
+o.doppelganger = {
 	role: "monster",
 	team: 1,
 	badass: true,
 	
 	animated: true,
 	spriteSheet: "characters",
-	spriteY: 768,
+	spriteY: 0,
 	
 	damage: 20,
 	hitPoints: 5000,
@@ -1977,7 +1976,7 @@ o.nega_xam = {
 					this.stopMoving();
 					this.phaseInit = true;
 					this.makeSpikeWalls(engine);
-					this.weapons = [{type: "e_nega_spear", count: null}];
+					this.weapons = [{type: "e_dopp_sword", count: null}];
 				}
 				if (this.phaseTimer.expired()) {
 					this.nextPhase();
@@ -2012,7 +2011,7 @@ o.nega_xam = {
 					this.animDelay = 200;
 					this.phaseInit = true;
 					this.phaseTimer.start(15000);
-					this.weapons = [{type: "e_nega_axe", count: null}];
+					this.weapons = [{type: "e_dopp_axe", count: null}];
 					this.cooldown = false;
 					this.setDirection(horde.randomDirection());
 				}
@@ -2138,35 +2137,62 @@ o.nega_xam = {
 	
 };
 
-o.e_nega_axe = {
-	name: "Nega Axe",
+o.e_dopp_axe = {
 	role: "projectile",
 	cooldown: 2500,
 	speed: 250,
 	hitPoints: Infinity,
 	damage: 15,
 	spriteSheet: "objects",
-	spriteX: 128,
-	spriteY: 544,
+	spriteX: 160,
+	spriteY: 32,
 	rotate: true,
+	rotateSpeed: 700,
 	priority: 5,
-	ttl: 10000
+	ttl: 10000,
+	soundAttacks: "hero_attacks",
+
+	onInit: function () {
+		this.spawnTimer = new horde.Timer();
+		this.spawnTimer.start(50);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.spawnTimer.update(elapsed);
+		if (this.spawnTimer.expired()) {
+			engine.spawnObject(this, "e_dopp_fire");
+			this.spawnTimer.reset();
+		}
+	}
 };
 
-o.e_nega_spear = {
-	name: "Nega Spear",
+o.e_dopp_sword = {
 	role: "projectile",
 	cooldown: 750,
 	speed: 350,
 	hitPoints: Infinity,
 	damage: 5,
 	spriteSheet: "objects",
-	spriteX: 96,
+	spriteX: 384,
 	spriteY: 544,
 	spriteAlign: true,
 	priority: 2,
 	bounce: false,
-	piercing: true
+	piercing: true,
+	soundAttacks: "hero_attacks",
+
+	onInit: function () {
+		this.spawnTimer = new horde.Timer();
+		this.spawnTimer.start(50);
+	},
+	
+	onUpdate: function (elapsed, engine) {
+		this.spawnTimer.update(elapsed);
+		if (this.spawnTimer.expired()) {
+			engine.spawnObject(this, "e_dopp_fire");
+			this.spawnTimer.reset();
+		}
+	}
 };
 
 o.beholder = {
@@ -2422,7 +2448,7 @@ o.dragon = {
 				if (!this.followUpShot && this.altTimer.expired()) {
 					if (this.wounds > (this.hitPoints / 2)) {
 						this.cooldown = false;
-						this.weapons = [{type: "e_ring_fire_nega", count: null}];
+						this.weapons = [{type: "e_ring_fire_dopp", count: null}];
 						engine.objectAttack(this);
 						this.followUpShot = true;
 					}
@@ -2562,7 +2588,7 @@ o.e_ring_fire = {
 	damageType: "magic"
 };
 
-o.e_ring_fire_nega = {
+o.e_ring_fire_dopp = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 150,
@@ -2617,6 +2643,23 @@ o.e_static_blue_fire = {
 	rotate: true,
 	rotateSpeed: 100,
 	ttl: 1000,
+	bounce: false,
+	drawIndex: 0,
+	damageType: "magic"
+};
+
+o.e_dopp_fire = {
+	role: "projectile",
+	cooldown: 200,
+	speed: 0,
+	hitPoints: Infinity,
+	damage: 10,
+	spriteSheet: "objects",
+	spriteX: 288,
+	spriteY: 32,
+	rotate: true,
+	rotateSpeed: 200,
+	ttl: 250,
 	bounce: false,
 	drawIndex: 0,
 	damageType: "magic"
@@ -2755,41 +2798,21 @@ o.mini_heart = {
 		this.setDirection(new horde.Vector2(0, -1));
 		this.speed = horde.randomRange(55, 85);
 	}
-	
 };
 
-o.mini_sparkle = {
+o.mini_skull = {
 	role: "fluff",
 	spriteSheet: "objects",
-	spriteX: 224,
+	spriteX: 288 + 32,
 	spriteY: 128,
-	size: new horde.Size(14, 18),
-	ttl: 600,
-	speed: 75,
+	size: new horde.Size(10, 10),
+	ttl: 1300,
 	collidable: false,
 	drawIndex: 5,
 	onInit: function () {
 		this.setDirection(new horde.Vector2(0, -1));
-		this.speed = horde.randomRange(55, 85);
+		this.speed = horde.randomRange(25, 60);
 	}
-	
-};
-
-o.mini_sword = {
-	role: "fluff",
-	spriteSheet: "objects",
-	spriteX: 256,
-	spriteY: 128,
-	size: new horde.Size(10, 16),
-	ttl: 600,
-	speed: 75,
-	collidable: false,
-	drawIndex: 5,
-	onInit: function () {
-		this.setDirection(new horde.Vector2(0, -1));
-		this.speed = horde.randomRange(55, 85);
-	}
-	
 };
 
 o.rose = {
@@ -2971,7 +2994,7 @@ o.item_weapon_fireball = {
 	spriteY: 0,
 	ttl: 5000,
 	wepType: "h_fireball",
-	wepCount: 125
+	wepCount: 100
 };
 
 /*
@@ -2995,7 +3018,7 @@ o.item_weapon_axe = {
 	spriteY: 32,
 	ttl: 5000,
 	wepType: "h_axe",
-	wepCount: 100
+	wepCount: 80
 };
 
 o.item_weapon_fire_sword = {

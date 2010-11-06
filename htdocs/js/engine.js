@@ -572,7 +572,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 20;
+	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1159,7 +1159,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	// Wave 50: Doppelganger
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
-	w.addObjects(1, "nega_xam", 1);
+	w.addObjects(1, "doppelganger", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
 	w.bossName = "Doppelganger"
@@ -1655,7 +1655,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			break;
 	
 		case 50:
-			// Despawn all traps; Nega Xam is hard enough!!
+			// Despawn all traps; Doppelganger is hard enough!!
 			for (var id in this.objects) {
 				var obj = this.objects[id];
 				if (obj.role === "trap") {
@@ -2998,7 +2998,7 @@ proto.objectAttack = function (object, v) {
 			}
 			break;
 
-			case "e_ring_fire_nega":
+			case "e_ring_fire_dopp":
 				var len = (Math.PI * 2);
 				var step = (len / 10);
 				for (var h = 0; h < len; h += step) {
