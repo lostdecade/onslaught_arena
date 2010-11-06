@@ -23,6 +23,7 @@ var TUTORIAL_NUM_TIPS = 4;
 
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
+var SCORE_COUNT = 10;
 
 /**
  * Creates a new Engine object
@@ -452,7 +453,8 @@ proto.initGame = function () {
 
 	this.monstersAlive = 0;
 
-	this.newHighScore = 0;
+	this.gotNewHighScore = 0;
+	this.scoreCount = 0;
 	this.statsCount = 0;
 	this.statsIncrement = 0;
 	this.statsIndex = 0;
@@ -1805,7 +1807,7 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 		if (totalScore > highScore) {
 			this.putData(HIGH_SCORE_KEY, totalScore);
 			horde.sound.play("victory");
-			this.newHighScore = totalScore;
+			this.gotNewHighScore = true;
 		}
 
 		if (this.saveHighScores()) {
@@ -2223,6 +2225,15 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		this.woundsTo -= ((this.woundsToSpeed / 1000) * elapsed);
 	} else {
 		this.woundsTo = player.wounds;
+	}
+
+	var totalScore = this.getTotalScore();
+	if (this.scoreCount < totalScore) {
+		this.scoreCount += SCORE_COUNT;
+		if (this.scoreCount > totalScore) this.scoreCount = totalScore;
+	} else if (this.scoreCount > totalScore) {
+		this.scoreCount -= SCORE_COUNT;
+		if (this.scoreCount < totalScore) this.scoreCount = totalScore;
 	}
 
 	// Snap to grid to prevent vibrating bars
@@ -3268,7 +3279,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 				564, 2444, 256, 50,
 				192, headerY, 256, 50
 			);
-		} else if (this.newHighScore) {
+		} else if (this.gotNewHighScore) {
 			ctx.drawImage(
 				this.preloader.getImage("ui"),
 				564, 2374, 404, 50,
@@ -3818,10 +3829,8 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillStyle = COLOR_WHITE;
 	ctx.font = "Bold 38px Cracked";
 
-	var totalScore = this.getTotalScore();
-
 	ctx.fillText(wCount, 600, 440);
-	ctx.fillText(totalScore, 600, 472);
+	ctx.fillText(this.scoreCount, 600, 472);
 	ctx.restore();
 
 };
@@ -4276,7 +4285,7 @@ proto.sendHighScore = function (highScore) {
 	if (window.ldgHash) {
 		var hash = decodeURIComponent(window.ldgHash);
 	} else {
-		var hash = ["l", "d", "g", "f", "t", "w"].join("");
+		var hash = "ldgftw";
 	}
 	var data = "high_score=" + highScore;
 	data += "&x=" + encodeURIComponent(horde.x(data, hash)); // Every other parameter besides this one is a dummy
