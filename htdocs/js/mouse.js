@@ -5,6 +5,7 @@ horde.Mouse = function (canvas) {
 	this.mouseX = 0;
 	this.mouseY = 0;
 	this.canvas = canvas;
+	this.lastButtonStates = {};
 	horde.on("mousemove", this.handleMouseMove, window, this);
 	horde.on("mousedown", this.handleMouseDown, window, this);
 	horde.on("mouseup", this.handleMouseUp, window, this);
@@ -51,6 +52,16 @@ proto.isAnyButtonDown = function () {
 
 proto.clearButtons = function () {
 	this.buttonStates = {};
+};
+
+proto.wasButtonClicked = function (button) {
+	return (this.buttonStates[button] && !this.lastButtonStates[button]);
+};
+
+proto.storeButtonStates = function () {
+	for (var key in this.buttonStates) {
+		this.lastButtonStates[key] = this.buttonStates[key];
+	}
 };
 
 }());

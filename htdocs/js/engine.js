@@ -86,25 +86,31 @@ horde.Engine = function horde_Engine () {
 var proto = horde.Engine.prototype;
 
 proto.resize = function horde_Engine_proto_resize () {
-	if (!this.enableFullscreen) {
-		return;
-	}
-	var height = window.innerHeight;
-	height -= 80; // Some buffer around the game
-	if (height < 480) {
+	var windowWidth = window.innerWidth;
+	var windowHeight = window.innerHeight;
+	var stage = document.getElementById("stage");
+	var stageHeight = (windowHeight - stage.offsetTop);
+	stage.style.height = stageHeight + "px";
+	if (this.enableFullscreen) {
+		height = (stageHeight - 50);
+		if (height < 480) {
+			height = 480;
+		}
+		if (height > 768) {
+			height = 768;
+		}
+		var width = Math.round(height * 1.333);
+	} else {
+		width = 640;
 		height = 480;
 	}
-	if (height > 768) {
-		height = 768;
-	}
-	var width = Math.round(height * 1.333);
 	var c = this.canvases["display"];
 	c.style.width = width + "px";
 	c.style.height = height + "px";
-	c.style.marginLeft = -(width / 2) + "px";
-	c.style.marginTop = -(height / 2) + "px";
-	var stage = document.getElementById("stage");
-	stage.style.height = height + "px";
+	var gameLeft = Math.max((windowWidth / 2) - (width / 2), 0);
+	var gameTop = Math.max((stageHeight / 2) - (height / 2), 0);
+	c.style.left = gameLeft + "px";
+	c.style.top = gameTop + "px";
 };
 
 /**
@@ -2863,16 +2869,24 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			player.setDirection(move);
 		}
 
-		// Fire using the targeting reticle
-		if (this.mouse.isButtonDown(buttons.LEFT)) {
-
-			// Where did the click take place?
+		if (this.mouse.wasButtonClicked(buttons.LEFT)) {
 			if (
 				this.showTutorial
 				&& (mouseV.y <= (TUTORIAL_HEIGHT + this.tutorialY))
 			) {
-				// Press here or ESC to skip
+				// Dismiss tutorial
 				this.showTutorial = false;
+				this.mouse.clearButtons();
+			} else if (
+				mouseV.x >= 603 
+				&& mouseV.x <= 635
+				&& mouseV.y >= 10
+				&& mouseV.y <= 42
+			) {
+				// Toggle fullscreen
+				this.enableFullscreen = !this.enableFullscreen;
+				this.resize();
+				this.mouse.clearButtons();
 			} else if (
 				((mouseV.x >= 380) && (mouseV.x <= 380+96))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 416+58))
@@ -2880,16 +2894,17 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				// Toggle mute
 				horde.sound.toggleMuted();
 				this.mouse.clearButtons();
-			} else {
-				// Anywhere else: ATTACK!
-				var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
-				this.objectAttack(player, v);
-				this.heroFiring = true;
-				this.heroFiringDirection = v;
-				this.nextTutorial(4);
-				this.showReticle = true;
 			}
+		}
 
+		// Fire using the targeting reticle
+		if (this.mouse.isButtonDown(buttons.LEFT)) {
+			var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
+			this.objectAttack(player, v);
+			this.heroFiring = true;
+			this.heroFiringDirection = v;
+			this.nextTutorial(4);
+			this.showReticle = true;
 		} else if (shoot.x !== 0 || shoot.y !== 0) {
 			this.objectAttack(player, shoot);
 			this.heroFiring = true;
@@ -2905,6 +2920,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 		
 		this.keyboard.storeKeyStates();
+		this.mouse.storeButtonStates();
 	}
 
 };
@@ -3825,6 +3841,15 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		this.images.getImage("objects"),
 		w.spriteX, w.spriteY, 32, 32,
 		603, 412, 32, 32
+	);
+	
+	// Draw fullscreen toggle icon
+	// TODO: Create acutal gfx for this icon
+	// Would be nice to have 1 icon for each state (this.enableFullscreen = true/false)
+	ctx.drawImage(
+		this.images.getImage("objects"),
+		32, 32, 32, 32,
+		603, 5, 32, 32
 	);
 	
 	// Draw gold amount and weapon count
