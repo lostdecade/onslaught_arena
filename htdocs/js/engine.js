@@ -209,7 +209,11 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facin
 	var o = horde.makeObject(type, true);
 	var owner = parent;
 	while (owner.ownerId !== null) {
-		owner = this.objects[owner.ownerId];
+		if (this.objects[owner.ownerId]) {
+			owner = this.objects[owner.ownerId];
+		} else {
+			break;
+		}
 	}
 	o.ownerId = owner.id;
 	o.team = parent.team;
