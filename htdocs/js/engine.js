@@ -812,13 +812,13 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	w.nextWaveTime = 90000;
 	this.waves.push(w);
 
-	// Wave 20: Demonclops
+	// Wave 20: Minotaur
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
 	w.addObjects(1, "superclops", 1);
 	w.nextWaveTime = Infinity;
 	w.bossWave = true;
-	w.bossName = "Demonclops"
+	w.bossName = "Minotaur"
 	this.waves.push(w);
 	
 	// Wave 21: Level 3
