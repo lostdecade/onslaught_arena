@@ -3663,7 +3663,7 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	if (o.spriteYOverlay) {
 		ctx.save();
 		var alpha = (1 - (o.wounds / o.hitPoints)) + 0.3;
-		ctx.globalAlpha = percentage;
+		ctx.globalAlpha = alpha;
 		ctx.drawImage(
 			this.images.getImage(o.spriteSheet),
 			s.x, o.spriteYOverlay + 1, o.size.width - 1, o.size.height - 1,
