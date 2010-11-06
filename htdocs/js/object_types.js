@@ -1340,7 +1340,7 @@ o.superclops = {
 	soundDamage: "cyclops_damage",
 	soundDies: "cyclops_dies",
 
-	weapons: [{type: "e_energy_ball", count: null}],
+	weapons: [{type: "e_minotaur_trident", count: null}],
 
 	lootTable: [
 		{type: "item_gold_chest", weight: 4},
@@ -1454,7 +1454,7 @@ o.superclops = {
 			case 6:
 				if (!this.phaseInit) {
 					this.speed = 50;
-					this.weapons = [{type: "e_energy_ball", count: null}];
+					this.weapons = [{type: "e_minotaur_trident", count: null}];
 					this.cooldown = true;
 					this.phaseTimer.start(6000)
 					this.phaseInit = true;
@@ -2535,18 +2535,17 @@ o.e_bouncing_boulder = {
 	ttl: 5000
 };
 
-o.e_energy_ball = {
+o.e_minotaur_trident = {
 	role: "projectile",
 	cooldown: 2000,
 	speed: 200,
 	hitPoints: Infinity,
 	damage: 20,
+	spriteAlign: true,
 	spriteSheet: "objects",
-	spriteX: 320,
+	spriteX: 160,
 	spriteY: 0,
-	rotate: true,
-	bounce: false,
-	damageType: "magic"
+	bounce: false
 };
 
 o.e_ring_fire = {
@@ -3010,6 +3009,7 @@ o.item_weapon_fire_sword = {
 	wepCount: 5000
 };
 
+/*
 o.item_weapon_fire_knife = {
 	role: "powerup_weapon",
 	speed: 0,
@@ -3020,5 +3020,6 @@ o.item_weapon_fire_knife = {
 	wepType: "h_fire_knife",
 	wepCount: 1000
 };
+*/
 
 }());

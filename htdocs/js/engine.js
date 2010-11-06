@@ -572,7 +572,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 40;
+	var testWave = 20;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -2909,7 +2909,7 @@ proto.objectAttack = function (object, v) {
 
 	switch (weaponType) {
 		
-		case "e_energy_ball":
+		case "e_minotaur_trident":
 			var h = v.heading();
 			for (var x = -0.5; x <= 0.5; x += 0.5) {
 				this.spawnObject(
