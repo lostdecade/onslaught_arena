@@ -55,8 +55,6 @@ horde.Engine = function horde_Engine () {
 	this.pointerOptionsStart = 0;
 	
 	this.targetReticle = {
-		angle: 0,
-		rotateSpeed: 1,
 		position: new horde.Vector2()
 	};
 	
@@ -2123,12 +2121,6 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 
 horde.Engine.prototype.updateObjects = function (elapsed) {
 
-	var tr = this.targetReticle;
-	tr.angle += (tr.rotateSpeed / 1000) * elapsed;
-	if (tr.angle > 360) {
-		tr.angle = 0;
-	}
-
 	var numMonsters = 0;
 	var numMonstersAboveGate = 0;
 	
@@ -2444,6 +2436,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		// Toggle sound with "M" for "mute".
 		if (this.keyboard.isKeyPressed(77)) {
 			horde.sound.toggleMuted();
+		}
+
+		// Toggle fullscreen with "F".
+		if (this.keyboard.isKeyPressed(70)) {
+			this.toggleFullscreen();
 		}
 
 		// Code: lddqd = god mode
@@ -2891,13 +2888,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				&& mouseV.y >= 443
 				&& mouseV.y <= 475
 			) {
-				// Toggle fullscreen
-				horde.sound.play("select_pointer");
-				this.enableFullscreen = !this.enableFullscreen;
-				var fullscreenPref = (this.enableFullscreen) ? 1 : 0;
-				this.putData("fullscreen", fullscreenPref);
-				this.resize();
-				this.mouse.clearButtons();
+				this.toggleFullscreen();
 			} else if (
 				((mouseV.x >= 506) && (mouseV.x <= 602))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
@@ -3733,7 +3724,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	if (!this.showReticle) return;
 
 	ctx.save();
-	ctx.globalAlpha = 0.5;
+	ctx.globalAlpha = 0.75;
 	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
 	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
@@ -4350,6 +4341,15 @@ proto.sendHighScore = function (highScore) {
 	xhr.open("POST", "/onslaught_arena/high_scores");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 	xhr.send(data);
+};
+
+proto.toggleFullscreen = function () {
+	horde.sound.play("select_pointer");
+	this.enableFullscreen = !this.enableFullscreen;
+	var fullscreenPref = (this.enableFullscreen ? 1 : 0);
+	this.putData("fullscreen", fullscreenPref);
+	this.resize();
+	this.mouse.clearButtons();
 };
 
 }());
