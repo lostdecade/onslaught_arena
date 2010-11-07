@@ -265,11 +265,16 @@ proto.preloadComplete = function () {
  * @return {void}
  */
 proto.init = function horde_Engine_proto_init () {
-
+	
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
+	
+	var fullscreenPref = this.getData("fullscreen");
+	if (fullscreenPref == 0) {
+		this.enableFullscreen = false;
+	}
 	
 	this.resize();
 	horde.on("resize", this.resize, window, this);
@@ -2890,6 +2895,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				// Toggle fullscreen
 				horde.sound.play("select_pointer");
 				this.enableFullscreen = !this.enableFullscreen;
+				var fullscreenPref = (this.enableFullscreen) ? 1 : 0;
+				this.putData("fullscreen", fullscreenPref);
 				this.resize();
 				this.mouse.clearButtons();
 			} else if (
