@@ -488,6 +488,9 @@ proto.initGame = function () {
 	this.tutorialDirection = "down";
 	this.hideTutorialTimer = null;
 
+	this.heroFiring = false;
+	this.heroFiringDirection = null;
+
 };
 
 /**
