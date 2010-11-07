@@ -2878,18 +2878,19 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.showTutorial = false;
 				this.mouse.clearButtons();
 			} else if (
-				mouseV.x >= 603 
-				&& mouseV.x <= 635
-				&& mouseV.y >= 10
-				&& mouseV.y <= 42
+				mouseV.x >= 440
+				&& mouseV.x <= 472
+				&& mouseV.y >= 443
+				&& mouseV.y <= 475
 			) {
 				// Toggle fullscreen
+				horde.sound.play("select_pointer");
 				this.enableFullscreen = !this.enableFullscreen;
 				this.resize();
 				this.mouse.clearButtons();
 			} else if (
-				((mouseV.x >= 380) && (mouseV.x <= 380+96))
-				&& ((mouseV.y >= 416) && (mouseV.y <= 416+58))
+				((mouseV.x >= 344) && (mouseV.x <= 440))
+				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
 			) {
 				// Toggle mute
 				horde.sound.toggleMuted();
@@ -3778,19 +3779,27 @@ proto.drawImagePain = function horde_Engine_proto_drawImagePain (
  * @return {void}
  */
 proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
+
+	// Draw fullscreen toggle icon
+	var spriteX = (this.enableFullscreen ? 596 : 564);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		spriteX, 910, 32, 32,
+		440, 443, 32, 32
+	);
 	
+	// Health bar
 	var bar = {
-		width : 320,
-		height : 24,
-		x : 50,
-		y : 432
+		width: 280,
+		height: 24,
+		x: 50,
+		y: 432
 	};
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
 	var w = horde.objectTypes[weaponInfo.type];
 	var wCount = (weaponInfo.count ? weaponInfo.count : "");
 	
-	// Draw health bar
 	var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
 	var width2 = (bar.width - Math.round((bar.width * this.woundsTo) / o.hitPoints));
 
@@ -3838,10 +3847,10 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
-		380, 416, 96, 58
+		344, 416, 96, 58
 	);
 	
-	// Draw gold coin
+	// Draw score icon
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		32, 32, 32, 32,
@@ -3854,16 +3863,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		w.spriteX, w.spriteY, 32, 32,
 		603, 412, 32, 32
 	);
-	
-	// Draw fullscreen toggle icon
-	// TODO: Create acutal gfx for this icon
-	// Would be nice to have 1 icon for each state (this.enableFullscreen = true/false)
-	ctx.drawImage(
-		this.images.getImage("objects"),
-		32, 32, 32, 32,
-		603, 5, 32, 32
-	);
-	
+		
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "right";
