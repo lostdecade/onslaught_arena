@@ -76,3 +76,16 @@ canvas {
 .nav a:hover {
 	color: #faa61a;
 }
+
+#tip {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 5px;
+	font-family: Tahoma, Arial, Sans;
+	font-size: 14px;
+	font-weight: bold;
+	text-align: center;
+	color: #eee;
+	text-shadow: #666 1px 1px 0;
+}
