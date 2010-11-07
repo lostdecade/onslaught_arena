@@ -78,6 +78,23 @@ horde.Engine = function horde_Engine () {
 		scale: 1,
 		position: new horde.Vector2()
 	};
+	
+	// Super ghetto Tips
+	var tips = [
+		"Hold down the left mouse button to auto fire.",
+		"Some enemies can only be hurt using certain types of weapons.",
+		"Certain enemy projectiles can't be destroyed. Learn to dodge!",
+		"Toggle fullscreen mode by using the screen icon in the lower right.",
+		"Taking damage lowers your score. Try not to get hit!",
+		"Your game is saved automatically after you defeat each boss."
+	];
+	var tip = document.getElementById("tip");
+	var rotateTip = function () {
+		var index = horde.randomRange(0, tips.length - 1);
+		tip.innerHTML = "Tip: " + tips[index];
+	};
+	rotateTip();
+	window.setInterval(rotateTip, 15000);
 		
 };
 
@@ -106,9 +123,13 @@ proto.resize = function horde_Engine_proto_resize () {
 	c.style.width = width + "px";
 	c.style.height = height + "px";
 	var gameLeft = Math.max((windowWidth / 2) - (width / 2), 0);
-	var gameTop = Math.max((stageHeight / 2) - (height / 2), 0);
+	var gameTop = Math.max((stageHeight / 2) - (height / 2), 30);
 	c.style.left = gameLeft + "px";
 	c.style.top = gameTop + "px";
+	var tip = document.getElementById("tip");
+	tip.style.top = (gameTop - 30) + "px";
+	tip.style.left = "20px";
+	tip.style.width = (windowWidth - 40) + "px";
 };
 
 /**
