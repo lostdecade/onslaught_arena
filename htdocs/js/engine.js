@@ -2272,11 +2272,14 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 	}
 
 	var totalScore = this.getTotalScore();
+	var diff = Math.abs(this.scoreCount - totalScore);
+	var speed = horde.clamp(diff, 1000, 10000);
+	var amount = Math.floor((speed / 1000) * elapsed);
 	if (this.scoreCount < totalScore) {
-		this.scoreCount += SCORE_COUNT;
+		this.scoreCount += amount;
 		if (this.scoreCount > totalScore) this.scoreCount = totalScore;
 	} else if (this.scoreCount > totalScore) {
-		this.scoreCount -= SCORE_COUNT;
+		this.scoreCount -= amount;
 		if (this.scoreCount < totalScore) this.scoreCount = totalScore;
 	}
 
@@ -2923,6 +2926,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				&& mouseV.y <= 475
 			) {
 				this.toggleFullscreen();
+				this.mouse.clearButtons();
 			} else if (
 				((mouseV.x >= 506) && (mouseV.x <= 602))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
@@ -4382,7 +4386,6 @@ proto.toggleFullscreen = function () {
 	var fullscreenPref = (this.enableFullscreen ? 1 : 0);
 	this.putData("fullscreen", fullscreenPref);
 	this.resize();
-	this.mouse.clearButtons();
 };
 
 }());

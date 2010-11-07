@@ -118,6 +118,10 @@ horde.randomRange = function horde_randomRange (min, max) {
 	return (Math.round(Math.random() * (max - min)) + min);
 };
 
+horde.clamp = function horde_clamp (value, min, max) {
+	return Math.min(Math.max(value, min), max);
+};
+
 /**
  * Returns a randomly generated direction
  * @return {horde.Vector2} Direction vector
