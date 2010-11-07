@@ -22,30 +22,52 @@ function setup () {
 // Cleanup
 function cleanup () {
 	unlink(ROOT . 'horde.js');
+	unlink(ROOT . 'horde_demo.js');
 }
 
 // Compile a bunch of JS files
-function compileJS ($files, $target) {
+function compileJS ($files, $target, $version, $demo = false) {
+	$js = '';
+	foreach ($files as $filename) {
+		$js .= file_get_contents($filename);
+	}
+	$js = <<< JAVASCRIPT
+(function () {
+	{$js}
+}());
+JAVASCRIPT;
+	if ($demo) {
+		$js = str_replace('var DEMO = false;', 'var DEMO = true;', $js);
+	}
+	$js = str_replace('{{VERSION}}', $version, $js);
+	file_put_contents(ROOT . 'tmp.js', $js);
 	$command = 
 		'closure ' . 
 		" --js_output_file {$target}" .
-		' --compilation_level SIMPLE_OPTIMIZATIONS';
-	foreach ($files as $filename) {
-		$command .= " --js {$filename}";
-	}
+		' --compilation_level SIMPLE_OPTIMIZATIONS' .
+		' --js ' . ROOT . 'tmp.js';
 	exec($command);
+	unlink(ROOT . 'tmp.js');
 }
 
 // Build the web version
 function buildWeb ($version) {
+	// FULL
 	$compiled_js = file_get_contents(ROOT . 'horde.js');
 	$tpl = file_get_contents(ROOT . 'template/web.template.html');
 	$tpl = str_replace('{{GAME_CODE}}', $compiled_js, $tpl);
 	$tpl = str_replace('{{VERSION}}', $version, $tpl);
+	// DEMO
+	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
+	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
+	$demo_tpl = str_replace('{{GAME_CODE}}', $demo_js, $demo_tpl);
+	$demo_tpl = str_replace('{{VERSION}}', $version, $demo_tpl);
+	// SHARED
 	$web_root = ROOT . 'build/web/';
 	$htdocs = ROOT . 'htdocs';
 	exec("mkdir {$web_root}");
-	file_put_contents("{$web_root}index.html", $tpl);
+	file_put_contents("{$web_root}full.html", $tpl);
+	file_put_contents("{$web_root}demo.html", $demo_tpl);
 	exec("cp -r {$htdocs}/img {$web_root}");
 	exec("cp -r {$htdocs}/css {$web_root}");
 	exec("cp -r {$htdocs}/lib {$web_root}");
@@ -82,6 +104,7 @@ $source_js = array(
 	"{$js_dir}/rect.js",
 	"{$js_dir}/keyboard.js",
 	"{$js_dir}/mouse.js",
+	"{$js_dir}/", // Append wave file to index 8!
 	"{$js_dir}/engine.js",
 	"{$js_dir}/object.js",
 	"{$js_dir}/object_types.js",
@@ -94,8 +117,17 @@ $source_js = array(
 $version = getVersion();
 echo "Building Onslaught! Arena v{$version}\n";
 
-echo "Compiling JavaScript...\n";
-compileJS($source_js, ROOT. 'horde.js');
+$full_version = $source_js;
+$full_version[8] .= 'waves_full.js';
+
+echo "Compiling Full Version JavaScript...\n";
+compileJS($full_version, ROOT. 'horde.js', $version);
+
+$demo_version = $source_js;
+$demo_version[8] .= 'waves_demo.js';
+
+echo "Compiling Demo Version JavaScript...\n";
+compileJS($demo_version, ROOT. 'horde_demo.js', $version, true);
 
 setup();
 

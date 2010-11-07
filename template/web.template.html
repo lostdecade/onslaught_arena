@@ -7,7 +7,7 @@
 	<meta name="keywords" content="onslaught, html5, indie, browser-based, lost decade games, javascript, chiptunes, arcade, retro, oldschool, geoff blair, matt hackett, joshua morse">
 	<link rel="icon" href="img/favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="css/horde.css">
+	<link rel="stylesheet" href="css/horde.css?v={{VERSION}}">
 	<title>Onslaught! Arena &bull; an HTML5 medieval fantasy shoot-em-up</title>
 </head>
 <body>
@@ -43,7 +43,11 @@
 		soundManager.url = "lib/sm2/";
 	</script>
 	
-	<script>{{GAME_CODE}}</script>
+	<script>
+	(function () {
+		{{GAME_CODE}}
+	}());
+	</script>
 	
 	<script type="text/javascript">
 	  var _gaq = _gaq || [];
