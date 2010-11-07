@@ -2922,11 +2922,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.heroFiringDirection = null;
 		}
 		
-		// Fire using the keyboard
-		if (this.keyboard.isKeyDown(keys.SPACE)) {
-			this.objectAttack(player);
-		}
-		
 		this.keyboard.storeKeyStates();
 		this.mouse.storeButtonStates();
 	}
