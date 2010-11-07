@@ -61,7 +61,6 @@ horde.Engine = function horde_Engine () {
 	this.enableFullscreen = true;
 	this.enableClouds = false;
 	this.cloudTimer = null;
-	this.woundsTo = 0;
 	this.woundsToSpeed = 10;
 	
 	this.introTimer = new horde.Timer();
@@ -81,12 +80,21 @@ horde.Engine = function horde_Engine () {
 	
 	// Super ghetto Tips
 	var tips = [
+		"The Beholder drops special loot, a powerful weapon!",
+		"Pick up meat to restore 10% of your health.",
+		"There are 5 bosses in Onslaught Arena!.",
+		"The Last Boss can be found on Wave 50.",
+		"Enemies deal more melee damage than their projectile weapons.",
 		"Hold down the left mouse button to auto fire.",
-		"Some enemies can only be hurt using certain types of weapons.",
+		"The Gelatinous Cube can only be hurt by fire weapons.",
+		"You get 1,000 points for each wave you survive!",
 		"Certain enemy projectiles can't be destroyed. Learn to dodge!",
 		"Toggle fullscreen mode by using the screen icon in the lower right.",
 		"Taking damage lowers your score. Try not to get hit!",
-		"Your game is saved automatically after you defeat each boss."
+		"Your game is saved automatically after you defeat each boss.",
+		"All actions in Onslaught! Arena support keyboard controls.",
+		"You can press the M key to toggle muting.",
+		"You can press the F key to toggle fullscreen mode."
 	];
 	var tip = document.getElementById("tip");
 	var rotateTip = function () {
@@ -94,7 +102,7 @@ horde.Engine = function horde_Engine () {
 		tip.innerHTML = "Tip: " + tips[index];
 	};
 	rotateTip();
-	window.setInterval(rotateTip, 15000);
+	setInterval(rotateTip, 15000);
 		
 };
 
@@ -511,6 +519,7 @@ proto.initGame = function () {
 
 	this.heroFiring = false;
 	this.heroFiringDirection = null;
+	this.woundsTo = 0;
 
 };
 
