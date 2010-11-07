@@ -2883,8 +2883,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.showTutorial = false;
 				this.mouse.clearButtons();
 			} else if (
-				mouseV.x >= 440
-				&& mouseV.x <= 472
+				mouseV.x >= 604
+				&& mouseV.x <= 636
 				&& mouseV.y >= 443
 				&& mouseV.y <= 475
 			) {
@@ -2896,7 +2896,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.resize();
 				this.mouse.clearButtons();
 			} else if (
-				((mouseV.x >= 344) && (mouseV.x <= 440))
+				((mouseV.x >= 506) && (mouseV.x <= 602))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
 			) {
 				// Toggle mute
@@ -3787,25 +3787,48 @@ proto.drawImagePain = function horde_Engine_proto_drawImagePain (
  */
 proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
-	// Draw fullscreen toggle icon
-	var spriteX = (this.enableFullscreen ? 596 : 564);
+	var o = this.getPlayerObject();
+	var weaponInfo = o.getWeaponInfo();
+	var w = horde.objectTypes[weaponInfo.type];
+	var wCount = (weaponInfo.count ? weaponInfo.count : "");
+
+	// Weapon Icon
 	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		spriteX, 910, 32, 32,
-		440, 443, 32, 32
+		this.images.getImage("objects"),
+		w.spriteX, w.spriteY, 32, 32,
+		4, 412, 32, 32
 	);
+
+	// Score icon
+	ctx.drawImage(
+		this.images.getImage("objects"),
+		32, 32, 32, 32,
+		4, 443, 32, 32
+	);
+			
+	// Draw gold amount and weapon count
+	ctx.save();
+	ctx.textAlign = "left";
+	ctx.font = "Bold 38px Cracked";
+
+	ctx.globalAlpha = 0.75;
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText(wCount, 48, 444);
+	ctx.fillText(this.scoreCount, 48, 474);
+
+	ctx.globalAlpha = 1;
+	ctx.fillStyle = COLOR_WHITE;
+	ctx.fillText(wCount, 46, 440);
+	ctx.fillText(this.scoreCount, 46, 472);
+	ctx.restore();
 	
 	// Health bar
 	var bar = {
 		width: 280,
 		height: 24,
-		x: 50,
+		x: 180, // centered
 		y: 432
 	};
-	var o = this.getPlayerObject();
-	var weaponInfo = o.getWeaponInfo();
-	var w = horde.objectTypes[weaponInfo.type];
-	var wCount = (weaponInfo.count ? weaponInfo.count : "");
 	
 	var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
 	var width2 = (bar.width - Math.round((bar.width * this.woundsTo) / o.hitPoints));
@@ -3847,40 +3870,25 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	}
 	ctx.drawImage(
 		this.images.getImage("objects"),
-		spriteX, 64, 42, 42, 18, 424, 42, 42
+		spriteX, 64, 42, 42,
+		(bar.x - 32), 424, 42, 42
 	);
 
 	// Mute button
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
-		344, 416, 96, 58
+		506, 416, 96, 58
+	);
+
+	// Fullscreen toggle icon
+	var spriteX = (this.enableFullscreen ? 596 : 564);
+	ctx.drawImage(
+		this.preloader.getImage("ui"),
+		spriteX, 910, 32, 32,
+		604, 443, 32, 32
 	);
 	
-	// Draw score icon
-	ctx.drawImage(
-		this.images.getImage("objects"),
-		32, 32, 32, 32,
-		603, 443, 32, 32
-	);
-	
-	// Draw Weapon Icon
-	ctx.drawImage(
-		this.images.getImage("objects"),
-		w.spriteX, w.spriteY, 32, 32,
-		603, 412, 32, 32
-	);
-		
-	// Draw gold amount and weapon count
-	ctx.save();
-	ctx.textAlign = "right";
-	ctx.fillStyle = COLOR_WHITE;
-	ctx.font = "Bold 38px Cracked";
-
-	ctx.fillText(wCount, 600, 440);
-	ctx.fillText(this.scoreCount, 600, 472);
-	ctx.restore();
-
 };
 
 /**
