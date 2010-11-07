@@ -409,22 +409,20 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("cyclops_dies", "sound/effects/cyclops_dies");
 
 		// Owlbear
-		s.create("owlbear_alarm", "sound/effects/owlbear_alarm", false, 15);
+		s.create("owlbear_alarm", "sound/effects/owlbear_alarm", false, 20);
 		s.create("owlbear_attacks", "sound/effects/owlbear_attacks", false, 15);
-		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 10);
-		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 20);
+		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 40);
+		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 50);
 
 		// Boss 1/5: Gelatinous Cube
 		s.create("cube_attacks", "sound/effects/cube_attacks");
 		s.create("cube_damage", "sound/effects/cube_damage");
 		s.create("cube_dies", "sound/effects/cube_dies");
 
-		// Demonclops
-		/*
-		s.create("_attacks", "sound/effects/_attacks");
-		s.create("_damage", "sound/effects/_damage");
-		s.create("_dies", "sound/effects/_dies");
-		*/
+		// Minotaur
+		s.create("minotaur_attacks", "sound/effects/minotaur_attacks");
+		s.create("minotaur_damage", "sound/effects/minotaur_damage");
+		s.create("minotaur_dies", "sound/effects/minotaur_dies");
 
 		// Boss 3/5: Green Dragon
 		s.create("dragon_attacks", "sound/effects/dragon_attacks");
@@ -440,11 +438,9 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("eyelet_dies", "sound/effects/eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
-		/*
-		s.create("doppleganger_attacks", "sound/effects/doppleganger_attacks");
-		s.create("doppleganger_damage", "sound/effects/doppleganger_damage");
-		s.create("doppleganger_dies", "sound/effects/doppleganger_dies");
-		*/
+		s.create("dopp_attacks", "sound/effects/dopp_attacks");
+		s.create("dopp_damage", "sound/effects/dopp_damage");
+		s.create("dopp_dies", "sound/effects/dopp_dies");
 			
 	});
 	
@@ -3584,11 +3580,11 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	ctx.textAlign = "center";
 
 	var tips = [
-		"Tip 1/4: Use the WASD keys to move the character.",
-		"Tip 2/4: Throw weapons with the arrow keys.",
-		"Tip 3/4: Or use the mouse to aim with the target reticle.",
-		"Tip 4/4: Throw weapons with the left mouse button.",
-		"Kill monsters and collect gold to raise your score!"
+		"MOVE with the WASD keys.",
+		"ATTACK with the ARROW keys.",
+		"Or use the MOUSE to AIM with the target reticle.",
+		"ATTACK by HOLDING DOWN the LEFT MOUSE BUTTON.",
+		"KILL MONSTERS and COLLECT GOLD to raise your score!"
 	];
 
 	ctx.fillStyle = COLOR_BLACK;

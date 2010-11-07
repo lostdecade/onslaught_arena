@@ -1339,9 +1339,9 @@ o.superclops = {
 	speed: 25,
 	worth: 0,
 
-	soundAttacks: "cyclops_attacks",
-	soundDamage: "cyclops_damage",
-	soundDies: "cyclops_dies",
+	soundAttacks: "minotaur_attacks",
+	soundDamage: "minotaur_damage",
+	soundDies: "minotaur_dies",
 
 	weapons: [{type: "e_minotaur_trident", count: null}],
 
@@ -1849,6 +1849,10 @@ o.doppelganger = {
 	hitPoints: 5000,
 	speed: 200,
 
+	soundAttacks: "dopp_attacks",
+	soundDamage: "dopp_damage",
+	soundDies: "dopp_dies",
+
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 	},
@@ -2156,7 +2160,7 @@ o.e_dopp_axe = {
 	rotateSpeed: 700,
 	priority: 5,
 	ttl: 10000,
-	soundAttacks: "hero_attacks",
+	soundAttacks: "dopp_attacks",
 
 	onInit: function () {
 		this.spawnTimer = new horde.Timer();
@@ -2188,7 +2192,7 @@ o.e_dopp_sword = {
 	priority: 2,
 	bounce: false,
 	piercing: true,
-	soundAttacks: "hero_attacks",
+	soundAttacks: "dopp_attacks",
 
 	onInit: function () {
 		this.spawnTimer = new horde.Timer();
@@ -3027,7 +3031,7 @@ o.item_weapon_axe = {
 	spriteY: 32,
 	ttl: 5000,
 	wepType: "h_axe",
-	wepCount: 80
+	wepCount: 75
 };
 
 o.item_weapon_fire_sword = {
