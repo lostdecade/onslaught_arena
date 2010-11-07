@@ -82,19 +82,21 @@ horde.Engine = function horde_Engine () {
 	var tips = [
 		"The Beholder drops special loot, a powerful weapon!",
 		"Pick up meat to restore 10% of your health.",
-		"There are 5 bosses in Onslaught Arena!.",
+		"There are 5 bosses in Onslaught! Arena.",
 		"The Last Boss can be found on Wave 50.",
 		"Enemies deal more melee damage than their projectile weapons.",
 		"Hold down the left mouse button to auto fire.",
-		"The Gelatinous Cube can only be hurt by fire weapons.",
-		"You get 1,000 points for each wave you survive!",
+		"Gelatinous Cube dislikes magic.",
+		"You earn 1,000 points for each wave you survive!",
 		"Certain enemy projectiles can't be destroyed. Learn to dodge!",
-		"Toggle fullscreen mode by using the screen icon in the lower right.",
+		"Toggle fullscreen mode by clicking the screen icon in the lower right.",
+		"Toggle sounds by clicking the trumpet icon in the lower right corner of the screen.",
 		"Taking damage lowers your score. Try not to get hit!",
 		"Your game is saved automatically after you defeat each boss.",
 		"All actions in Onslaught! Arena support keyboard controls.",
-		"You can press the M key to toggle muting.",
-		"You can press the F key to toggle fullscreen mode."
+		"You can press the \"M\" key to toggle muting.",
+		"You can press the \"F\" key to toggle fullscreen mode.",
+		"Press \"P\" to pause the game."
 	];
 	var tip = document.getElementById("tip");
 	var rotateTip = function () {
