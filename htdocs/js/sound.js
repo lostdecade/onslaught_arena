@@ -19,6 +19,13 @@ horde.sound.init = function horde_sound_init (callback) {
 			soundManager.volume = 100;
 			soundManager.onload = callback;
 			soundManager.useHTML5Audio = false;
+
+			soundManager.onerror = (function (init) {
+				return function () {
+					api = "html5";
+					init(callback);
+				};
+			}(arguments.callee));
 			break;
 		case "html5":
 			var audio = document.createElement("audio");

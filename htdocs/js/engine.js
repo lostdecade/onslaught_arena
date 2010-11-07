@@ -3728,7 +3728,6 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.save();
 	ctx.globalAlpha = 0.75;
 	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
-	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		256, 192, 64, 64,
