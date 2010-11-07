@@ -229,6 +229,10 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facin
 	return this.addObject(o);
 };
 
+proto.objectExists = function (objectId) {
+	return (this.objects[objectId]);
+};
+
 /**
  * Returns the currently "active" object
  * In our case this is the player avatar

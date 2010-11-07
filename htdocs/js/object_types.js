@@ -2164,6 +2164,9 @@ o.e_dopp_axe = {
 	},
 	
 	onUpdate: function (elapsed, engine) {
+		if (!engine.objectExists(this.ownerId)) {
+			this.die();
+		}
 		this.spawnTimer.update(elapsed);
 		if (this.spawnTimer.expired()) {
 			engine.spawnObject(this, "e_dopp_fire");
