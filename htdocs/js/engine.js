@@ -327,118 +327,120 @@ proto.initSound = function horde_Engine_proto_initSound () {
 	horde.sound.init(function () {
 	
 		// Create all sound files
+		var musicDir = "sound/music/";
+		var sfxDir = "sound/effects/";
 		var s = horde.sound;
 
 		// Music
-		s.create("normal_battle_music", "sound/music/normal_battle", true, 20);
-		s.create("final_battle_music", "sound/music/final_battle", true, 20);
-		s.create("victory", "sound/music/victory", true, 20);
+		s.create("normal_battle_music", musicDir + "normal_battle", true, 20);
+		s.create("final_battle_music", musicDir + "final_battle", true, 20);
+		s.create("victory", musicDir + "victory", true, 20);
 		
 		// UI
-		s.create("move_pointer", "sound/effects/move_pointer", false, 50);
-		s.create("select_pointer", "sound/effects/select_pointer", false, 50);
-		s.create("pause", "sound/effects/pause");
-		s.create("unpause", "sound/effects/unpause");
+		s.create("move_pointer", sfxDir + "move_pointer", false, 50);
+		s.create("select_pointer", sfxDir + "select_pointer", false, 50);
+		s.create("pause", sfxDir + "pause");
+		s.create("unpause", sfxDir + "unpause");
 		
 		// Environment
-		s.create("code_entered", "sound/effects/code_entered");
-		s.create("gate_opens", "sound/effects/gate_opens");
-		s.create("gate_closes", "sound/effects/gate_closes");
-		s.create("spike_attack", "sound/effects/spike_attacks");
+		s.create("code_entered", sfxDir + "code_entered");
+		s.create("gate_opens", sfxDir + "gate_opens");
+		s.create("gate_closes", sfxDir + "gate_closes");
+		s.create("spike_attack", sfxDir + "spike_attacks");
 
 		// Misc
-		s.create("immunity", "sound/effects/immunity", false, 25);
-		s.create("coins", "sound/effects/coins", false, 10);
-		s.create("eat_food", "sound/effects/eat_food", false, 20);
-		s.create("pickup_weapon", "sound/effects/pickup_weapon");
-		s.create("weapon_wall", "sound/effects/weapon_wall", false, 25);
+		s.create("immunity", sfxDir + "immunity", false, 25);
+		s.create("coins", sfxDir + "coins", false, 10);
+		s.create("eat_food", sfxDir + "eat_food", false, 20);
+		s.create("pickup_weapon", sfxDir + "pickup_weapon");
+		s.create("weapon_wall", sfxDir + "weapon_wall", false, 25);
 		
 		// Hero
-		s.create("fire_attack", "sound/effects/char_attacks_fire");
-		s.create("hero_attacks", "sound/effects/char_attacks");
-		s.create("hero_damage", "sound/effects/char_damage_3");
-		s.create("hero_dies", "sound/effects/char_dies");
+		s.create("fire_attack", sfxDir + "char_attacks_fire");
+		s.create("hero_attacks", sfxDir + "char_attacks");
+		s.create("hero_damage", sfxDir + "char_damage_3");
+		s.create("hero_dies", sfxDir + "char_dies");
 		
 		// Bat
 		// Attack: not needed
-		s.create("bat_damage", "sound/effects/bat_damage");
-		s.create("bat_dies", "sound/effects/bat_dies");
+		s.create("bat_damage", sfxDir + "bat_damage");
+		s.create("bat_dies", sfxDir + "bat_dies");
 		
 		// Goblin
-		s.create("goblin_attacks", "sound/effects/goblin_attacks");
-		s.create("goblin_damage", "sound/effects/goblin_damage");
-		s.create("goblin_dies", "sound/effects/goblin_dies");
+		s.create("goblin_attacks", sfxDir + "goblin_attacks");
+		s.create("goblin_damage", sfxDir + "goblin_damage");
+		s.create("goblin_dies", sfxDir + "goblin_dies");
 
 		// Demoblin
-		s.create("demoblin_attacks", "sound/effects/demoblin_attacks", false, 80);
+		s.create("demoblin_attacks", sfxDir + "demoblin_attacks", false, 80);
 		// Damage: goblin_damage
 		// Dies: goblin_dies
 
 		// Imp
 		// Attack: not needed
-		s.create("imp_damage", "sound/effects/imp_damage", false, 50);
-		s.create("imp_dies", "sound/effects/imp_dies", false, 50);
+		s.create("imp_damage", sfxDir + "imp_damage", false, 50);
+		s.create("imp_dies", sfxDir + "imp_dies", false, 50);
 
 		// Gel
 		// Attack: not needed
-		s.create("gel_damage", "sound/effects/gel_damage", false, 20);
-		s.create("gel_dies", "sound/effects/gel_dies", false, 20);
+		s.create("gel_damage", sfxDir + "gel_damage", false, 20);
+		s.create("gel_dies", sfxDir + "gel_dies", false, 20);
 
 		// Flaming Skull
 		// Attack: not needed
-		s.create("skull_damage", "sound/effects/skull_damage", false, 25);
-		s.create("skull_dies", "sound/effects/skull_dies", false, 5);
+		s.create("skull_damage", sfxDir + "skull_damage", false, 25);
+		s.create("skull_dies", sfxDir + "skull_dies", false, 5);
 	
 		// Wizard
-		s.create("wizard_attacks", "sound/effects/wizard_attacks", false, 25);
+		s.create("wizard_attacks", sfxDir + "wizard_attacks", false, 25);
 		// Damage: goblin_damage
 		// Dies: goblin_dies
-		s.create("wizard_disappear", "sound/effects/wizard_disappear", false, 50);
-		s.create("wizard_reappear", "sound/effects/wizard_reappear", false, 50);
+		s.create("wizard_disappear", sfxDir + "wizard_disappear", false, 50);
+		s.create("wizard_reappear", sfxDir + "wizard_reappear", false, 50);
 
 		// Sandworm
-		s.create("sandworm_attacks", "sound/effects/sandworm_attacks", false, 75);
+		s.create("sandworm_attacks", sfxDir + "sandworm_attacks", false, 75);
 		// Damage: goblin_damage
-		s.create("sandworm_dies", "sound/effects/sandworm_dies", false, 40);
+		s.create("sandworm_dies", sfxDir + "sandworm_dies", false, 40);
 
 		// Cyclops
-		s.create("cyclops_attacks", "sound/effects/cyclops_attacks");
-		s.create("cyclops_damage", "sound/effects/cyclops_damage");
-		s.create("cyclops_dies", "sound/effects/cyclops_dies");
+		s.create("cyclops_attacks", sfxDir + "cyclops_attacks");
+		s.create("cyclops_damage", sfxDir + "cyclops_damage");
+		s.create("cyclops_dies", sfxDir + "cyclops_dies");
 
 		// Owlbear
-		s.create("owlbear_alarm", "sound/effects/owlbear_alarm", false, 20);
-		s.create("owlbear_attacks", "sound/effects/owlbear_attacks", false, 15);
-		s.create("owlbear_damage", "sound/effects/owlbear_damage", false, 40);
-		s.create("owlbear_dies", "sound/effects/owlbear_dies", false, 50);
+		s.create("owlbear_alarm", sfxDir + "owlbear_alarm", false, 20);
+		s.create("owlbear_attacks", sfxDir + "owlbear_attacks", false, 15);
+		s.create("owlbear_damage", sfxDir + "owlbear_damage", false, 40);
+		s.create("owlbear_dies", sfxDir + "owlbear_dies", false, 50);
 
 		// Boss 1/5: Gelatinous Cube
-		s.create("cube_attacks", "sound/effects/cube_attacks");
-		s.create("cube_damage", "sound/effects/cube_damage");
-		s.create("cube_dies", "sound/effects/cube_dies");
+		s.create("cube_attacks", sfxDir + "cube_attacks");
+		s.create("cube_damage", sfxDir + "cube_damage");
+		s.create("cube_dies", sfxDir + "cube_dies");
 
 		// Minotaur
-		s.create("minotaur_attacks", "sound/effects/minotaur_attacks");
-		s.create("minotaur_damage", "sound/effects/minotaur_damage");
-		s.create("minotaur_dies", "sound/effects/minotaur_dies");
+		s.create("minotaur_attacks", sfxDir + "minotaur_attacks");
+		s.create("minotaur_damage", sfxDir + "minotaur_damage");
+		s.create("minotaur_dies", sfxDir + "minotaur_dies");
 
 		// Boss 3/5: Green Dragon
-		s.create("dragon_attacks", "sound/effects/dragon_attacks");
-		s.create("dragon_damage", "sound/effects/dragon_damage");
-		s.create("dragon_dies", "sound/effects/dragon_dies");
+		s.create("dragon_attacks", sfxDir + "dragon_attacks");
+		s.create("dragon_damage", sfxDir + "dragon_damage");
+		s.create("dragon_dies", sfxDir + "dragon_dies");
 
 		// Boss 4/5: Beholder
-		s.create("beholder_damage", "sound/effects/beholder_damage", false, 50);
-		s.create("beholder_dies", "sound/effects/beholder_dies", false, 25);
+		s.create("beholder_damage", sfxDir + "beholder_damage", false, 50);
+		s.create("beholder_dies", sfxDir + "beholder_dies", false, 25);
 
 		// Add: Eyelet
-		s.create("eyelet_damage", "sound/effects/eyelet_damage", false, 25);
-		s.create("eyelet_dies", "sound/effects/eyelet_dies", false, 25);
+		s.create("eyelet_damage", sfxDir + "eyelet_damage", false, 25);
+		s.create("eyelet_dies", sfxDir + "eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
-		s.create("dopp_attacks", "sound/effects/dopp_attacks");
-		s.create("dopp_damage", "sound/effects/dopp_damage");
-		s.create("dopp_dies", "sound/effects/dopp_dies");
+		s.create("dopp_attacks", sfxDir + "dopp_attacks");
+		s.create("dopp_damage", sfxDir + "dopp_damage");
+		s.create("dopp_dies", sfxDir + "dopp_dies");
 			
 	});
 	

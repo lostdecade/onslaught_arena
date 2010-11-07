@@ -10,18 +10,6 @@ var sounds = {};
 
 horde.sound.init = function horde_sound_init (callback) {
 
-	if (typeof(Titanium) == "undefined") {
-		var audio = document.createElement('audio');
-		if (audio.canPlayType) {
-			//audio.canPlayType('audio/ogg; codecs="vorbis"');
-			if (!audio.canPlayType("audio/mpeg;")) {
-				format = ".ogg";
-			}
-		}
-	} else {
-		api = "Titanium";
-	}
-
 	switch (api) {
 		case "sm2":
 			soundManager.useFastPolling = true;
@@ -32,8 +20,16 @@ horde.sound.init = function horde_sound_init (callback) {
 			soundManager.onload = callback;
 			soundManager.useHTML5Audio = false;
 			break;
-		case "html5": // Intentional fallthrough
-		case "Titanium":
+		case "html5":
+			var audio = document.createElement("audio");
+
+			if (audio.canPlayType) {
+				//audio.canPlayType('audio/ogg; codecs="vorbis"');
+				if (!audio.canPlayType("audio/mpeg;")) {
+					format = ".ogg";
+				}
+			}
+
 			callback();
 			break;
 	}
@@ -41,7 +37,7 @@ horde.sound.init = function horde_sound_init (callback) {
 
 horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 
-	loops = !!loops;
+	loops = Boolean(loops);
 	url += format;
 
 	if (volume === undefined) {
@@ -67,12 +63,12 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 			audio.preload = "auto";
 			audio.src = url;
 			if (loops) {
-				audio.addEventListener('ended', function () {
+				audio.addEventListener("ended", function () {
 					this.currentTime = 0;
 					this.play();
 				}, false);
 			} else {
-				audio.addEventListener('ended', function () {
+				audio.addEventListener("ended", function () {
 					this.pause();
 					this.currentTime = 0;
 				}, false);
@@ -80,24 +76,6 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 			audio.load();
 			audio.volume = volume / 100;
 			sounds[id] = audio;
-			break;
-		case "Titanium":
-			sounds[id] = Titanium.Media.createSound("app://" + url);
-			//sounds[id].setLooping(loops);
-			/**
-			 * Using this weaksauce looping workaround because Titanium.Media.Sound.stop()
-			 * does NOT actually stop a looping sound... wtf Appcelerator!?
-			 * @link http://developer.appcelerator.com/question/41791/titaniummediasoundstop-does-not-stop-looping-sounds
-			 */
-			if (loops) {
-				sounds[id].oncomplete = function () {
-					this.play();
-				};
-			}
-			sounds[id].setVolume(0);
-			sounds[id].play();
-			sounds[id].stop();
-			sounds[id].setVolume(volume / 100);
 			break;
 	}
 };
@@ -110,10 +88,8 @@ horde.sound.isPlaying = function (id) {
 				return (sound.playState === 1);
 			}
 			return false;
-			break;
 		case "html5":
 			return (sounds[id].currentTime > 0);
-			break;
 	}
 };
 
@@ -132,12 +108,6 @@ horde.sound.play = function horde_sound_play (id) {
 				sounds[id].play();
 			} catch (e) {}
 			break;
-		case "Titanium":
-			if (sounds[id].isPlaying()) {
-				sounds[id].stop();
-			}
-			sounds[id].play();
-			break;
 	}
 };
 
@@ -149,9 +119,6 @@ horde.sound.stop = function horde_sound_stop (id) {
 		case "html5":
 			sounds[id].pause();
 			sounds[id].currentTime = 0;
-			break;
-		case "Titanium":
-			sounds[id].stop();
 			break;
 	}
 };
@@ -171,11 +138,6 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 				console.log("[ERROR horde.sound.stopAll]", e);
 			}
 			break;
-		case "Titanium":
-			for (var id in sounds) {
-				sounds[id].stop();
-			}
-			break;
 	}
 };
 
@@ -191,13 +153,6 @@ horde.sound.pauseAll = function horde_sound_pauseAll () {
 				}
 			}
 			break;
-		case "Titanium":
-			for (var id in sounds) {
-				if (sounds[id].isPlaying()) {
-					sounds[id].pause();
-				}
-			}
-			break;
 	}
 };
 
@@ -209,13 +164,6 @@ horde.sound.resumeAll = function horde_sound_resumeAll () {
 		case "html5":
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
-					sounds[id].play();
-				}
-			}
-			break;
-		case "Titanium":
-			for (var id in sounds) {
-				if (sounds[id].isPaused()) {
 					sounds[id].play();
 				}
 			}
