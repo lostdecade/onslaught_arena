@@ -1096,18 +1096,24 @@ o.eyelet = {
 	damage: 10,
 	hitPoints: 40,
 	speed: 100,
-	worth: 0,
 
 	soundDamage: "eyelet_damage",
 	soundDies: "eyelet_dies",
 	
 	collidable: false,
-	
+
 	lootTable: [
 		{type: null, weight: 18},
 		{type: "item_food", weight: 1},
 		{type: "WEAPON_DROP", weight: 1}
 	],
+	
+	makeBadass: function () {
+		this.spriteY = 960;
+		this.hitPoints = 100;
+		this.speed = 175;
+		this.damage = 20;
+	},
 	
 	onInit: function () {
 		if (horde.randomRange(1, 10) > 5) {
@@ -2237,6 +2243,7 @@ o.beholder = {
 		this.phaseTimer = new horde.Timer();
 		this.eyeletOffset = 100;
 		this.eyeletOffsetMod = 1;
+		this.enraged = false;
 	},
 	
 	onUpdate: function (elapsed, engine) {
@@ -2247,6 +2254,12 @@ o.beholder = {
 		}
 		if (this.eyeletOffset < 100) {
 			this.eyeletOffsetMod = 1;
+		}
+
+		if (this.wounds > (this.hitPoints / 2) && !this.enraged) {
+			this.enraged = true;
+			this.speed *= 1.5;
+			this.animDelay /= 2;
 		}
 
 		switch (this.phase) {
@@ -2292,7 +2305,11 @@ o.beholder = {
 				movementTypes.wander.apply(this, arguments);
 				if (this.eyeletTimer.expired()) {
 					this.eyeletTimer.reset();
-					engine.spawnObject(this, "eyelet");
+					var id = engine.spawnObject(this, "eyelet");
+					if (this.wounds > (this.hitPoints / 2)) {
+						var o = engine.objects[id];
+						o.makeBadass();
+					}
 					++this.eyeletsSpawned;
 					if (this.eyeletsSpawned >= 12) {
 						this.nextPhase();
@@ -2317,15 +2334,48 @@ o.beholder = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				break;
-				
+			
+			// Shake
 			case 4:
+				if (!this.phaseInit) {
+					this.stopMoving();
+					this.phaseTimer.start(2000);
+					this.phaseInit = true;
+				}
+				this.position.x += horde.randomRange(-2, 2);
+				if (this.phaseTimer.expired()) {
+					this.nextPhase();
+				}
+				break;
+			
+			// Shit some gas clouds
+			case 5:
 				for (var n = 0; n < 2; ++n) {
 					engine.spawnObject(this, "gas_cloud");
 				}
-				this.setPhase(2);
+				this.nextPhase();
+				break;
+				
+			case 6:
+				if (!this.phaseInit) {
+					this.oldSpeed = this.speed;
+					this.speed = 250;
+					this.oldAnimDelay = this.animDelay;
+					this.animDelay = 100;
+					this.chase(engine.getPlayerObject());
+					this.phaseInit = true;
+				}
 				break;
 			
 		}	
+	},
+	
+	onWallCollide: function () {
+		if (this.phase === 6) {
+			this.speed = this.oldSpeed;
+			this.animDelay = this.oldAnimDelay;
+			this.setPhase(2);
+		}
 	}
 	
 };
@@ -2345,7 +2395,7 @@ o.gas_cloud = {
 	damage: 20,
 	hitPoints: 9999,
 	speed: 10,
-	ttl: 120000,
+	ttl: 45000,
 	
 	onInit: function () {
 		this.setDirection(horde.randomDirection());

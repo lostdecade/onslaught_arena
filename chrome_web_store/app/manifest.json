@@ -7,8 +7,7 @@
 			"http://play.lostdecadegames.com/"
 		],
 		"launch": {
-			"web_url": "http://play.lostdecadegames.com/onslaught_arena/",
-			"container": "tab"
+			"web_url": "http://play.lostdecadegames.com/onslaught_arena/"
 		}
 	},
 	"icons": {

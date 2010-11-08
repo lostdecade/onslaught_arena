@@ -54,7 +54,9 @@ horde.Engine = function horde_Engine () {
 	this.pointerOptionsStart = 0;
 	
 	this.targetReticle = {
-		position: new horde.Vector2()
+		position: new horde.Vector2(),
+		angle: 0,
+		moving: false
 	};
 	
 	this.enableFullscreen = true;
@@ -629,7 +631,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 41;
+	var testWave = 40;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1842,6 +1844,8 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
  */
 proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 	
+	this.targetReticle.moving = false;
+	
 	// Grab the current mouse position as a vector
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 
@@ -1852,6 +1856,16 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 	);
 
 	var trp = this.targetReticle.position;
+
+	if (trp.x !== mouseV.x && trp.y !== mouseV.y) {
+		this.targetReticle.moving = true;
+		var diff = trp.clone().subtract(mouseV.clone()).abs();
+		var speed = horde.clamp((diff.x + diff.y) * 2, 1, 100);
+		this.targetReticle.angle += ((speed / 1000) * this.lastElapsed);
+		if (this.targetReticle.angle > (Math.PI * 2)) {
+			this.targetReticle.angle = 0;
+		}
+	}
 
 	// Adjust the X position
 	if (mouseV.x < mouseBounds.left) {
@@ -3197,6 +3211,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.save();
 	ctx.globalAlpha = 0.75;
 	ctx.translate(this.targetReticle.position.x, this.targetReticle.position.y);
+	ctx.rotate(this.targetReticle.angle);
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		256, 192, 64, 64,
