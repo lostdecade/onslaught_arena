@@ -1,3 +1,7 @@
+horde.isDemo = function () {
+	return true;
+};
+
 horde.populateWaves = function (engine) {
 
 	// DEMO WAVES

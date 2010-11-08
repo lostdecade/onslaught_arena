@@ -1,7 +1,6 @@
 (function define_horde_Engine () {
 
 var VERSION = "{{VERSION}}";
-var DEMO = false;
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
 var URL_HIGH_SCORES = "/onslaught_arena/high_scores";
@@ -82,7 +81,6 @@ horde.Engine = function horde_Engine () {
 	var tips = [
 		"The Beholder drops special loot, a powerful weapon!",
 		"Pick up meat to restore 10% of your health.",
-		"There are 5 bosses in Onslaught! Arena.",
 		"The Last Boss can be found on Wave 50.",
 		"Enemies deal more melee damage than their projectile weapons.",
 		"Hold down the left mouse button to auto fire.",
@@ -90,10 +88,9 @@ horde.Engine = function horde_Engine () {
 		"You earn 1,000 points for each wave you survive!",
 		"Certain enemy projectiles can't be destroyed. Learn to dodge!",
 		"Toggle fullscreen mode by clicking the screen icon in the lower right.",
-		"Toggle sounds by clicking the trumpet icon in the lower right corner of the screen.",
+		"Toggle audio by clicking the trumpet icon in the lower right corner of the screen.",
 		"Taking damage lowers your score. Try not to get hit!",
 		"Your game is saved automatically after you defeat each boss.",
-		"All actions in Onslaught! Arena support keyboard controls.",
 		"You can press the \"M\" key to toggle muting.",
 		"You can press the \"F\" key to toggle fullscreen mode.",
 		"Press \"P\" to pause the game."
@@ -417,8 +414,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 
 		// Imp
 		// Attack: not needed
-		s.create("imp_damage", sfxDir + "imp_damage", false, 50);
-		s.create("imp_dies", sfxDir + "imp_dies", false, 50);
+		s.create("imp_damage", sfxDir + "imp_damage", false, 30);
+		s.create("imp_dies", sfxDir + "imp_dies", false, 30);
 
 		// Gel
 		// Attack: not needed
@@ -632,7 +629,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 50;
+	var testWave = 41;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1303,7 +1300,7 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 };
 
 proto.saveHighScores = function horde_Engine_proto_saveHighScores () {
-	return !DEMO;
+	return !horde.isDemo();
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
@@ -2078,7 +2075,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		var startY = (this.pointerYStart - 22);
 
 		// Buy Now! or Continue
-		if (DEMO || this.canContinue()) {
+		if (horde.isDemo() || this.canContinue()) {
 			if (
 				(mouseV.x >= startX && mouseV.x <= stopX)
 				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
@@ -2137,7 +2134,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 			switch (this.pointerY) {
 				case 0:
-					if (DEMO) {
+					if (horde.isDemo()) {
 						// Buy Now!
 						location.href = URL_STORE;
 					} else {
@@ -2218,6 +2215,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					location.href = URL_STORE;
 					break;
 				case 1: // Maybe later
+					horde.sound.stop("victory");
 					this.initGame();
 					break;
 			}
@@ -2742,7 +2740,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 			this.mouse.clearButtons();
 			this.statsIndex += 1;
 			if (this.statsIndex >= 5) {
-				if (DEMO) {
+				if (horde.isDemo()) {
 					this.state = "buy_now";
 					this.initOptions();
 				} else {
@@ -3382,7 +3380,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	// Version
 	var version = ("v" + VERSION);
-	if (DEMO) version += " demo";
+	if (horde.isDemo()) version += " demo";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 	ctx.textAlign = "right";
@@ -3435,7 +3433,7 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 	var startY = (this.pointerYStart - 22);
 	var spriteY;
 
-	if (DEMO) {
+	if (horde.isDemo()) {
 		// Buy now!!
 		spriteY = ((this.pointerY == 0) ? 638 : 430);
 		ctx.drawImage(
@@ -3536,7 +3534,7 @@ proto.initOptions = function () {
 		case "title":
 			this.pointerYStart = 300;
 
-			if (DEMO || this.canContinue()) {
+			if (horde.isDemo() || this.canContinue()) {
 				this.pointerY = 0;
 				this.pointerOptionsStart = 0;
 			} else {

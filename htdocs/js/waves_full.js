@@ -1,3 +1,7 @@
+horde.isDemo = function () {
+	return false;
+};
+
 horde.populateWaves = function (engine) {
 
 	// FULL GAME WAVES
