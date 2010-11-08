@@ -630,11 +630,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
+	
 	var testWave = 40;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
+	
 
 	// Test Wave
 	/*
@@ -1182,8 +1182,9 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
 		if (this.continuing || this.waveHack) {
+			var start = (this.waveHack) ? 1 : 2;
 			// Start with 2 as we don't want the bonus weapons spawning at continue
-			for (var wn = 2; wn <= actualWave; ++wn) {
+			for (var wn = start; wn <= actualWave; ++wn) {
 				this.spawnWaveExtras(wn);
 			}
 			this.waveHack = false;
