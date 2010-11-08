@@ -63,7 +63,8 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 					this.play();
 				};
 			}
-			soundManager.createSound(params);
+			var sound = soundManager.createSound(params);
+			sound.load();
 			break;
 		case "html5":
 			var audio = new Audio();
