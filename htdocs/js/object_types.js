@@ -1103,14 +1103,14 @@ o.eyelet = {
 	collidable: false,
 
 	lootTable: [
-		{type: null, weight: 18},
+		{type: null, weight: 13},
 		{type: "item_food", weight: 1},
-		{type: "WEAPON_DROP", weight: 1}
+		{type: "WEAPON_DROP", weight: 6}
 	],
 	
 	makeBadass: function () {
 		this.spriteY = 960;
-		this.hitPoints = 100;
+		this.hitPoints = 75;
 		this.speed = 175;
 		this.damage = 20;
 	},
@@ -1459,7 +1459,7 @@ o.superclops = {
 				this.nextPhase();
 				break;
 			
-			// Chase and shoot energy balls
+			// Chase and shoot tridents
 			case 6:
 				if (!this.phaseInit) {
 					this.speed = 50;
@@ -2241,12 +2241,21 @@ o.beholder = {
 	
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
+		this.attackTimer = new horde.Timer();
 		this.eyeletOffset = 100;
 		this.eyeletOffsetMod = 1;
 		this.enraged = false;
 	},
 	
 	onUpdate: function (elapsed, engine) {
+
+		this.attackTimer.update(elapsed);
+		if (this.attackTimer.expired()) {
+			var id = engine.spawnObject(this, "e_energy_ball");
+			var o = engine.objects[id];
+			o.chase(engine.getPlayerObject());
+			this.attackTimer.reset();
+		}
 
 		this.eyeletOffset += (((20 / 1000) * elapsed) * this.eyeletOffsetMod);
 		if (this.eyeletOffset > 120) {
@@ -2260,6 +2269,7 @@ o.beholder = {
 			this.enraged = true;
 			this.speed *= 1.5;
 			this.animDelay /= 2;
+			this.attackTimer.start(2000);
 		}
 
 		switch (this.phase) {
@@ -2287,6 +2297,7 @@ o.beholder = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				if (this.phaseTimer.expired()) {
+					this.attackTimer.start(4000);
 					this.nextPhase();
 				}
 				break;
@@ -2634,6 +2645,19 @@ o.e_minotaur_trident = {
 	spriteSheet: "objects",
 	spriteX: 160,
 	spriteY: 0,
+	bounce: false
+};
+
+o.e_energy_ball = {
+	role: "projectile",
+	cooldown: 2000,
+	speed: 200,
+	hitPoints: Infinity,
+	damage: 25,
+	spriteSheet: "objects",
+	spriteX: 320,
+	spriteY: 0,
+	rotate: true,
 	bounce: false
 };
 
