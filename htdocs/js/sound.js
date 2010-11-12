@@ -33,7 +33,8 @@ horde.sound.init = function horde_sound_init (callback) {
 			if (audio.canPlayType) {
 				//audio.canPlayType('audio/ogg; codecs="vorbis"');
 				if (!audio.canPlayType("audio/mpeg;")) {
-					format = ".ogg";
+					//format = ".ogg";
+					api = null;
 				}
 			}
 
