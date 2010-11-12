@@ -529,6 +529,8 @@ proto.initGame = function () {
 	this.heroFiring = false;
 	this.heroFiringDirection = null;
 	this.woundsTo = 0;
+	
+	this.gameStartTime = horde.now();
 
 };
 
@@ -1296,7 +1298,14 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 		}
 
 		if (this.saveHighScores()) {
-			this.sendHighScore(totalScore);
+			var meta = {
+				won: this.wonGame,
+				wave: this.currentWaveId + 1,
+				timePlayed: this.timePlayed,
+				player: this.getPlayerObject(),
+				fullscreen: this.enableFullscreen
+			};
+			this.sendHighScore(totalScore, meta);
 		}
 	}
 
@@ -3810,16 +3819,20 @@ proto.endGame = function () {
 	this.gameOverAlpha = 0;
 	this.updateGameOver();
 	this.state = "game_over";
+	this.timePlayed = (horde.now() - this.gameStartTime);
 };
 
-proto.sendHighScore = function (highScore) {
+proto.sendHighScore = function (highScore, meta) {
 	if (window.ldgHash) {
 		var hash = decodeURIComponent(window.ldgHash);
 	} else {
 		var hash = "ldgftw";
 	}
 	var data = "high_score=" + highScore;
-	data += "&x=" + encodeURIComponent(horde.x(data, hash)); // Every other parameter besides this one is a dummy
+	data += "&x=" + encodeURIComponent(horde.x(data, hash));
+	if (meta) {
+		data += "&m=" + encodeURIComponent(horde.x(JSON.stringify(meta), hash));
+	}
 	data += "&y=" + encodeURIComponent(horde.x(HIGH_SCORE_KEY, hash));
 	data += "&z=" + encodeURIComponent(horde.x(this.state, hash));
 	data += "&t=" + horde.Timer.now();
