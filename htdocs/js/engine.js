@@ -1551,7 +1551,18 @@ proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
 	var drop = horde.makeObject(type);
 	drop.position = object.position.clone();
 	drop.position.y -= 1;
+	if (type === "item_weapon_fire_sword") {
+		drop.position = new horde.Vector2(304, 226);
+	}
 	this.addObject(drop);
+	if (type === "item_weapon_fire_sword") {
+		// Also spawn the pointer
+		var ptr = horde.makeObject("pickup_arrow");
+		ptr.position = drop.position.clone();
+		ptr.position.x = (320 - (ptr.size.width / 2));
+		ptr.position.y -= (ptr.size.height + 10);
+		this.addObject(ptr);
+	}
 };
 
 proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
@@ -1616,7 +1627,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			continue;
 		}
 
-		if (o.role === "monster") {
+		if (o.role === "monster" || o.type === "pickup_arrow") {
 			numMonsters++;
 			if (o.position.y <= GATE_CUTOFF_Y) {
 				numMonstersAboveGate++;
@@ -1683,6 +1694,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						w.alpha = 0.9;
 						w.position = o2.position.clone();
 						w.state = "on";
+						if (o2.type === "item_weapon_fire_sword") {
+							for (var j in this.objects) {
+								if (this.objects[j].type === "pickup_arrow") {
+									this.objects[j].die();
+								}
+							}
+						}
 					}
 				}
 				if (

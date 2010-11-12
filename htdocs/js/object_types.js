@@ -2226,7 +2226,7 @@ o.beholder = {
 	drawIndex: 3,
 	
 	damage: 30,
-	hitPoints: 2500,
+	hitPoints: 3000,
 	speed: 50,
 
 	//soundAttacks: "_attacks",
@@ -2981,6 +2981,17 @@ o.gate = {
 	size: new horde.Size(64, 64)
 };
 
+o.pickup_arrow = {
+	role: "fluff",
+	speed: 0,
+	spriteSheet: "objects",
+	spriteX: 0,
+	spriteY: 608,
+	size: new horde.Size(118, 52),
+	drawIndex: 9,
+	animated: true
+};
+
 // FOOD (Eat Meat!)
 
 o.item_food = {
@@ -3090,7 +3101,6 @@ o.item_weapon_fire_sword = {
 	spriteSheet: "objects",
 	spriteX: 384,
 	spriteY: 0,
-	ttl: 30000,
 	wepType: "h_fire_sword",
 	wepCount: 5000
 };
