@@ -2251,6 +2251,8 @@ o.beholder = {
 
 		this.attackTimer.update(elapsed);
 		if (this.attackTimer.expired()) {
+			horde.sound.play("wizard_attacks");
+
 			var id = engine.spawnObject(this, "e_energy_ball");
 			var o = engine.objects[id];
 			o.chase(engine.getPlayerObject());
@@ -2435,20 +2437,22 @@ o.gas_cloud = {
 			object.addState(horde.Object.states.SLOWED, 300);
 		}
 		if (this.team !== 3 && object.damageType == "magic") {
+			horde.sound.play("fire_attack");
+
 			this.ownerId = null;
 			this.team = 3;
-			this.speed *= 5;
+			//this.speed *= 5;
 			this.damage = 2;
-			this.ttl = 15000;
+			this.ttl = 2000;
 			this.ttlElapsed = 0;
 			this.spriteY += 224;
-			this.animDelay = 400;
+			this.animDelay = 500;
 			this.animFrameIndex = 0;
 			this.animNumFrames = 3;
-			this.moveChangeDelay = horde.randomRange(3000, 5000);
-			this.bounce = true;
-			this.rotate = true;
-			this.rotateSpeed = 200;
+			//this.moveChangeDelay = horde.randomRange(3000, 5000);
+			//this.bounce = true;
+			//this.rotate = true;
+			//this.rotateSpeed = 200;
 		}
 	}
 
