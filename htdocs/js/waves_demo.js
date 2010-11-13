@@ -44,16 +44,6 @@ horde.populateWaves = function (engine) {
 
 	// Wave 5
 	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 10000);
-	w.addSpawnPoint(1, 10000);
-	w.addSpawnPoint(2, 10000);
-	w.addObjects(0, "wizard", 2);
-	w.addObjects(1, "wizard", 2);
-	w.addObjects(2, "wizard", 2);
-	engine.waves.push(w);
-
-	// Wave 6
-	var w = new horde.SpawnWave();
 	w.addSpawnPoint(0, 500);
 	w.addSpawnPoint(1, 750);
 	w.addSpawnPoint(2, 500);
@@ -64,6 +54,16 @@ horde.populateWaves = function (engine) {
 	w.addObjects(1, "goblin", 3);
 	w.addObjects(2, "bat", 5);
 	w.addObjects(2, "goblin", 2);
+	engine.waves.push(w);
+
+	// Wave 6
+	var w = new horde.SpawnWave();
+	w.addSpawnPoint(0, 10000);
+	w.addSpawnPoint(1, 10000);
+	w.addSpawnPoint(2, 10000);
+	w.addObjects(0, "wizard", 2);
+	w.addObjects(1, "wizard", 2);
+	w.addObjects(2, "wizard", 2);
 	engine.waves.push(w);
 	
 	// Wave 7
@@ -83,9 +83,9 @@ horde.populateWaves = function (engine) {
 	w.addSpawnPoint(2, 750);
 	w.addObjects(0, "cyclops", 1);
 	w.addObjects(2, "cyclops", 1);
-	w.addObjects(0, "bat", 10);
-	w.addObjects(1, "bat", 10);
-	w.addObjects(2, "bat", 10);
+	w.addObjects(0, "dire_bat", 10);
+	w.addObjects(1, "dire_bat", 10);
+	w.addObjects(2, "dire_bat", 10);
 	engine.waves.push(w);
 
 	// Wave 9
@@ -93,12 +93,16 @@ horde.populateWaves = function (engine) {
 	w.addSpawnPoint(0, 3000);
 	w.addSpawnPoint(1, 3000);
 	w.addSpawnPoint(2, 3000);
-	w.addObjects(0, "cyclops", 1);
-	w.addObjects(1, "goblin", 1);
-	w.addObjects(2, "cyclops", 1);
-	w.addObjects(0, "wizard", 2);
-	w.addObjects(1, "wizard", 2);
-	w.addObjects(2, "wizard", 2);
+	w.addObjects(0, "wizard", 1);
+	w.addObjects(1, "wizard", 1);
+	w.addObjects(2, "wizard", 1);
+	w.addObjects(0, "imp", 2);
+	w.addObjects(1, "imp", 2);
+	w.addObjects(2, "imp", 2);
+	w.addObjects(0, "demoblin", 4);
+	w.addObjects(1, "demoblin", 3);
+	w.addObjects(1, "cyclops", 1);
+	w.addObjects(2, "demoblin", 4);
 	engine.waves.push(w);
 
 	// Wave 10: Minotaur
