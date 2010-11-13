@@ -1103,9 +1103,10 @@ o.eyelet = {
 	collidable: false,
 
 	lootTable: [
-		{type: null, weight: 13},
+		{type: null, weight: 9},
 		{type: "item_food", weight: 1},
-		{type: "WEAPON_DROP", weight: 6}
+		{type: "WEAPON_DROP", weight: 8},
+		{type: "item_weapon_fireball", weight: 2}
 	],
 	
 	makeBadass: function () {
