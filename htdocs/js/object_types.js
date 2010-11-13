@@ -2292,6 +2292,7 @@ o.beholder = {
 			// Phase in
 			case 1:
 				if (!this.phaseInit) {
+					horde.sound.play("wizard_reappear");
 					this.speed = 50;
 					this.removeState(horde.Object.states.INVISIBLE);
 					this.addState(horde.Object.states.INVINCIBLE);
@@ -2318,6 +2319,8 @@ o.beholder = {
 				this.eyeletTimer.update(elapsed);
 				movementTypes.wander.apply(this, arguments);
 				if (this.eyeletTimer.expired()) {
+					horde.sound.play("wizard_reappear");
+
 					this.eyeletTimer.reset();
 					var id = engine.spawnObject(this, "eyelet");
 					if (this.wounds > (this.hitPoints / 2)) {
@@ -2424,8 +2427,8 @@ o.gas_cloud = {
 			this.spriteX = 896;
 		}
 		if (
-			this.team === 1 
-			&& !engine.objects[this.ownerId] 
+			this.team === 1
+			&& !engine.objects[this.ownerId]
 			&& (this.ttl - this.ttlElapsed > 2000)
 		) {
 			this.ttlElapsed = (this.ttl - 2000);
