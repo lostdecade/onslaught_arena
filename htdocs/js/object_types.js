@@ -762,6 +762,7 @@ o.spike_wall = {
 			
 			case 1:
 				if (!this.phaseInit) {
+					horde.sound.play("spike_attack");
 					this.setDirection(this.wallDirection);
 					this.phaseInit = true;
 				}
@@ -798,7 +799,6 @@ o.spike_sentry = {
 	spawnFramesX: 0,
 	spawnFramesY: 576,
 	spawnFrameCount: 2,
-	
 	
 	rotate: true,
 	rotateSpeed: 100,
@@ -1111,8 +1111,8 @@ o.eyelet = {
 	
 	makeBadass: function () {
 		this.spriteY = 960;
-		this.hitPoints = 75;
-		this.speed = 175;
+		this.hitPoints = 50;
+		this.speed = 150;
 		this.damage = 20;
 	},
 	
@@ -1936,6 +1936,7 @@ o.doppelganger = {
 				}
 				this.spikeTimer.update(elapsed);
 				if (this.spikeTimer.expired()) {
+					horde.sound.play("spike_attack");
 					var id = engine.spawnObject(this, "spikes");
 					var o = engine.objects[id];
 					if (o) {
@@ -2001,7 +2002,10 @@ o.doppelganger = {
 				}
 				this.chase(engine.getPlayerObject());
 				this.stopMoving();
-				return "shoot";
+				if (this.wounds > (this.hitPoints * 0.33)) {
+					// 2/3 HP (or lower)
+					return "shoot";
+				}
 				break;
 
 			// Chill out for a bit
@@ -2016,7 +2020,6 @@ o.doppelganger = {
 					var meat = horde.makeObject("item_food");
 					meat.position.x = 32;
 					meat.position.y = 64;
-					meat.healAmount *= 2;
 					engine.addObject(meat);
 					this.nextPhase();
 				}
@@ -2057,6 +2060,7 @@ o.doppelganger = {
 			// Spawn some shit...
 			case 10:
 				if (!this.phaseInit) {
+					horde.sound.play("minotaur_dies");
 					this.setDirection(new horde.Vector2(0, 1));
 					this.stopMoving();
 					this.phaseInit = true;
@@ -2078,10 +2082,12 @@ o.doppelganger = {
 	},
 	
 	makeSpikeWalls: function (engine) {
+
+		horde.sound.play("wizard_reappear");
 		
 		var safeSpots = 3;
-		var spinUpTime = 10000;
-		var wallSpeedMod = 1;
+		var spinUpTime = 5000;
+		var wallSpeedMod = 2;
 	
 		if (this.wounds > (this.hitPoints * 0.66)) {
 			// 1/3 HP (or lower)

@@ -476,8 +476,8 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("eyelet_dies", sfxDir + "eyelet_dies", false, 25);
 
 		// Boss 5/5: Doppelganger
-		s.create("dopp_attacks", sfxDir + "dopp_attacks");
-		s.create("dopp_damage", sfxDir + "dopp_damage");
+		s.create("dopp_attacks", sfxDir + "dopp_attacks", false, 50);
+		s.create("dopp_damage", sfxDir + "dopp_damage", false, 50);
 		s.create("dopp_dies", sfxDir + "dopp_dies");
 			
 	});
@@ -632,9 +632,11 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	var testWave = 40;
+	/*
+	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
+	*/
 
 	// Test Wave
 	/*
