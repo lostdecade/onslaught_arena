@@ -1121,6 +1121,7 @@ o.eyelet = {
 		}
 		this.ownerAngle = 0;
 		this.phaseTimer = new horde.Timer();
+		this.addState(horde.Object.states.INVINCIBLE, 1000);
 	},
 	
 	onUpdate: function (elapsed, engine) {
@@ -2408,7 +2409,7 @@ o.gas_cloud = {
 	damage: 20,
 	hitPoints: 9999,
 	speed: 10,
-	ttl: 45000,
+	ttl: 90000,
 	
 	damageType: "magic",
 
@@ -2438,21 +2439,15 @@ o.gas_cloud = {
 		}
 		if (this.team !== 3 && object.damageType == "magic") {
 			horde.sound.play("fire_attack");
-
 			this.ownerId = null;
 			this.team = 3;
-			//this.speed *= 5;
-			this.damage = 2;
+			this.damage = 5;
 			this.ttl = 2000;
 			this.ttlElapsed = 0;
 			this.spriteY += 224;
 			this.animDelay = 500;
 			this.animFrameIndex = 0;
 			this.animNumFrames = 3;
-			//this.moveChangeDelay = horde.randomRange(3000, 5000);
-			//this.bounce = true;
-			//this.rotate = true;
-			//this.rotateSpeed = 200;
 		}
 	}
 
