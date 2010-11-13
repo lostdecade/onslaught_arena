@@ -1708,13 +1708,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					&& o2.team !== null
 					&& o.team !== o2.team
 				) {
-					if (
-						!(o.role === "projectile" && o2.role === "trap")
-						&& !(o.role === "trap" && o2.role === "projectile")
-					) {
-						this.dealDamage(o2, o);
-						this.dealDamage(o, o2);
-					}
+					this.dealDamage(o2, o);
+					this.dealDamage(o, o2);
 				}
 			}
 		}
@@ -1754,19 +1749,27 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 
 // Deals damage from object "attacker" to "defender"
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
-	
+
 	// Monsters don't damage projectiles
 	if (attacker.role === "monster" && defender.role === "projectile") {
 		return false;
 	}
-	
+
 	// Allow the objects to handle the collision
 	attacker.execute("onObjectCollide", [defender, this]);
-	
+
+	// Traps & Projectiles shouldn't damage each other
+	if (
+		(attacker.role == "projectile" && defender.role == "trap")
+		|| (attacker.role == "trap" && defender.role == "projectile")
+	) {
+		return false;
+	}
+
 	// Allow the defender to declare themselves immune to attacks from the attacker
 	// For example: Cube is immune to non-fire attacks
 	var nullify = defender.execute("onThreat", [attacker, this]);
-	
+
 	// Check for defender immunity
 	if (
 		defender.hasState(horde.Object.states.INVINCIBLE)

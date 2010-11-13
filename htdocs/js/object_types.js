@@ -2394,7 +2394,7 @@ o.beholder = {
 o.gas_cloud = {
 	role: "trap",
 	team: 1,
-	
+
 	animated: true,
 	size: new horde.Size(128, 128),
 	spriteSheet: "characters",
@@ -2402,30 +2402,56 @@ o.gas_cloud = {
 	spriteY: 416,
 	drawIndex: 2,
 	animDelay: 400,
-	
+
 	damage: 20,
 	hitPoints: 9999,
 	speed: 10,
 	ttl: 45000,
 	
+	damageType: "magic",
+
 	onInit: function () {
 		this.setDirection(horde.randomDirection());
 		this.moveChangeDelay = horde.randomRange(5000, 10000);
 	},
-	
+
 	onUpdate: function (elasped, engine) {
-		if (!engine.objects[this.ownerId] && (this.ttl - this.ttlElapsed > 2000)) {
+		if (this.animFrameIndex === 2) {
+			this.animated = false;
+			this.spriteX = 896;
+		}
+		if (
+			this.team === 1 
+			&& !engine.objects[this.ownerId] 
+			&& (this.ttl - this.ttlElapsed > 2000)
+		) {
 			this.ttlElapsed = (this.ttl - 2000);
 		}
 		movementTypes.wander.apply(this, arguments);
 	},
-	
+
 	onObjectCollide: function (object, engine) {
 		if (object.team !== this.team && object.role !== "projectile") {
 			object.addState(horde.Object.states.SLOWED, 300);
 		}
+		if (this.team !== 3 && object.damageType == "magic") {
+			this.ownerId = null;
+			this.team = 3;
+			this.speed *= 5;
+			this.damage = 2;
+			this.ttl = 15000;
+			this.ttlElapsed = 0;
+			this.spriteY += 224;
+			this.animDelay = 400;
+			this.animFrameIndex = 0;
+			this.animNumFrames = 3;
+			this.moveChangeDelay = horde.randomRange(3000, 5000);
+			this.bounce = true;
+			this.rotate = true;
+			this.rotateSpeed = 200;
+		}
 	}
-	
+
 };
 
 o.dragon = {
