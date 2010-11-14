@@ -802,52 +802,6 @@ o.hero = {
 	spriteSheet: "characters",
 	spriteY: 0,
 	animated: true,
-<<<<<<< Updated upstream
-	animNumFrames: 1,
-	
-	spawnFramesX: 96,
-	spawnFramesY: 576,
-	spawnFrameCount: 2,
-	
-	rotate: true,
-	rotateSpeed: 0,
-	
-	onInit: function () {
-		this.phaseTimer = new horde.Timer();
-		this.spinUpTime = 7500;
-		this.wallDirection = new horde.Vector2(0, 1);
-		this.addState(horde.Object.states.SPAWNING);
-	},
-	
-	onDamage: function (defender, engine) {
-		this.spriteX = 128;
-	},
-	
-	onUpdate: function (elapsed, engine) {
-		
-		switch (this.phase) {
-			
-			case 0:
-				if (!this.phaseInit) {
-					this.phaseTimer.start(this.spinUpTime);
-					this.phaseInit = true;
-				}
-				var step = (this.spinUpTime / 200);
-				this.rotateSpeed += ((step / 1000) * elapsed);
-				if (this.phaseTimer.expired()) {
-					this.nextPhase();
-				}
-				break;
-			
-			case 1:
-				if (!this.phaseInit) {
-					horde.sound.play("spike_attack");
-					this.setDirection(this.wallDirection);
-					this.phaseInit = true;
-				}
-				break;
-			
-=======
 	soundAttacks: "hero_attacks",
 	soundDamage: "hero_damage",
 	soundDies: "hero_dies",
@@ -861,37 +815,9 @@ o.hero = {
 			skull.position.x = (this.position.x + (i * (this.size.width / num)));
 			skull.position.y = (this.position.y + this.size.height - horde.randomRange(0, this.size.height));
 			engine.addObject(skull);
->>>>>>> Stashed changes
 		}
 	}
 };
-
-<<<<<<< Updated upstream
-o.spike_sentry = {
-	
-	role: "trap",
-	team: 1,
-	
-	speed: 100,
-	hitPoints: Infinity,
-	damage: 10,
-	worth: 0,
-	
-	spriteSheet: "objects",
-	spriteX: 64,
-	spriteY: 256,
-	
-	animated: true,
-	animNumFrames: 1,
-	
-	spawnFramesX: 0,
-	spawnFramesY: 576,
-	spawnFrameCount: 2,
-	
-	rotate: true,
-	rotateSpeed: 100,
-=======
->>>>>>> Stashed changes
 
 // ENEMIES
 
@@ -1245,21 +1171,12 @@ o.huge_skull = {
 		{type: horde.objectTypes.e_static_green_fire, count: null}
 	],
 	
-<<<<<<< Updated upstream
-	makeBadass: function () {
-		this.spriteY = 960;
-		this.hitPoints = 50;
-		this.speed = 150;
-		this.damage = 20;
-	},
-=======
 	lootTable: [
 		{type: null, weight: 4},
 		{type: horde.objectTypes.RANDOM_WEAPON_DROP, weight: 3},
 		{type: horde.objectTypes.item_chest, weight: 3}
 	],
->>>>>>> Stashed changes
-	
+
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		switch (horde.randomRange(1, 2)) {
@@ -2042,21 +1959,6 @@ o.superclops = {
 					this.animDelay = 400;
 					this.phaseTimer.start(2000);
 					this.phaseInit = true;
-<<<<<<< Updated upstream
-					this.spikeTimer = new horde.Timer();
-					this.spikeTimer.start(200);
-				}
-				this.spikeTimer.update(elapsed);
-				if (this.spikeTimer.expired()) {
-					horde.sound.play("spike_attack");
-					var id = engine.spawnObject(this, "spikes");
-					var o = engine.objects[id];
-					if (o) {
-						o.ttl = 10000;
-					}
-					this.spikeTimer.reset();
-=======
->>>>>>> Stashed changes
 				}
 				movementTypes.wander.apply(this, arguments);
 				if (this.phaseTimer.expired()) {
@@ -2107,105 +2009,14 @@ o.superclops = {
 				if (this.phaseTimer.expired()) {
 					this.setPhase(4);
 				}
-<<<<<<< Updated upstream
-				this.chase(engine.getPlayerObject());
-				this.stopMoving();
-				if (this.wounds > (this.hitPoints * 0.33)) {
-					// 2/3 HP (or lower)
-					return "shoot";
-				}
-				break;
-
-			// Chill out for a bit
-			case 7:
-				if (!this.phaseInit) {
-					this.stopMoving();
-					this.phaseTimer.start(4000);
-					this.phaseInit = true;
-				}
-				if (this.phaseTimer.expired()) {
-					// Poop out a meat...
-					var meat = horde.makeObject("item_food");
-					meat.position.x = 32;
-					meat.position.y = 64;
-					engine.addObject(meat);
-					this.nextPhase();
-				}
-				break;
-
-			// Wander throwing battle axes
-			case 8:
-				if (!this.phaseInit) {
-					this.speed = 200;
-					this.animDelay = 200;
-					this.phaseInit = true;
-					this.phaseTimer.start(15000);
-					this.weapons = [{type: "e_dopp_axe", count: null}];
-					this.cooldown = false;
-					this.setDirection(horde.randomDirection());
-				}
-				if (this.phaseTimer.expired()) {
-					this.nextPhase();
-				}
-				movementTypes.wander.apply(this, arguments);
-				return "shoot";
-			
-			// Dash to center
-			case 9:
-				if (!this.phaseInit) {
-					this.speed = 200;
-					this.animDelay = 200;
-					this.phaseInit = true;
-					this.targetPos = new horde.Vector2((640 / 2) - 16, (480 / 2) - 16);
-				}
-				this.moveToward(this.targetPos);
-				var diff = this.targetPos.clone().subtract(this.position).abs();
-				if (diff.x < 5 && diff.y < 5) {
-					this.nextPhase();
-				}
-				break;
-				
-			// Spawn some shit...
-			case 10:
-				if (!this.phaseInit) {
-					horde.sound.play("minotaur_dies");
-					this.setDirection(new horde.Vector2(0, 1));
-					this.stopMoving();
-					this.phaseInit = true;
-					for (var b = 0; b < 60; ++b) {
-						var id = engine.spawnObject(this, "dire_bat");
-						var o = engine.objects[id];
-						o.setDirection(horde.randomDirection());
-						o.addState(horde.Object.states.INVINCIBLE, 250);
-					}
-					this.phaseTimer.start(8000);
-				}
-				if (this.phaseTimer.expired()) {
-					this.setPhase(1);
-				}
-				break;
-	
-		}
-	
-	},
-	
-	makeSpikeWalls: function (engine) {
-
-		horde.sound.play("wizard_reappear");
-		
-		var safeSpots = 3;
-		var spinUpTime = 5000;
-		var wallSpeedMod = 2;
-=======
 				engine.objectAttack(this);
 				movementTypes.chase.apply(this, arguments);
 				break;
 
 		}
-		
+
 	},
->>>>>>> Stashed changes
-	
+
 	onWallCollide: function () {
 		if (this.phase === 2) {
 			this.nextPhase();
@@ -2285,41 +2096,8 @@ o.imp = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				if (this.phaseTimer.expired()) {
-<<<<<<< Updated upstream
-					this.attackTimer.start(4000);
-					this.nextPhase();
-				}
-				break;
-			
-			// Wander and spawn X eyelets (now attackable)
-			case 2:
-				if (!this.phaseInit) {
-					this.removeState(horde.Object.states.INVINCIBLE);
-					this.collidable = true;
-					this.eyeletTimer = new horde.Timer();
-					this.eyeletTimer.start(500);
-					this.eyeletsSpawned = 0;
-					this.phaseInit = true;
-				}
-				this.eyeletTimer.update(elapsed);
-				movementTypes.wander.apply(this, arguments);
-				if (this.eyeletTimer.expired()) {
-					horde.sound.play("wizard_reappear");
-
-					this.eyeletTimer.reset();
-					var id = engine.spawnObject(this, "eyelet");
-					if (this.wounds > (this.hitPoints / 2)) {
-						var o = engine.objects[id];
-						o.makeBadass();
-					}
-					++this.eyeletsSpawned;
-					if (this.eyeletsSpawned >= 12) {
-						this.nextPhase();
-					}
-=======
 					this.phase++;
 					this.phaseInit = false;
->>>>>>> Stashed changes
 				}
 				break;
 
@@ -2338,20 +2116,6 @@ o.imp = {
 				}
 				break;
 
-<<<<<<< Updated upstream
-	onUpdate: function (elasped, engine) {
-		if (this.animFrameIndex === 2) {
-			this.animated = false;
-			this.spriteX = 896;
-		}
-		if (
-			this.team === 1
-			&& !engine.objects[this.ownerId]
-			&& (this.ttl - this.ttlElapsed > 2000)
-		) {
-			this.ttlElapsed = (this.ttl - 2000);
-=======
->>>>>>> Stashed changes
 		}
 
 	}
