@@ -44,7 +44,8 @@ JAVASCRIPT;
 	$command = 
 		'closure ' . 
 		" --js_output_file {$target}" .
-		' --compilation_level SIMPLE_OPTIMIZATIONS' .
+		' --compilation_level ADVANCED_OPTIMIZATIONS' .
+		' --externs ' . ROOT . 'htdocs/js/soundmanager2_externs.js' .
 		' --js ' . ROOT . 'tmp.js';
 	exec($command);
 	unlink(ROOT . 'tmp.js');

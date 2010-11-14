@@ -107,7 +107,19 @@ horde.Engine = function horde_Engine () {
 		
 };
 
-var proto = horde.Engine.prototype;
+var Engine = horde.Engine;
+var proto = Engine.prototype;
+
+Engine.States = {
+	Intro: 0,
+	Title: 1,
+	Credits: 2,
+	HighScores: 3,
+	IntroCinematic: 4,
+	Running: 5,
+	GameOver: 6,
+	BuyNow: 7
+};
 
 proto.cacheBust = function () {
 	if (VERSION.indexOf("VERSION") !== -1) {
@@ -136,7 +148,7 @@ proto.resize = function horde_Engine_proto_resize () {
 		width = 640;
 		height = 480;
 	}
-	var c = this.canvases["display"];
+	var c = this.canvases.display;
 	c.style.width = width + "px";
 	c.style.height = height + "px";
 	var gameLeft = Math.max((windowWidth / 2) - (width / 2), 0);
@@ -290,7 +302,7 @@ proto.getObjectCountByType = function horde_Engine_proto_getObjectCountByType (t
 };
 
 proto.preloadComplete = function () {
-	this.state = "intro";
+	this.state = Engine.States.Intro;
 	this.logoAlpha = 0;
 	this.logoFade = "in";
 	this.logoFadeSpeed = 0.5;
@@ -302,10 +314,10 @@ proto.preloadComplete = function () {
  */
 proto.init = function horde_Engine_proto_init () {
 	
-	this.state = "intro";
+	this.state = Engine.States.Intro;
 
-	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
-	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
+	this.canvases.display = horde.makeCanvas("", this.view.width, this.view.height);
+	this.canvases.buffer = horde.makeCanvas("", this.view.width, this.view.height, true);
 	
 	var fullscreenPref = this.getData("fullscreen");
 	if (fullscreenPref == 0) {
@@ -315,7 +327,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.resize();
 	horde.on("resize", this.resize, window, this);
 	
-	this.mouse = new horde.Mouse(this.canvases["display"]);
+	this.mouse = new horde.Mouse(this.canvases.display);
 	
 	horde.on("contextmenu", function (e) {
 		horde.stopEvent(e);
@@ -323,7 +335,7 @@ proto.init = function horde_Engine_proto_init () {
 	
 	horde.on("blur", function () {
 		this.stop();
-		if (this.state != "running" || this.wonGame) return;
+		if (this.state != Engine.States.Running || this.wonGame) return;
 		this.keyboard.keyStates = {};
 		if (!this.paused) this.togglePause();
 	}, window, this);
@@ -492,7 +504,7 @@ proto.initGame = function () {
 	this.closeGates();
 	
 	this.objects = {};
-	this.state = "title";
+	this.state = Engine.States.Title;
 	this.initOptions();
 	
 	this.initMap();
@@ -625,7 +637,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 
 	this.waveText = {
-		string: "<WAVE TEXT HERE>",
+		string: "",
 		size: 20,
 		state: "off",
 		alpha: 0
@@ -660,10 +672,10 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
  * @return {void}
  */
 proto.initPlayer = function horde_Engine_proto_initPlayer () {
-	var player = horde.makeObject("hero");
+	var player = horde.makeObject(horde.objectTypes.hero);
 	// NOTE: below line shouldn't be necessary, but it fixes the weapon retention bug for now.
 	player.weapons = [
-		{type: "h_sword", count: null}
+		{type: horde.objectTypes.h_sword, count: null}
 	];
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
@@ -766,7 +778,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 		// Move hero out
 		case 4:
 			if (!this.introPhaseInit) {
-				var h = horde.makeObject("hero");
+				var h = horde.makeObject(horde.objectTypes.hero);
 				h.position.x = 304;
 				h.position.y = -64;
 				h.collidable = false;
@@ -817,7 +829,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 			if (this.introTimer.expired()) {
 				this.currentMusic = "normal_battle_music";
 				horde.sound.play(this.currentMusic);
-				this.state = "running";
+				this.state = Engine.States.Running;
 			}
 			break;
 
@@ -839,28 +851,28 @@ proto.update = function horde_Engine_proto_update () {
 
 	switch (this.state) {
 
-		case "intro":
+		case Engine.States.Intro:
 			this.updateLogo(elapsed);
 			this.render();
 			break;
 
-		case "title":
+		case Engine.States.Title:
 			this.handleInput();
 			this.updateFauxGates(elapsed);
 			this.render();
 			break;
 
-		case "credits":
+		case Engine.States.Credits:
 			this.handleInput();
 			this.render();
 			break;
 
-		case "high_scores":
+		case Engine.States.HighScores:
 			this.handleInput();
 			this.render();
 			break;
 			
-		case "intro_cinematic":
+		case Engine.States.IntroCinematic:
 			this.handleInput();
 			this.updateIntroCinematic(elapsed);
 			this.updateFauxGates(elapsed);
@@ -868,7 +880,7 @@ proto.update = function horde_Engine_proto_update () {
 			break;
 			
 		// The game!
-		case "running":
+		case Engine.States.Running:
 			if (this.wonGame) {
 				this.updateWonGame(elapsed);
 			} else {
@@ -888,12 +900,12 @@ proto.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
-		case "game_over":
+		case Engine.States.GameOver:
 			this.updateGameOver(elapsed);
 			this.render();
 			break;
 
-		case "buy_now":
+		case Engine.States.BuyNow:
 			this.handleInput();
 			this.render();
 			break;
@@ -961,7 +973,7 @@ proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
 		case 2:
 			if (this.roseTimer.expired()) {
 				++this.rosesThrown;
-				var rose = horde.makeObject("rose");
+				var rose = horde.makeObject(horde.ObjectTypes.rose);
 				if (horde.randomRange(1, 2) === 2) {
 					rose.position.x = -32;
 					rose.position.y = horde.randomRange(100, 300);
@@ -1001,7 +1013,7 @@ proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
 	// Kill off clouds that are past the screen
 	for (var id in this.objects) {
 		var o = this.objects[id];
-		if (o.type === "cloud") {
+		if (o.type === horde.objectTypes.cloud) {
 			clouds++;
 			if (o.position.x < -(o.size.width)) {
 				o.die();
@@ -1014,7 +1026,7 @@ proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
 		if (horde.randomRange(1, 10) >= 1) {
 			var numClouds = horde.randomRange(1, 3);
 			for (var x = 0; x < numClouds; x++) {
-				var cloud = horde.makeObject("cloud");
+				var cloud = horde.makeObject(horde.objectTypes.cloud);
 				cloud.position.x = SCREEN_WIDTH + horde.randomRange(1, 32);
 				cloud.position.y = horde.randomRange(
 					-(cloud.size.height / 2),
@@ -1064,28 +1076,28 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			var player = this.getPlayerObject();
 
 			// 1. Knife
-			var wep = horde.makeObject("item_weapon_knife");
+			var wep = horde.makeObject(horde.objectTypes.item_weapon_knife);
 			wep.position = player.position.clone();
 			wep.position.x -= 96;
 			wep.position.y += 64;
 			this.addObject(wep);
 
 			// 2. Spear
-			var wep = horde.makeObject("item_weapon_spear");
+			var wep = horde.makeObject(horde.objectTypes.item_weapon_spear);
 			wep.position = player.position.clone();
 			wep.position.x -= 32;
 			wep.position.y += 64;
 			this.addObject(wep);
 
 			// 3. Axe
-			var wep = horde.makeObject("item_weapon_axe");
+			var wep = horde.makeObject(horde.objectTypes.item_weapon_axe);
 			wep.position = player.position.clone();
 			wep.position.x += 32;
 			wep.position.y += 64;
 			this.addObject(wep);
 
 			// 4. Fire
-			var wep = horde.makeObject("item_weapon_fireball");
+			var wep = horde.makeObject(horde.objectTypes.item_weapon_fireball);
 			wep.position = player.position.clone();
 			wep.position.x += 96;
 			wep.position.y += 64;
@@ -1101,7 +1113,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			var len = locs.length;
 			for (var x = 0; x < len; ++x) {
 				var pos = locs[x];
-				var s = horde.makeObject("spikes");
+				var s = horde.makeObject(horde.objectTypes.spikes);
 				s.position = new horde.Vector2(pos.x, pos.y);
 				this.addObject(s);
 			}
@@ -1118,12 +1130,12 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			var len = spikeLocs.length;
 			for (var x = 0; x < len; x++) {
 				var pos = spikeLocs[x];
-				var s = horde.makeObject("spike_sentry");
+				var s = horde.makeObject(horde.objectTypes.spike_sentry);
 				s.position = new horde.Vector2(pos.x, pos.y);
 				this.addObject(s);
 			}
 			break;
-	
+
 		case 31:
 			var locs = [
 				{x: 304, y: 114},
@@ -1132,26 +1144,26 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			var len = locs.length;
 			for (var x = 0; x < len; ++x) {
 				var pos = locs[x];
-				var s = horde.makeObject("spikes");
+				var s = horde.makeObject(horde.objectTypes.spikes);
 				s.position = new horde.Vector2(pos.x, pos.y);
 				this.addObject(s);
 			}
 			break;
-			
+
 		case 41:
 			this.enableClouds = true;
 			break;
-	
+
 		case 50:
 			// Despawn all traps; Doppelganger is hard enough!!
 			for (var id in this.objects) {
 				var obj = this.objects[id];
-				if (obj.role === "trap") {
+				if (obj.role === horde.Object.Roles.Trap) {
 					obj.die();
 				}
 			}
 			break;
-		
+
 	}
 };
 
@@ -1458,22 +1470,22 @@ proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (objec
 };
 
 proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
-	
+
 	if (!object.badass && object.hasState(horde.Object.states.HURTING)) {
 		return false;
 	}
-	
+
 	var speed = object.speed;
 	if (object.hasState(horde.Object.states.SLOWED)) {
 		speed *= 0.20;
 	}
-	
+
 	var px = ((speed / 1000) * elapsed);
-		
+
 	var axis = [];
 	var collisionX = false;
 	var collisionY = false;
-	
+
 	// Check tile collision for X axis
 	if (object.direction.x !== 0) {
 		// the object is moving along the "x" axis
@@ -1499,7 +1511,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			}
 		}
 	}
-	
+
 	// Check tile collision for Y axis
 	if (object.direction.y !== 0) {
 		// the object is moving along the "y" axis
@@ -1522,18 +1534,18 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			}
 		}
 	}
-	
+
 	if (object.collidable) {
-		
+
 		var yStop = 0;
 		if (
 			this.gateState === "down"
-			|| object.role === "monster"
-			|| object.role === "hero"
+			|| object.role === horde.Object.Roles.Monster
+			|| object.role === horde.Object.Roles.Hero
 		) {
 			yStop = GATE_CUTOFF_Y;
 		}
-		
+
 		if (object.direction.y < 0 && object.position.y < yStop) {
 			object.position.y = yStop;
 			axis.push("y");
@@ -1542,22 +1554,22 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		if (axis.length > 0) {
 			object.wallCollide(axis);
 		}
-		
+
 	}
-	
+
 };
 
 proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
 	var drop = horde.makeObject(type);
 	drop.position = object.position.clone();
 	drop.position.y -= 1;
-	if (type === "item_weapon_fire_sword") {
+	if (type === horde.objectTypes.item_weapon_fire_sword) {
 		drop.position = new horde.Vector2(304, 226);
 	}
 	this.addObject(drop);
-	if (type === "item_weapon_fire_sword") {
+	if (type === horde.objectTypes.item_weapon_fire_sword) {
 		// Also spawn the pointer
-		var ptr = horde.makeObject("pickup_arrow");
+		var ptr = horde.makeObject(horde.objectTypes.pickup_arrow);
 		ptr.position = drop.position.clone();
 		ptr.position.x = (320 - (ptr.size.width / 2));
 		ptr.position.y -= (ptr.size.height + 10);
@@ -1586,22 +1598,22 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 	
 	if (type !== null) {
 		var player = this.getPlayerObject();
-		if (type === "item_food" && player.wounds === 0) {
-			type = "item_chest";
+		if (type === horde.objectTypes.item_food && player.wounds === 0) {
+			type = horde.objectTypes.item_chest;
 		}
-		if (type === "WEAPON_DROP") {
+		if (type === horde.objectTypes.RANDOM_WEAPON_DROP) {
 			switch (horde.randomRange(1, 4)) {
-				case 1: type = "item_weapon_knife"; break;
-				case 2: type = "item_weapon_spear"; break;
-				case 3: type = "item_weapon_fireball"; break;
-				case 4: type = "item_weapon_axe"; break;
+				case 1: type = horde.objectTypes.item_weapon_knife; break;
+				case 2: type = horde.objectTypes.item_weapon_spear; break;
+				case 3: type = horde.objectTypes.item_weapon_fireball; break;
+				case 4: type = horde.objectTypes.item_weapon_axe; break;
 			}
 		}
 		if (
-			type.indexOf("item_weapon") >= 0
-			&& player.hasWeapon("h_fire_sword")
+			type.role === horde.Object.Roles.PowerupWeapon
+			&& player.hasWeapon(horde.objectTypes.h_fire_sword)
 		) {
-			type = "item_gold_chest";
+			type = horde.objectTypes.item_gold_chest;
 		}
 		this.dropObject(object, type);
 	}
@@ -1618,16 +1630,16 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		var o = this.objects[id];
 		
 		if (o.isDead()) {
-			if (o.role === "hero") {
+			if (o.role === horde.Object.Roles.Hero) {
 				this.endGame();
 				return;
 			}
-			o.execute("onDelete", [this]);
+			o.onDelete(this);
 			delete(this.objects[o.id]);
 			continue;
 		}
 
-		if (o.role === "monster" || o.type === "pickup_arrow") {
+		if (o.role === horde.Object.Roles.Monster || o.type === horde.objectTypes.pickup_arrow) {
 			numMonsters++;
 			if (o.position.y <= GATE_CUTOFF_Y) {
 				numMonstersAboveGate++;
@@ -1646,8 +1658,8 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 		}
 		
 		if (
-			o.role === "fluff"
-			|| o.role === "powerup_food"
+			o.role === horde.Object.Roles.Fluff
+			|| o.role === horde.Object.Roles.PowerupFood
 			|| o.hasState(horde.Object.states.DYING)
 			|| o.hasState(horde.Object.states.INVISIBLE)
 		) {
@@ -1659,7 +1671,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			if (
 				o2.isDead()
 				|| o2.team === o.team
-				|| o2.role === "fluff"
+				|| o2.role === horde.Object.Roles.Fluff
 				|| o2.hasState(horde.Object.states.DYING)
 				|| o2.hasState(horde.Object.states.INVISIBLE)
 			) {
@@ -1667,24 +1679,24 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 			}
 			// Reduce the size of the bounding boxes a tad when evaluating object => object collision
 			if (o.boundingBox().reduce(5).intersects(o2.boundingBox().reduce(5))) {
-				if (o.role == "hero") {
-					if (o2.role == "powerup_food") {
+				if (o.role == horde.Object.Roles.Hero) {
+					if (o2.role == horde.Object.Roles.PowerupFood) {
 						o2.die();
 						o.wounds -= o2.healAmount;
 						if (o.wounds < 0) o.wounds = 0;
 						o.meatEaten++;
 						horde.sound.play("eat_food");
 						for (var j = 0; j < 5; ++j) {
-							var heart = horde.makeObject("mini_heart");
+							var heart = horde.makeObject(horde.objectTypes.mini_heart);
 							heart.position.x = (o.position.x + (j * (o.size.width / 5)));
 							heart.position.y = (o.position.y + o.size.height - horde.randomRange(0, o.size.height));
 							this.addObject(heart);
 						}
-					} else if (o2.role == "powerup_coin") {
+					} else if (o2.role == horde.Object.Roles.PowerupCoin) {
 						o2.die();
 						o.gold += o2.coinAmount;
 						horde.sound.play("coins");
-					} else if (o2.role == "powerup_weapon") {
+					} else if (o2.role == horde.Object.Roles.PowerupWeapon) {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
 						horde.sound.play("pickup_weapon");
@@ -1694,9 +1706,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						w.alpha = 0.9;
 						w.position = o2.position.clone();
 						w.state = "on";
-						if (o2.type === "item_weapon_fire_sword") {
+						if (o2.type === horde.objectTypes.item_weapon_fire_sword) {
 							for (var j in this.objects) {
-								if (this.objects[j].type === "pickup_arrow") {
+								if (this.objects[j].type === horde.objectTypes.pickup_arrow) {
 									this.objects[j].die();
 								}
 							}
@@ -1751,24 +1763,27 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 horde.Engine.prototype.dealDamage = function (attacker, defender) {
 
 	// Monsters don't damage projectiles
-	if (attacker.role === "monster" && defender.role === "projectile") {
+	if (
+		attacker.role === horde.Object.Roles.Monster 
+		&& defender.role === horde.Object.Roles.Projectile
+	) {
 		return false;
 	}
 
 	// Allow the objects to handle the collision
-	attacker.execute("onObjectCollide", [defender, this]);
+	attacker.onObjectCollide(defender, this);
 
 	// Traps & Projectiles shouldn't damage each other
 	if (
-		(attacker.role == "projectile" && defender.role == "trap")
-		|| (attacker.role == "trap" && defender.role == "projectile")
+		(attacker.role == horde.Object.Roles.Projectile && defender.role == horde.Object.Roles.Trap)
+		|| (attacker.role == horde.Object.Roles.Trap && defender.role == horde.Object.Roles.Projectile)
 	) {
 		return false;
 	}
 
 	// Allow the defender to declare themselves immune to attacks from the attacker
 	// For example: Cube is immune to non-fire attacks
-	var nullify = defender.execute("onThreat", [attacker, this]);
+	var nullify = defender.onThreat(attacker, this);
 
 	// Check for defender immunity
 	if (
@@ -1778,12 +1793,12 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	) {
 		// Defender is immune/invincible
 		if (
-			attacker.role === "projectile"
+			attacker.role === horde.Object.Roles.Projectile
 			&& attacker.hitPoints !== Infinity
 		) {
 			if (
-				defender.damageType === "physical"
-				&& attacker.damageType === "physical"
+				defender.damageType === horde.Object.DamageTypes.Physical
+				&& attacker.damageType === horde.Object.DamageTypes.Physical
 			) {
 				// deflect if both parties are physical
 				attacker.reverseDirection();
@@ -1800,10 +1815,10 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	// Special case for non-immune projectiles hitting each other
 	if (
 		attacker.hitPoints !== Infinity
-		&& attacker.role === "projectile"
-		&& defender.role === "projectile"
-		&& attacker.damageType === "physical"
-		&& defender.damageType === "physical"
+		&& attacker.role === horde.Object.Roles.Projectile
+		&& defender.role === horde.Object.Roles.Projectile
+		&& attacker.damageType === horde.Object.DamageTypes.Physical
+		&& defender.damageType === horde.Object.DamageTypes.Physical
 	) {
 		if (attacker.piercing === false) {
 			attacker.reverseDirection();
@@ -1817,8 +1832,8 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 	}
 
 	// Allow attackers to do stuff when they've hurt something
-	attacker.execute("onDamage", [defender, this]);
-	
+	attacker.onDamage(defender, this);
+
 	// Track combat stats
 	var scorer = attacker;
 	if (scorer.ownerId !== null) {
@@ -1827,46 +1842,46 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			scorer = owner;
 		}
 	}
-	if (attacker.role === "projectile") {
+	if (attacker.role === horde.Object.Roles.Projectile) {
 		scorer.shotsLanded++;
 	}
 
 	// Deal damage and check for death
 	if (defender.wound(attacker.damage)) {
 		// defender has died
-		
+
 		// Assign gold/kills etc
 		scorer.gold += defender.worth;
 		scorer.kills++;
-		defender.execute("onKilled", [attacker, this]);
+		defender.onKilled(attacker, this);
 		if (defender.lootTable.length > 0) {
 			this.spawnLoot(defender);
 		}
-		
+
 		// Handler piercing weapons
 		if (
-			attacker.role === "projectile"
+			attacker.role === horde.Object.Roles.Projectile
 			&& attacker.piercing === false
 			&& attacker.hitPoints !== Infinity
 		) {
 			attacker.die();
 		}
-		
+
 	} else {
 		// defender did NOT die
-		
+
 		// Make the player invincible after some damage
-		if (attacker.damage > 0 && defender.role === "hero") {
+		if (attacker.damage > 0 && defender.role === horde.Object.Roles.Hero) {
 			defender.addState(horde.Object.states.INVINCIBLE, 2500);
 		}
-		
+
 		// Projectile failed to kill it's target; automatic death for projectile
-		if (attacker.role === "projectile" && attacker.hitPoints !== Infinity) {
+		if (attacker.role === horde.Object.Roles.Projectile && attacker.hitPoints !== Infinity) {
 			attacker.die();
 		}
-		
+
 	}
-	
+
 };
 
 /**
@@ -1931,7 +1946,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var newPointerY;
 	var usingPointerOptions = false;
 
-	if (this.state == "running") {
+	if (this.state == Engine.States.Running) {
 		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
 			if (this.showTutorial) {
@@ -1976,7 +1991,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			var p = this.getPlayerObject();
 			p.cheater = true;
 			p.weapons = [{
-				type: "h_fire_sword",
+				type: horde.objectTypes.h_fire_sword,
 				count: null
 			}];
 			horde.sound.play("code_entered");
@@ -1988,7 +2003,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			var p = this.getPlayerObject();
 			p.cheater = true;
 			p.weapons = [{
-				type: "h_fire_knife",
+				type: horde.objectTypes.h_fire_knife,
 				count: null
 			}];
 			horde.sound.play("code_entered");
@@ -2000,7 +2015,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			var p = this.getPlayerObject();
 			p.cheater = true;
 			p.weapons = [{
-				type: "h_firebomb",
+				type: horde.objectTypes.h_firebomb,
 				count: null
 			}];
 			horde.sound.play("code_entered");
@@ -2101,7 +2116,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
-	if (this.state === "title") {
+	if (this.state === Engine.States.Title) {
 
 		usingPointerOptions = true;
 
@@ -2198,20 +2213,20 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 							}
 							this.continuing = true;
 							this.showTutorial = false;
-							this.state = "intro_cinematic";
+							this.state = Engine.States.IntroCinematic;
 						}
 					}
 					break;
 				case 1: // New game
 					this.continuing = false;
 					this.showTutorial = true;
-					this.state = "intro_cinematic";
+					this.state = Engine.States.IntroCinematic;
 					break;
 				case 2: // Credits
-					this.state = "credits";
+					this.state = Engine.States.Credits;
 					break;
 				case 3: // High scores
-					this.state = "high_scores";
+					this.state = Engine.States.HighScores;
 					break;
 			}
 
@@ -2219,7 +2234,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
-	if (this.state == "buy_now") {
+	if (this.state == Engine.States.BuyNow) {
 
 		usingPointerOptions = true;
 
@@ -2270,7 +2285,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	// Want to see all high scores? Click here!
-	if (this.state === "high_scores") {
+	if (this.state === Engine.States.HighScores) {
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			if ((mouseV.x > 76) && (mouseV.x < 560)) {
 				if ((mouseV.y > 392) && (mouseV.y < 416)) {
@@ -2282,21 +2297,21 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	}
 
 	if (
-		(this.state === "credits")
-		|| (this.state === "high_scores")
+		(this.state === Engine.States.Credits)
+		|| (this.state === Engine.States.HighScores)
 	) {
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
 			this.mouse.clearButtons();
-			this.state = "title";
+			this.state = Engine.States.Title;
 		}
 	}
 
-	if (this.state === "intro_cinematic") {
+	if (this.state === Engine.States.IntroCinematic) {
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
 			this.mouse.clearButtons();
-			this.state = "running";
+			this.state = Engine.States.Running;
 			var player = this.getPlayerObject();
 			this.woundsTo = player.wounds;
 			this.currentMusic = "normal_battle_music";
@@ -2336,7 +2351,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
-	if (this.state === "running") {
+	if (this.state === Engine.States.Running) {
 		var player = this.getPlayerObject();
 
 		if (this.paused || player.hasState(horde.Object.states.DYING)) {
@@ -2449,11 +2464,11 @@ proto.objectAttack = function (object, v) {
 		return;
 	}
 	
-	var weaponDef = horde.objectTypes[weaponType];
+	var weaponDef = weaponType;
 
 	switch (weaponType) {
 		
-		case "e_minotaur_trident":
+		case horde.objectTypes.e_minotaur_trident:
 			var h = v.heading();
 			for (var x = -0.5; x <= 0.5; x += 0.5) {
 				this.spawnObject(
@@ -2466,8 +2481,8 @@ proto.objectAttack = function (object, v) {
 			break;
 		
 		// Shoot 2 knives in a spread pattern
-		case "h_knife":
-		case "h_fire_knife":
+		case horde.objectTypes.h_knife:
+		case horde.objectTypes.h_fire_knife:
 			var h = v.heading();
 			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
 				h - 0.1
@@ -2479,7 +2494,7 @@ proto.objectAttack = function (object, v) {
 			break;
 
 		// Spread fire shotgun style
-		case "e_fireball_green":
+		case horde.objectTypes.e_fireball_green:
 			for (var x = -0.25; x <= 0.25; x += 0.25) {
 				var h = v.heading();
 				h += (x + (horde.randomRange(-1, 1) / 10));
@@ -2492,7 +2507,7 @@ proto.objectAttack = function (object, v) {
 			object.shotsFired += 3;
 			break;
 
-		case "h_fireball":
+		case horde.objectTypes.h_fireball:
 			var h = v.heading();
 			var vh = horde.Vector2.fromHeading(h);
 
@@ -2512,13 +2527,13 @@ proto.objectAttack = function (object, v) {
 			object.shotsFired += 3;
 			break;
 
-		case "h_firebomb":
+		case horde.objectTypes.h_firebomb:
 			var rv = this.targetReticle.position.clone();
 			var len = (Math.PI * 2);
 			var step = (len / 20);
 
 			for (var h = 0; h < len; h += step) {
-				var o = horde.makeObject("h_fireball");
+				var o = horde.makeObject(horde.objectTypes.h_fireball);
 				o.position.x = rv.x - 16;
 				o.position.y = rv.y - 16;
 				o.setDirection(horde.Vector2.fromHeading(h));
@@ -2529,7 +2544,7 @@ proto.objectAttack = function (object, v) {
 			}
 			break;
 
-		case "e_ring_fire":
+		case horde.objectTypes.e_ring_fire:
 			var len = (Math.PI * 2);
 			var step = (len / 10);
 			var seed = (step / 2);
@@ -2542,7 +2557,7 @@ proto.objectAttack = function (object, v) {
 			}
 			break;
 
-			case "e_ring_fire_dopp":
+			case horde.objectTypes.e_ring_fire_dopp:
 				var len = (Math.PI * 2);
 				var step = (len / 10);
 				for (var h = 0; h < len; h += step) {
@@ -2555,7 +2570,7 @@ proto.objectAttack = function (object, v) {
 				break;
 
 		// Spawn in a circle around the object
-		case "e_bouncing_boulder":
+		case horde.objectTypes.e_bouncing_boulder:
 			var len = (Math.PI * 2);
 			var step = (len / 8);
 			for (var h = 0; h < len; h += step) {
@@ -2597,40 +2612,40 @@ proto.objectAttack = function (object, v) {
 
 proto.render = function horde_Engine_proto_render () {
 	
-	var ctx = this.canvases["display"].getContext("2d");
+	var ctx = this.canvases.display.getContext("2d");
 
 	switch (this.state) {
 
 		// Company Logo
-		case "intro":
+		case Engine.States.Intro:
 			this.drawLogo(ctx);
 			break;
 		
 		// Title Screen
-		case "title":
+		case Engine.States.Title:
 			this.drawTitle(ctx);
 			this.drawPointer(ctx);
 			this.drawTitlePointerOptions(ctx);
 			break;
 
 		// Credits
-		case "credits":
+		case Engine.States.Credits:
 			this.drawTitle(ctx);
 			this.drawCredits(ctx);
 			break;
 
 		// High Scores
-		case "high_scores":
+		case Engine.States.HighScores:
 			this.drawTitle(ctx);
 			this.drawHighScores(ctx);
 			break;
 
-		case "intro_cinematic":
+		case Engine.States.IntroCinematic:
 			this.drawIntroCinematic(ctx);
 			break;
 
 		// The game!
-		case "running":
+		case Engine.States.Running:
 			this.drawFloor(ctx);
 			if (!this.wonGame) {
 				this.drawTargetReticle(ctx);
@@ -2651,11 +2666,11 @@ proto.render = function horde_Engine_proto_render () {
 			}
 			break;
 		
-		case "game_over":
+		case Engine.States.GameOver:
 			this.drawGameOver(ctx);
 			break;
 
-		case "buy_now":
+		case Engine.States.BuyNow:
 			this.drawBuyNow(ctx);
 			this.drawPointer(ctx);
 			break;
@@ -2786,7 +2801,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 			this.statsIndex += 1;
 			if (this.statsIndex >= 5) {
 				if (horde.isDemo()) {
-					this.state = "buy_now";
+					this.state = Engine.States.BuyNow;
 					this.initOptions();
 				} else {
 					horde.sound.stop("victory");
@@ -3136,7 +3151,7 @@ proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 
 proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	
-	if (o.role === "hero" && this.heroFiring) {
+	if (o.role === horde.Object.Roles.Hero && this.heroFiring) {
 		var s = o.getSpriteXY(this.heroFiringDirection);
 	} else {
 		var s = o.getSpriteXY();
@@ -3161,7 +3176,7 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 		ctx.globalAlpha = o.alpha;
 	}
 
-	if (o.role === "powerup_weapon") {
+	if (o.role === horde.Object.Roles.PowerupWeapon) {
 		// Draw a scroll behind the weapon
 		ctx.drawImage(
 			this.images.getImage("objects"),
@@ -3189,7 +3204,7 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 
 	// Boss pain!
 	if (
-		(o.role === "monster")
+		(o.role === horde.Object.Roles.Monster)
 		&& o.badass
 		&& o.hasState(horde.Object.states.HURTING)
 	) {
@@ -3203,7 +3218,7 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 
 	// HP bar
 	if (
-		(this.debug && (o.role === "monster"))
+		(this.debug && (o.role === horde.Object.Roles.Monster))
 		|| (o.badass && !o.hasState(horde.Object.states.DYING))
 	) {
 		var hpWidth = (o.size.width - 2);
@@ -3294,7 +3309,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 
 	var o = this.getPlayerObject();
 	var weaponInfo = o.getWeaponInfo();
-	var w = horde.objectTypes[weaponInfo.type];
+	var w = weaponInfo.type;
 	var wCount = (weaponInfo.count ? weaponInfo.count : "");
 
 	// Weapon Icon
@@ -3577,7 +3592,7 @@ proto.drawPausedPointerOptions = function horde_Engine_proto_drawPausedPointerOp
 proto.initOptions = function () {
 
 	switch (this.state) {
-		case "title":
+		case Engine.States.Title:
 			this.pointerYStart = 300;
 
 			if (horde.isDemo() || this.canContinue()) {
@@ -3593,14 +3608,14 @@ proto.initOptions = function () {
 				this.maxPointerY = 2;
 			}
 			break;
-		case "running":
+		case Engine.States.Running:
 			this.pointerYStart = 378;
 			this.pointerY = 0;
 			this.maxPointerY = 1;
 			this.pointerOptionsStart = 0;
 			this.verifyQuit = false;
 			break;
-		case "buy_now":
+		case Engine.States.BuyNow:
 			this.pointerYStart = 378;
 			this.pointerY = 0;
 			this.maxPointerY = 1;
@@ -3839,7 +3854,7 @@ proto.endGame = function () {
 	this.gameOverReady = false;
 	this.gameOverAlpha = 0;
 	this.updateGameOver();
-	this.state = "game_over";
+	this.state = Engine.States.GameOver;
 	this.timePlayed = (horde.now() - this.gameStartTime);
 };
 

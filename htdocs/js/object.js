@@ -55,7 +55,7 @@ horde.Object = function () {
 	this.soundDamage = null;
 	this.soundDies = null;
 	
-	this.damageType = "physical";
+	this.damageType = horde.Object.DamageTypes.Physical;
 	
 	this.drawIndex = 1; // Controls what order objects are drawn, lower is first
 	
@@ -100,7 +100,33 @@ horde.Object.states = {
 	VICTORIOUS: 10
 };
 
+horde.Object.Roles = {
+	Hero: 0,
+	Monster: 1,
+	Projectile: 2,
+	Trap: 3,
+	PowerupWeapon: 4,
+	PowerupCoin: 5,
+	PowerupFood: 6,
+	Fluff: 7
+};
+
+horde.Object.DamageTypes = {
+	Physical: 0,
+	Magic: 1
+};
+
 var proto = horde.Object.prototype;
+
+// Placeholder event handlers
+proto.onInit = function () {};
+proto.onUpdate = function () {};
+proto.onDelete = function () {};
+proto.onWallCollide = function () {};
+proto.onObjectCollide = function () {};
+proto.onThreat = function () {};
+proto.onDamage = function () {};
+proto.onKilled = function () {};
 
 /**
  * Populates this object's key stats from a JSON dump
@@ -197,7 +223,7 @@ proto.removeState = function (state) {
  * @return {void}
  */
 proto.init = function horde_Object_proto_init () {
-	this.execute("onInit");
+	this.onInit();
 	if (this.rotate) {
 		this.angle = horde.randomRange(0, 359);
 	}
@@ -227,7 +253,7 @@ proto.isDead = function horde_Object_proto_isDead () {
  * @param {number} elapsed Elapsed time in milliseconds since last update
  * @return {void}
  */
-proto.update = function horde_Object_proto_update (elapsed) {
+proto.update = function horde_Object_proto_update (elapsed, engine) {
 	
 	this.updateStates(elapsed);
 
@@ -304,7 +330,10 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	if (this.cooldown === true) {
 		this.cooldownElapsed += elapsed;
 		var wepInfo = this.getWeaponInfo();
-		var wep = horde.objectTypes[wepInfo.type];
+		var wep = wepInfo.type;
+		if (!wep.cooldown) {
+			console.log(wep);
+		}
 		if (this.cooldownElapsed >= wep.cooldown) {
 			this.cooldown = false;
 			this.cooldownElapsed = 0;
@@ -319,8 +348,9 @@ proto.update = function horde_Object_proto_update (elapsed) {
 		// Don't proceed with calling any AI behavior if this thing is dying...
 		return;
 	}
-	
-	return this.execute("onUpdate", arguments);
+
+	return this.onUpdate(elapsed, engine);
+
 };
 
 /**
@@ -331,8 +361,8 @@ proto.getSpriteXY = function horde_Object_proto_getSpriteXY (facingOverride) {
 	if (this.animated) {
 		switch (this.role) {
 
-			case "hero":
-			case "monster":
+			case horde.Object.Roles.Hero:
+			case horde.Object.Roles.Monster:
 				if (this.hasState(horde.Object.states.DYING)) {
 					return new horde.Vector2(
 						(17 + this.deathFrameIndex) * this.size.width, this.spriteY
@@ -401,7 +431,7 @@ proto.boundingBox = function horde_Object_proto_boundingBox () {
 		this.position.x, this.position.y,
 		this.size.width - 1, this.size.height - 1
 	);
-	if (this.role === "projectile") {
+	if (this.role === horde.Object.Roles.Projectile) {
 		rect.reduce(1);
 	}
 	if (this.type === "e_spit_pool") {
@@ -446,12 +476,18 @@ proto.wound = function horde_Object_proto_wound (damage) {
 	this.wounds += damage;
 	this.totalDamageTaken += damage;
 	this.timesWounded++;
-	if (this.role === "monster" || this.role === "hero") {
+	if (
+		this.role === horde.Object.Roles.Monster 
+		|| this.role === horde.Object.Roles.Hero
+	) {
 		this.addState(horde.Object.states.HURTING, 300);
 	}
 	if (this.wounds >= this.hitPoints) {
 		this.wounds = this.hitPoints;
-		if (this.role === "monster" || this.role === "hero") {
+		if (
+			this.role === horde.Object.Roles.Monster 
+			|| this.role === horde.Object.Roles.Hero
+		) {
 			this.addState(horde.Object.states.DYING);
 			this.deathFrameIndex = 0;
 			this.deathTimer = new horde.Timer();
@@ -459,7 +495,7 @@ proto.wound = function horde_Object_proto_wound (damage) {
 		} else {
 			this.die();
 		}
-		if (this.role === "hero") {
+		if (this.role === horde.Object.Roles.Hero) {
 			horde.sound.stopAll();
 		}
 		if (this.soundDies) {
@@ -479,7 +515,7 @@ proto.wound = function horde_Object_proto_wound (damage) {
  * @return {void}
  */
 proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
-	if (this.role === "hero") {
+	if (this.role === horde.Object.Roles.Hero) {
 		return;
 	}
  	if (this.bounce) {
@@ -489,21 +525,21 @@ proto.wallCollide = function horde_Object_proto_wallCollide (axis) {
 			d[axis[i]] *= -1;
 		}
 		this.setDirection(d);
-		if (this.role === "projectile") {
+		if (this.role === horde.Object.Roles.Projectile) {
 			horde.sound.play("weapon_wall");
 		}
 	} else {
-		if (this.damageType === "physical") {
+		if (this.damageType === horde.Object.DamageTypes.Physical) {
 			this.deflect();
 		} else {
 			this.die();
 		}
 	}
-	this.execute("onWallCollide", [axis]);
+	this.onWallCollide(axis);
 };
 
 proto.deflect = function horde_Object_proto_deflect () {
-	this.role = "fluff";
+	this.role = horde.Object.Roles.Fluff;
 	this.rotateSpeed = this.speed * 5;
 	this.speed *= 0.50;
 	this.spriteAlign = false;
@@ -563,18 +599,6 @@ proto.isMoving = function horde_Object_proto_isMoving () {
  */
 proto.stopMoving = function horde_Object_proto_stopMoving () {
 	this.direction.zero();
-};
-
-/**
- * Executes a method that may or may not exist
- * @param {string} method Method to call
- * @param {array} args Array of arguments
- * @return {void}
- */
-proto.execute = function horde_Object_proto_execute (method, args) {
-	if (this[method]) {
-		return this[method].apply(this, args);
-	}
 };
 
 /**

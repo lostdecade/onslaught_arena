@@ -19,7 +19,7 @@
 			is an HTML5 game made by <a href="http://www.lostdecadegames.com/">Lost Decade Games</a>.
 		</p>
 	</div>
-	
+
 	<div class="nav">
 		<ul>
 			<li><a href="http://blog.lostdecadegames.com" target="_blank">Blog</a></li>
@@ -28,11 +28,11 @@
 			<li><a href="http://www.facebook.com/pages/Lost-Decade-Games/139862159378069" target="_blank">Facebook</a></li>
 		</ul>
 	</div>
-	
+
 	<div id="stage">
 		<div id="tip"></div>
 	</div>
-	
+
 	<script>
 		window.onslaughtScores = '{{ scores }}';
 		window.ldgHash = "{{ user_hash }}";
@@ -40,15 +40,11 @@
 
 	<script src="lib/sm2/soundmanager2.js"></script>
 	<script>
-		soundManager.url = "lib/sm2/";
-	</script>
-	
-	<script>
 	(function () {
 		{{GAME_CODE}}
 	}());
 	</script>
-	
+
 	<script type="text/javascript">
 	  var _gaq = _gaq || [];
 	  _gaq.push(['_setAccount', 'UA-16927444-5']);
@@ -59,6 +55,6 @@
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
 	</script>
-	
+
 </body>
 </html>

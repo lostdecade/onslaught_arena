@@ -2,38 +2,44 @@
 
 horde.sound = {};
 
+// Supported APIs
+horde.sound.API = {
+	SoundManager2: 0,
+	HTML5: 1
+};
+
 // TODO: Fallback to HTML5 (lolz!)
-var api = "sm2";
+var api = horde.sound.API.SoundManager2;
 var format = ".mp3";
 var muted = false;
 var sounds = {};
 
+var sm = soundManager;
+
 horde.sound.init = function horde_sound_init (callback) {
 
 	switch (api) {
-		case "sm2":
-			soundManager.useFastPolling = true;
-			soundManager.useHighPerformance = true;
-			soundManager.autoLoad = true;
-			soundManager.multiShot = true;
-			soundManager.volume = 100;
-			soundManager.onload = callback;
-			soundManager.useHTML5Audio = false;
-
-			soundManager.onerror = (function (init) {
+		case horde.sound.API.SoundManager2:
+			sm.url = "lib/sm2/";
+			sm.useFastPolling = true;
+			sm.useHighPerformance = true;
+			sm.autoLoad = true;
+			sm.multiShot = true;
+			sm.volume = 100;
+			sm.onload = callback;
+			sm.useHTML5Audio = false;
+			sm.onerror = (function (init) {
 				return function () {
-					api = "html5";
+					api = horde.sound.API.HTML5;
 					init(callback);
 				};
 			}(arguments.callee));
 			break;
-		case "html5":
-			var audio = document.createElement("audio");
 
+		case horde.sound.API.HTML5:
+			var audio = document.createElement("audio");
 			if (audio.canPlayType) {
-				//audio.canPlayType('audio/ogg; codecs="vorbis"');
 				if (!audio.canPlayType("audio/mpeg;")) {
-					//format = ".ogg";
 					api = null;
 				}
 			}
@@ -53,7 +59,7 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 	}
 
 	switch (api) {
-		case "sm2":
+		case horde.sound.API.SoundManager2:
 			var params = {
 				id: id,
 				url: url,
@@ -64,10 +70,10 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 					this.play();
 				};
 			}
-			var sound = soundManager.createSound(params);
+			var sound = sm.createSound(params);
 			sound.load();
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			var audio = new Audio();
 			audio.preload = "auto";
 			audio.src = url;
@@ -91,13 +97,13 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 
 horde.sound.isPlaying = function (id) {
 	switch (api) {
-		case "sm2":
-			var sound = soundManager.getSoundById(id);
+		case horde.sound.API.SoundManager2:
+			var sound = sm.getSoundById(id);
 			if (sound) {
 				return (sound.playState === 1);
 			}
 			return false;
-		case "html5":
+		case horde.sound.API.HTML5:
 			return (sounds[id].currentTime > 0);
 	}
 };
@@ -107,10 +113,10 @@ horde.sound.play = function horde_sound_play (id) {
 		return false;
 	}
 	switch (api) {
-		case "sm2":
-			soundManager.play(id);
+		case horde.sound.API.SoundManager2:
+			sm.play(id);
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			try {
 				sounds[id].pause();
 				sounds[id].currentTime = 0;
@@ -122,10 +128,10 @@ horde.sound.play = function horde_sound_play (id) {
 
 horde.sound.stop = function horde_sound_stop (id) {
 	switch (api) {
-		case "sm2":
-			soundManager.stop(id);
+		case horde.sound.API.SoundManager2:
+			sm.stop(id);
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			sounds[id].pause();
 			sounds[id].currentTime = 0;
 			break;
@@ -134,10 +140,10 @@ horde.sound.stop = function horde_sound_stop (id) {
 
 horde.sound.stopAll = function horde_sound_stopAll () {
 	switch (api) {
-		case "sm2":
-			soundManager.stopAll();
+		case horde.sound.API.SoundManager2:
+			sm.stopAll();
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			try {
 				for (var id in sounds) {
 					sounds[id].pause();
@@ -152,10 +158,10 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 
 horde.sound.pauseAll = function horde_sound_pauseAll () {
 	switch (api) {
-		case "sm2":
-			soundManager.pauseAll();
+		case horde.sound.API.SoundManager2:
+			sm.pauseAll();
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
 					sounds[id].pause();
@@ -167,10 +173,10 @@ horde.sound.pauseAll = function horde_sound_pauseAll () {
 
 horde.sound.resumeAll = function horde_sound_resumeAll () {
 	switch (api) {
-		case "sm2":
-			soundManager.resumeAll();
+		case horde.sound.API.SoundManager2:
+			sm.resumeAll();
 			break;
-		case "html5":
+		case horde.sound.API.HTML5:
 			for (var id in sounds) {
 				if (sounds[id].currentTime > 0) {
 					sounds[id].play();
