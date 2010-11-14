@@ -23,6 +23,7 @@ var TUTORIAL_NUM_TIPS = 4;
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
 var SCORE_COUNT = 10;
+var TIPS_KEY = "hide_tips";
 
 /**
  * Creates a new Engine object
@@ -79,31 +80,70 @@ horde.Engine = function horde_Engine () {
 		position: new horde.Vector2()
 	};
 	
-	// Super ghetto Tips
+	// Super Ghouls 'n Tips
 	var tips = [
-		"The Beholder drops special loot, a powerful weapon!",
-		"Pick up meat to restore 10% of your health.",
-		"The Last Boss can be found on Wave 50.",
-		"Enemies deal more melee damage than their projectile weapons.",
-		"Hold down the left mouse button to auto fire.",
-		"Gelatinous Cube dislikes magic.",
-		"You earn 1,000 points for each wave you survive!",
-		"Certain enemy projectiles can't be destroyed. Learn to dodge!",
-		"Toggle fullscreen mode by clicking the screen icon in the lower right.",
-		"Toggle audio by clicking the trumpet icon in the lower right corner of the screen.",
-		"Taking damage lowers your score. Try not to get hit!",
-		"Your game is saved automatically after you defeat each boss.",
-		"You can press the \"M\" key to toggle muting.",
-		"You can press the \"F\" key to toggle fullscreen mode.",
-		"Press \"P\" to pause the game."
+		"The <span>Beholder</span> drops special <span>loot</span>!",
+		"Pick up <span>meat</span> to restore 10% of your <span>health</span>.",
+		"The <span>Last Boss</span> can be found on <span>Wave 50</span>.",
+		"Enemies deal <span>more melee damage</span> than their projectile weapons.",
+		"Hold down the left <span>mouse button</span> to auto <span>fire</span>.",
+		"<span>Gelatinous Cube</span> dislikes magic weapons.",
+		"You earn <span>1,000</span> points for each <span>wave</span> you survive!",
+		"Certain enemy <span>projectiles</span> can't be destroyed. Learn to <span>dodge</span>!",
+		"Toggle <span>fullscreen</span> mode by clicking the <span>screen icon</span> in the lower right.",
+		"Toggle <span>audio</span> by clicking the <span>trumpet icon</span> in the lower right.",
+		"Taking <span>damage</span> lowers your <span>score</span>. Try not to get hit!",
+		"Your game is <span>saved automatically</span> after you defeat each boss.",
+		"You can press the <span>M</span> key to toggle <span>muting</span>.",
+		"You can press the <span>F</span> key to toggle <span>fullscreen</span> mode.",
+		"Press <span>P</span> to <span>pause</span> the game."
 	];
-	var tip = document.getElementById("tip");
+	var lastTipIndex = -1;
+	var tip = document.getElementById("tip_message");
 	var rotateTip = function () {
-		var index = horde.randomRange(0, tips.length - 1);
-		tip.innerHTML = "Tip: " + tips[index];
+		do {
+			var index = horde.randomRange(0, tips.length - 1);
+		} while (index === lastTipIndex);
+
+		lastTipIndex = index;
+
+		if (tip.innerHTML == "") {
+			tip.innerHTML = tips[index];
+			return;
+		}
+
+		setTimeout(function () {
+			tip.className = "fade-in";
+			tip.innerHTML = tips[index];
+		}, 1000);
+
+		tip.className = "fade-out";
 	};
 	rotateTip();
 	setInterval(rotateTip, 15000);
+
+	var tipControls = document.getElementById("tip_controls");
+
+	horde.on("click", function() {
+		if (this.getData(TIPS_KEY) == 0) {
+			this.putData(TIPS_KEY, 1);
+		} else {
+			this.putData(TIPS_KEY, 0);
+		}
+		updateTipControls(this.getData(TIPS_KEY));
+	}, tipControls, this);
+
+	var updateTipControls = function (hideTips) {
+		if (hideTips == 0) {
+			tipControls.innerHTML = "hide tips";
+			tip.style.display = "";
+		} else {
+			tipControls.innerHTML = "show tips";
+			tip.style.display = "none";
+		}
+	};
+
+	updateTipControls(this.getData(TIPS_KEY));
 		
 };
 
@@ -145,8 +185,8 @@ proto.resize = function horde_Engine_proto_resize () {
 	c.style.top = gameTop + "px";
 	var tip = document.getElementById("tip");
 	tip.style.top = (gameTop - 30) + "px";
-	tip.style.left = "20px";
-	tip.style.width = (windowWidth - 40) + "px";
+	tip.style.left = gameLeft + "px";
+	tip.style.width = width + "px";
 };
 
 /**
@@ -1932,15 +1972,20 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var usingPointerOptions = false;
 
 	if (this.state == "running") {
+
+		// ESC to skip tutorial.
+		if (this.keyboard.isKeyPressed(keys.ESCAPE)) {
+			if (this.showTutorial) {
+				this.tutorialIndex = TUTORIAL_NUM_TIPS;
+				this.nextTutorial(TUTORIAL_NUM_TIPS + 1);
+			}
+		}
+
 		// Press "p" to pause.
 		if (this.keyboard.isKeyPressed(keys.P) || this.keyboard.isKeyPressed(keys.ESCAPE)) {
-			if (this.showTutorial) {
-				this.showTutorial = false;
-			} else {
-				this.togglePause();
-				this.keyboard.clearKeys();
-				return;
-			}
+			this.togglePause();
+			this.keyboard.clearKeys();
+			return;
 		}
 
 		if (this.paused) {
@@ -2395,7 +2440,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				&& (mouseV.y <= (TUTORIAL_HEIGHT + this.tutorialY))
 			) {
 				// Dismiss tutorial
-				this.showTutorial = false;
+				this.tutorialIndex = TUTORIAL_NUM_TIPS;
+				this.nextTutorial(TUTORIAL_NUM_TIPS + 1);
 				this.mouse.clearButtons();
 			} else if (
 				mouseV.x >= 604
