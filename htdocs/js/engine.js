@@ -135,9 +135,11 @@ horde.Engine = function horde_Engine () {
 
 	var updateTipControls = function (hideTips) {
 		if (hideTips == 0) {
+			tipControls.className = "hide";
 			tipControls.innerHTML = "hide tips";
 			tip.style.display = "";
 		} else {
+			tipControls.className = "show";
 			tipControls.innerHTML = "show tips";
 			tip.style.display = "none";
 		}

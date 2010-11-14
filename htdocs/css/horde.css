@@ -98,6 +98,15 @@ canvas {
 	padding-right: 5px;
 }
 
+#tip_controls.show {
+	color: #f1f1f2;
+}
+
+#tip_controls.hide {
+	color: #6d6e70;
+	text-shadow: #000 1px 1px 2px;
+}
+
 .fade-in, .fade-out {
 	-moz-transition: all 1s ease-in-out;
 	-o-transition: all 1s ease-in-out;
