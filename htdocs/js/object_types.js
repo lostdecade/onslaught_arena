@@ -1343,7 +1343,7 @@ o.superclops = {
 	moveChangeDelay: 1000,
 
 	damage: 20,
-	hitPoints: 600,
+	hitPoints: 750,
 	speed: 25,
 	worth: 0,
 

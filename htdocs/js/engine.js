@@ -20,6 +20,7 @@ var POINTER_X = 270;
 var TUTORIAL_HEIGHT = 70;
 var TUTORIAL_NUM_TIPS = 4;
 
+var GLOW_INCREMENT = 0.2;
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
 var SCORE_COUNT = 10;
@@ -431,7 +432,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		// Misc
 		s.create("immunity", sfxDir + "immunity", false, 25);
 		s.create("coins", sfxDir + "coins", false, 10);
-		s.create("eat_food", sfxDir + "eat_food", false, 20);
+		s.create("eat_food", sfxDir + "eat_food", false, 30);
 		s.create("pickup_weapon", sfxDir + "pickup_weapon");
 		s.create("weapon_wall", sfxDir + "weapon_wall", false, 25);
 		
@@ -668,7 +669,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	this.currentWaveId = -1;
 
 	this.waveText = {
-		string: "<WAVE TEXT HERE>",
+		string: "",
 		size: 20,
 		state: "off",
 		alpha: 0
@@ -1767,6 +1768,38 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 					this.dealDamage(o, o2);
 				}
 			}
+
+		}
+
+		// Update glowing weapons			
+		if (this.isBadassWeapon(o)) {
+			if (o.glow === undefined) {
+				o.glow = {
+					alpha: 0,
+					increment: GLOW_INCREMENT,
+					timer: new horde.Timer()
+				};
+				o.glow.timer.start(50);
+			}
+
+			o.glow.timer.update(elapsed);
+
+			if (o.glow.timer.expired()) {
+				o.glow.timer.reset();
+				o.glow.alpha += o.glow.increment;
+
+				var max = (1 - GLOW_INCREMENT);
+				if (o.glow.alpha >= max) {
+					o.glow.alpha = max;
+					o.glow.increment = -GLOW_INCREMENT;
+				}
+
+				var min = GLOW_INCREMENT;
+				if (o.glow.alpha <= min) {
+					o.glow.alpha = min;
+					o.glow.increment = GLOW_INCREMENT;
+				}
+			}
 		}
 		
 	}
@@ -1837,7 +1870,10 @@ horde.Engine.prototype.dealDamage = function (attacker, defender) {
 			&& attacker.hitPoints !== Infinity
 		) {
 			if (
-				defender.damageType === "physical"
+				(
+					defender.damageType === "magic"
+					|| defender.damageType === "physical"
+				)
 				&& attacker.damageType === "physical"
 			) {
 				// deflect if both parties are physical
@@ -1993,6 +2029,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			if (this.showTutorial) {
 				this.tutorialIndex = TUTORIAL_NUM_TIPS;
 				this.nextTutorial(TUTORIAL_NUM_TIPS + 1);
+				return;
 			}
 		}
 
@@ -3072,19 +3109,26 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 };
 
 proto.drawFloor = function horde_Engine_proto_drawFloor (ctx) {
+	var offset = this.getArenaOffset();
 	ctx.drawImage(
 		this.images.getImage("arena"),
-		32, 480, 576, 386,
+		(offset + 32), 480, 576, 386,
 		32, 0, 576, 386
 	);
 };
 
 proto.drawWalls = function horde_Engine_proto_drawWalls (ctx) {
+	var offset = this.getArenaOffset();
 	ctx.drawImage(
 		this.images.getImage("arena"),
-		0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
+		offset, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
 		0, 0, this.view.width, this.view.height
 	);
+};
+
+proto.getArenaOffset = function horde_Engine_proto_getArenaOffset () {
+	return 0;
+	//return (SCREEN_WIDTH * Math.floor(this.currentWaveId / 10));
 };
 
 proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
@@ -3254,11 +3298,21 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 		&& o.badass
 		&& o.hasState(horde.Object.states.HURTING)
 	) {
-		this.drawImagePain(
+		this.drawImageOverlay(
 			ctx, this.images.getImage(o.spriteSheet),
 			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
 			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height,
 			"rgba(186, 51, 35, 0.6)"
+		);
+	}
+
+	// Message indestructible enemy projectiles
+	if (this.isBadassWeapon(o) && o.glow) {
+		this.drawImageOverlay(
+			ctx, this.images.getImage(o.spriteSheet),
+			s.x, s.y + 1, o.size.width - 1, o.size.height - 1,
+			-(o.size.width / 2), -(o.size.height / 2), o.size.width, o.size.height,
+			"rgba(255, 247, 143, " + o.glow.alpha + ")"
 		);
 	}
 
@@ -3282,6 +3336,14 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	ctx.restore();
 	
 };
+
+proto.isBadassWeapon = function horde_Engine_proto_isBadassWeapon (o) {
+	return (
+		(o.role === "projectile")
+		&& (o.hitPoints === Infinity)
+		&& (o.team === 1)
+	);
+}
 
 horde.Engine.prototype.drawObjects = function (ctx) {
 	var drawOrder = this.getObjectDrawOrder();
@@ -3312,7 +3374,7 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.restore();
 };
 
-proto.drawImagePain = function horde_Engine_proto_drawImagePain (
+proto.drawImageOverlay = function horde_Engine_proto_drawImageOverlay (
 	ctx, image,
 	spriteX, spriteY,
 	spriteWidth, spriteHeight,
