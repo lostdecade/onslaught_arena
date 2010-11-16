@@ -567,6 +567,7 @@ proto.initGame = function () {
 	this.tutorialY = -TUTORIAL_HEIGHT;
 	this.tutorialDirection = "down";
 	this.hideTutorialTimer = null;
+	this.nextTutorialTimer = null;
 
 	this.heroFiring = false;
 	this.heroFiringDirection = null;
@@ -1408,7 +1409,7 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 			this.tutorialDirection = null;
 
 			if (this.tutorialIndex >= TUTORIAL_NUM_TIPS) {
-				this.hideTutorialTimer.start(4000);
+				this.hideTutorialTimer.start(5000);
 			}
 		}
 	}
@@ -1429,10 +1430,21 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 		this.hideTutorialTimer = new horde.Timer();
 	}
 
+	if (!this.nextTutorialTimer) {
+		this.nextTutorialTimer = new horde.Timer();
+		this.nextTutorialTimer.start(10000);
+	}
+
 	this.hideTutorialTimer.update(elapsed);
+	this.nextTutorialTimer.update(elapsed);
 
 	if (this.hideTutorialTimer.expired()) {
 		this.tutorialDirection = "up";
+	}
+
+	if (this.nextTutorialTimer.expired()) {
+		this.nextTutorial(this.tutorialIndex + 1);
+		this.nextTutorialTimer.reset();
 	}
 
 };
@@ -1443,6 +1455,7 @@ proto.nextTutorial = function horde_Engine_proto_nextTutorial (index) {
 		return;
 	}
 
+	// Move the tutorial up if we want to see the next one
 	if (this.tutorialIndex === (index - 1)) {
 		this.tutorialDirection = "up";
 	}
