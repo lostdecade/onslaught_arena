@@ -2606,6 +2606,8 @@ o.dragon = {
 				if (this.altTimer.expired() && this.wounds > (this.hitPoints / 2)) {
 					engine.spawnObject(this, "e_fireball");
 					this.altTimer.reset();
+					// I don't know why this sound won't play. I give up.
+					//horde.sound.play(this.soundAttacks);
 				}
 				return "shoot";
 			
@@ -2789,7 +2791,7 @@ o.e_dopp_fire = {
 
 o.e_static_green_fire = {
 	role: "projectile",
-	cooldown: 100,
+	cooldown: 200,
 	speed: 0,
 	hitPoints: Infinity,
 	damage: 10,

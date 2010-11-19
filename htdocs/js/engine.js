@@ -676,11 +676,9 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	};
 	
 	// Wave testing code...
-	/*
-	var testWave = 50;
+	var testWave = 30;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
-	*/
 
 	// Test Wave
 	/*
@@ -3342,6 +3340,8 @@ proto.isBadassWeapon = function horde_Engine_proto_isBadassWeapon (o) {
 		(o.role === "projectile")
 		&& (o.hitPoints === Infinity)
 		&& (o.team === 1)
+		&& (o.type != "e_static_blue_fire")
+		&& (o.type != "e_static_green_fire")
 	);
 }
 
@@ -3374,6 +3374,11 @@ proto.drawTargetReticle = function horde_Engine_proto_drawTargetReticle (ctx) {
 	ctx.restore();
 };
 
+/**
+ * Draws an overlay over an image in its exact shape (exact pixels)
+ * @param too many, shut up :(
+ * @return {void}
+ */
 proto.drawImageOverlay = function horde_Engine_proto_drawImageOverlay (
 	ctx, image,
 	spriteX, spriteY,
