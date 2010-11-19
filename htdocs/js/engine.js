@@ -677,7 +677,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	
 	// Wave testing code...
 	/*
-	var testWave = 30;
+	var testWave = 50;
 	this.waveHack = true;
 	this.currentWaveId = (testWave - 2);
 	*/
@@ -1607,11 +1607,11 @@ proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
 	var drop = horde.makeObject(type);
 	drop.position = object.position.clone();
 	drop.position.y -= 1;
-	if (type === "item_weapon_fire_sword") {
+	if (this.isSpecialLoot(type)) {
 		drop.position = new horde.Vector2(304, 226);
 	}
 	this.addObject(drop);
-	if (type === "item_weapon_fire_sword") {
+	if (this.isSpecialLoot(type)) {
 		// Also spawn the pointer
 		var ptr = horde.makeObject("pickup_arrow");
 		ptr.position = drop.position.clone();
@@ -1619,6 +1619,13 @@ proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
 		ptr.position.y -= (ptr.size.height + 10);
 		this.addObject(ptr);
 	}
+};
+
+proto.isSpecialLoot = function horde_Engine_proto_isSpecialLoot (type) {
+	return (
+		(type === "item_weapon_fire_sword")
+		|| (type === "item_gold_chest")
+	);
 };
 
 proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
@@ -1657,7 +1664,7 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 			type.indexOf("item_weapon") >= 0
 			&& player.hasWeapon("h_fire_sword")
 		) {
-			type = "item_gold_chest";
+			type = "item_chest";
 		}
 		this.dropObject(object, type);
 	}
@@ -1740,6 +1747,14 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.gold += o2.coinAmount;
 						horde.sound.play("coins");
+
+						if (this.isSpecialLoot(o2.type)) {
+							for (var j in this.objects) {
+								if (this.objects[j].type === "pickup_arrow") {
+									this.objects[j].die();
+								}
+							}
+						}
 					} else if (o2.role == "powerup_weapon") {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
@@ -1750,7 +1765,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						w.alpha = 0.9;
 						w.position = o2.position.clone();
 						w.state = "on";
-						if (o2.type === "item_weapon_fire_sword") {
+						if (this.isSpecialLoot(o2.type)) {
 							for (var j in this.objects) {
 								if (this.objects[j].type === "pickup_arrow") {
 									this.objects[j].die();
@@ -3127,8 +3142,7 @@ proto.drawWalls = function horde_Engine_proto_drawWalls (ctx) {
 };
 
 proto.getArenaOffset = function horde_Engine_proto_getArenaOffset () {
-	return 0;
-	//return (SCREEN_WIDTH * Math.floor(this.currentWaveId / 10));
+	return (SCREEN_WIDTH * Math.floor(this.currentWaveId / 10));
 };
 
 proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
@@ -3342,6 +3356,7 @@ proto.isBadassWeapon = function horde_Engine_proto_isBadassWeapon (o) {
 		(o.role === "projectile")
 		&& (o.hitPoints === Infinity)
 		&& (o.team === 1)
+		&& (o.type != "e_fireball")
 		&& (o.type != "e_static_blue_fire")
 		&& (o.type != "e_static_green_fire")
 	);

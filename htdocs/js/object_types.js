@@ -1196,10 +1196,15 @@ o.cube = {
 	soundDamage: "cube_damage",
 	soundDies: "cube_dies",
 
+/*
 	lootTable: [
 		{type: "item_chest", weight: 1},
 		{type: "WEAPON_DROP", weight: 6},
 		{type: "item_food", weight: 3}
+	],
+	*/
+	lootTable: [
+		{type: "item_gold_chest", weight: 1}
 	],
 
 	onInit: function () {
@@ -1354,9 +1359,7 @@ o.superclops = {
 	weapons: [{type: "e_minotaur_trident", count: null}],
 
 	lootTable: [
-		{type: "item_gold_chest", weight: 4},
-		{type: "item_food", weight: 3},
-		{type: "WEAPON_DROP", weight: 3}
+		{type: "item_gold_chest", weight: 1}
 	],
 
 	onInit: function () {
@@ -1612,8 +1615,7 @@ o.wizard = {
 	
 	lootTable: [
 		{type: null, weight: 6},
-		{type: "item_chest", weight: 1},
-		{type: "item_gold_chest", weight: 1},
+		{type: "item_chest", weight: 2},
 		{type: "WEAPON_DROP", weight: 2}
 	],
 	
@@ -2609,8 +2611,8 @@ o.dragon = {
 					// I don't know why this sound won't play. I give up.
 					//horde.sound.play(this.soundAttacks);
 				}
+
 				return "shoot";
-			
 		}
 
 	}
@@ -3093,8 +3095,7 @@ o.item_gold_chest = {
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 0,
-	spriteY: 32,
-	ttl: 5000
+	spriteY: 32
 };
 
 // WEAPON POWERUPS
