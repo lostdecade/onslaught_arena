@@ -3142,7 +3142,8 @@ proto.drawWalls = function horde_Engine_proto_drawWalls (ctx) {
 };
 
 proto.getArenaOffset = function horde_Engine_proto_getArenaOffset () {
-	return (SCREEN_WIDTH * Math.floor(this.currentWaveId / 10));
+  var waveId = ((this.currentWaveId >= 0) ? this.currentWaveId : 0);
+	return (SCREEN_WIDTH * Math.floor(waveId / 10));
 };
 
 proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
@@ -3996,6 +3997,7 @@ proto.sendHighScore = function (highScore, meta) {
 	}
 	var data = "high_score=" + highScore;
 	data += "&x=" + encodeURIComponent(horde.x(data, hash));
+	data += "&app_id=onslaught_arena";
 	if (meta) {
 		data += "&m=" + encodeURIComponent(horde.x(JSON.stringify(meta), hash));
 	}
@@ -4003,7 +4005,7 @@ proto.sendHighScore = function (highScore, meta) {
 	data += "&z=" + encodeURIComponent(horde.x(this.state, hash));
 	data += "&t=" + horde.Timer.now();
 	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "/onslaught_arena/high_scores");
+	xhr.open("POST", "/api");
 	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
 	xhr.send(data);
 };

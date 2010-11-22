@@ -79,13 +79,48 @@ canvas {
 
 #tip {
 	position: absolute;
-	top: 0;
 	left: 0;
+	top: 0;
+
 	padding: 5px;
+
+	color: #faa61a;
 	font-family: Tahoma, Arial, Sans;
 	font-size: 14px;
 	font-weight: bold;
 	text-align: center;
-	color: #faa61a;
-	text-shadow: #906112 1px 1px 2px;
+	text-shadow: #91661e 1px 1px 2px;
+}
+
+#tip_controls {
+	cursor: pointer;
+	float: right;
+	padding-right: 5px;
+}
+
+#tip_controls.show {
+	color: #f1f1f2;
+}
+
+#tip_controls.hide {
+	color: #6d6e70;
+	text-shadow: #000 1px 1px 2px;
+}
+
+.fade-in, .fade-out {
+	-moz-transition: all 1s ease-in-out;
+	-o-transition: all 1s ease-in-out;
+	-webkit-transition: all 1s ease-in-out;
+}
+
+.fade-in {
+	opacity: 1;
+}
+
+.fade-out {
+	opacity: 0;
+}
+
+#tip span {
+	color: #f1f1f2;
 }
