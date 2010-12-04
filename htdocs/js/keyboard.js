@@ -107,6 +107,16 @@ Keyboard.bombCode = [
 	Keys.B
 ];
 
+Keyboard.cyclopsCode = [
+	67, // C
+	89, // Y
+	67, // C
+	Keys.L,
+	Keys.O,
+	Keys.P,
+	Keys.S
+];
+
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.

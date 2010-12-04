@@ -2069,70 +2069,93 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.toggleFullscreen();
 		}
 
-		// Code: lddqd = god mode
-		if (this.keyboard.historyMatch(horde.Keyboard.godModeCode)) {
-			this.keyboard.clearHistory();
-			var p = this.getPlayerObject();
-			p.cheater = true;
-			if (p.hasState(horde.Object.states.INVINCIBLE)) {
-				p.removeState(horde.Object.states.INVINCIBLE);
-			} else {
-				p.addState(horde.Object.states.INVINCIBLE);
+		if (!horde.isDemo()) {
+
+			// Code: lddqd = god mode
+			if (this.keyboard.historyMatch(horde.Keyboard.godModeCode)) {
+				this.keyboard.clearHistory();
+				var p = this.getPlayerObject();
+				p.cheater = true;
+				if (p.hasState(horde.Object.states.INVINCIBLE)) {
+					p.removeState(horde.Object.states.INVINCIBLE);
+				} else {
+					p.addState(horde.Object.states.INVINCIBLE);
+				}
+				horde.sound.play("code_entered");
 			}
-			horde.sound.play("code_entered");
-		}
 
-		// Code: ldkfa = Infinite fire swords
-		if (this.keyboard.historyMatch(horde.Keyboard.allWeaponsCode)) {
-			this.keyboard.clearHistory();
-			var p = this.getPlayerObject();
-			p.cheater = true;
-			p.weapons = [{
-				type: "h_fire_sword",
-				count: null
-			}];
-			horde.sound.play("code_entered");
-		}
+			// Code: ldkfa = Infinite fire swords
+			if (this.keyboard.historyMatch(horde.Keyboard.allWeaponsCode)) {
+				this.keyboard.clearHistory();
+				var p = this.getPlayerObject();
+				p.cheater = true;
+				p.weapons = [{
+					type: "h_fire_sword",
+					count: null
+				}];
+				horde.sound.play("code_entered");
+			}
 
-		// Code: awesm = Infinite fire knives
-		if (this.keyboard.historyMatch(horde.Keyboard.awesmCode)) {
-			this.keyboard.clearHistory();
-			var p = this.getPlayerObject();
-			p.cheater = true;
-			p.weapons = [{
-				type: "h_fire_knife",
-				count: null
-			}];
-			horde.sound.play("code_entered");
-		}
+			// Code: awesm = Infinite fire knives
+			if (this.keyboard.historyMatch(horde.Keyboard.awesmCode)) {
+				this.keyboard.clearHistory();
+				var p = this.getPlayerObject();
+				p.cheater = true;
+				p.weapons = [{
+					type: "h_fire_knife",
+					count: null
+				}];
+				horde.sound.play("code_entered");
+			}
 
-		// Code: ldbomb = Infinite firebombs
-		if (this.keyboard.historyMatch(horde.Keyboard.bombCode)) {
-			this.keyboard.clearHistory();
-			var p = this.getPlayerObject();
-			p.cheater = true;
-			p.weapons = [{
-				type: "h_firebomb",
-				count: null
-			}];
-			horde.sound.play("code_entered");
-		}
+			// Code: ldbomb = Infinite firebombs
+			if (this.keyboard.historyMatch(horde.Keyboard.bombCode)) {
+				this.keyboard.clearHistory();
+				var p = this.getPlayerObject();
+				p.cheater = true;
+				p.weapons = [{
+					type: "h_firebomb",
+					count: null
+				}];
+				horde.sound.play("code_entered");
+			}
 
-		// Code: lddebug = toggle debug
-		if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
-			this.keyboard.clearHistory();
-			this.debug = !this.debug;
-			horde.sound.play("code_entered");
-		}
+			// Code: lddebug = toggle debug
+			if (this.keyboard.historyMatch(horde.Keyboard.debugCode)) {
+				this.keyboard.clearHistory();
+				this.debug = !this.debug;
+				horde.sound.play("code_entered");
+			}
 
-		// Code: ldreset = reset save data
-		if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
-			this.keyboard.clearHistory();
-			this.clearData("checkpoint_wave");
-			this.clearData("checkpoint_hero");
-			this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
-			horde.sound.play("code_entered");
-		}
+			// Code: ldreset = reset save data
+			if (this.keyboard.historyMatch(horde.Keyboard.resetCode)) {
+				this.keyboard.clearHistory();
+				this.clearData("checkpoint_wave");
+				this.clearData("checkpoint_hero");
+				this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
+				horde.sound.play("code_entered");
+			}
+
+			// Code: cyclops = play as the cyclops
+			if (this.keyboard.historyMatch(horde.Keyboard.cyclopsCode)) {
+				var p = this.getPlayerObject();
+
+				if (!p.cheater) {
+					horde.sound.play("code_entered");
+					this.keyboard.clearHistory();
+
+					p.cheater = true;
+					p.hitPoints *= 2;
+					p.size = new horde.Size(64, 64);
+					p.spriteY = 224;
+					p.weapons = [
+						{type: "e_boulder", count: null}
+					];
+					p.wounds *= 2;
+				}
+			}
+
+		} // end isDemo
 
 		if (this.paused) {
 
