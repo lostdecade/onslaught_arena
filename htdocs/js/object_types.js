@@ -1602,7 +1602,7 @@ o.wizard = {
 	gibletSize: "medium",
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
-	
+
 	weapons: [
 		{type: "e_shock_wave", count: null}
 	],
@@ -1612,25 +1612,25 @@ o.wizard = {
 	soundReappear: "wizard_reappear",
 	soundDamage: "goblin_damage",
 	soundDies: "goblin_dies",
-	
+
 	lootTable: [
 		{type: null, weight: 6},
 		{type: "item_chest", weight: 2},
 		{type: "WEAPON_DROP", weight: 2}
 	],
-	
+
 	phase: 0,
 	phaseInit: false,
-	
+
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 		this.moveToY = horde.randomRange(50, 75);
 	},
 	onUpdate: function (elapsed, engine) {
-		
+
 		switch (this.phase) {
-			
+
 			// Move out of the gates
 			case 0:
 				if (!this.phaseInit) {
@@ -1641,7 +1641,7 @@ o.wizard = {
 					this.phaseInit = false;
 				}
 				break;
-				
+
 			// Phase out
 			case 1:
 				if (!this.phaseInit) {
@@ -1657,7 +1657,7 @@ o.wizard = {
 					this.phaseInit = false;
 				}
 				break;
-				
+
 			// Turn invisible and move around!
 			case 2:
 				if (!this.phaseInit) {
@@ -1666,13 +1666,17 @@ o.wizard = {
 					this.phaseTimer.start(horde.randomRange(1000, 2000));
 					this.phaseInit = true;
 				}
+				// Don't trigger phase in if wizard is too close to the player
+				var myCenter = this.boundingBox().center();
+				var playerCenter = engine.getPlayerObject().boundingBox().center();
+				var diff = playerCenter.clone().subtract(myCenter).abs();
 				movementTypes.wander.apply(this, arguments);
-				if (this.phaseTimer.expired()) {
+				if (this.phaseTimer.expired() && diff.magnitude() > 90) {
 					this.phase++;
 					this.phaseInit = false;
 				}
 				break;
-				
+
 			// Phase in
 			case 3:
 				if (!this.phaseInit) {
@@ -1687,7 +1691,7 @@ o.wizard = {
 					this.phaseInit = false;
 				}
 				break;
-				
+
 			// Shoot the player!
 			case 4:
 				if (!this.phaseInit) {
@@ -1716,10 +1720,10 @@ o.wizard = {
 };
 
 o.sandworm = {
-	
+
 	role: "monster",
 	team: 1,
-	
+
 	animated: true,
 	animDelay: 200,
 	spriteSheet: "characters",

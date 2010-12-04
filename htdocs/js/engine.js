@@ -3255,28 +3255,44 @@ proto.getObjectDrawOrder = function horde_Engine_proto_getObjectDrawOrder () {
 };
 
 proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
-	
+
 	if (o.role === "hero" && this.heroFiring) {
 		var s = o.getSpriteXY(this.heroFiringDirection);
 	} else {
 		var s = o.getSpriteXY();
 	}
 
+	/*
+	// Invisible testing hack
+	if (o.hasState(horde.Object.states.INVISIBLE)) {
+		ctx.save();
+		ctx.fillStyle = "rgb(0, 0, 255)";
+		ctx.fillRect(
+			o.position.x,
+			o.position.y,
+			o.size.width,
+			o.size.height
+		);
+		ctx.restore();
+		return;
+	}
+	*/
+
 	if (o.alpha <= 0 || o.hasState(horde.Object.states.INVISIBLE)) {
 		return;
 	}
-	
+
 	ctx.save();
-	
+
 	ctx.translate(
 		o.position.x + o.size.width / 2,
 		o.position.y + o.size.height / 2
 	);
-	
+
 	if (o.angle !== 0) {
 		ctx.rotate(o.angle * Math.PI / 180);
 	}
-	
+
 	if (o.alpha !== 1) {
 		ctx.globalAlpha = o.alpha;
 	}
@@ -3349,7 +3365,7 @@ proto.drawObject = function horde_Engine_proto_drawObject (ctx, o) {
 	}
 
 	ctx.restore();
-	
+
 };
 
 proto.isBadassWeapon = function horde_Engine_proto_isBadassWeapon (o) {
