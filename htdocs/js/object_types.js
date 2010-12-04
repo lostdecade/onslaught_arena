@@ -2232,13 +2232,13 @@ o.beholder = {
 	role: "monster",
 	team: 1,
 	badass: true,
-	
+
 	size: new horde.Size(128, 128),
 	spriteSheet: "beholder",
 	animated: true,
 	animDelay: 350,
 	drawIndex: 3,
-	
+
 	damage: 30,
 	hitPoints: 3000,
 	speed: 50,
@@ -2246,13 +2246,13 @@ o.beholder = {
 	//soundAttacks: "_attacks",
 	soundDamage: "beholder_damage",
 	soundDies: "beholder_dies",
-	
+
 	collidable: false,
-	
+
 	lootTable: [
 		{type: "item_weapon_fire_sword", weight: 1}
 	],
-	
+
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.attackTimer = new horde.Timer();
@@ -2260,7 +2260,7 @@ o.beholder = {
 		this.eyeletOffsetMod = 1;
 		this.enraged = false;
 	},
-	
+
 	onUpdate: function (elapsed, engine) {
 
 		this.attackTimer.update(elapsed);
@@ -2289,7 +2289,7 @@ o.beholder = {
 		}
 
 		switch (this.phase) {
-			
+
 			// Charge out of the gates (invisible)
 			case 0:
 				if (!this.phaseInit) {
@@ -2301,7 +2301,7 @@ o.beholder = {
 					this.nextPhase();
 				}
 				break;
-			
+
 			// Phase in
 			case 1:
 				if (!this.phaseInit) {
@@ -2318,7 +2318,7 @@ o.beholder = {
 					this.nextPhase();
 				}
 				break;
-			
+
 			// Wander and spawn X eyelets (now attackable)
 			case 2:
 				if (!this.phaseInit) {
@@ -2364,7 +2364,7 @@ o.beholder = {
 				}
 				movementTypes.wander.apply(this, arguments);
 				break;
-			
+
 			// Shake
 			case 4:
 				if (!this.phaseInit) {
@@ -2385,7 +2385,7 @@ o.beholder = {
 				}
 				this.nextPhase();
 				break;
-				
+
 			case 6:
 				if (!this.phaseInit) {
 					this.oldSpeed = this.speed;
@@ -2393,21 +2393,22 @@ o.beholder = {
 					this.oldAnimDelay = this.animDelay;
 					this.animDelay = 100;
 					this.chase(engine.getPlayerObject());
+					this.phaseTimer.start(1000); // Must charge for at least 1s
 					this.phaseInit = true;
 				}
 				break;
-			
+
 		}	
 	},
-	
+
 	onWallCollide: function () {
-		if (this.phase === 6) {
+		if (this.phase === 6 && this.phaseTimer.expired()) {
 			this.speed = this.oldSpeed;
 			this.animDelay = this.oldAnimDelay;
 			this.setPhase(2);
 		}
 	}
-	
+
 };
 
 o.gas_cloud = {

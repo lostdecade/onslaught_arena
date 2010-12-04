@@ -674,7 +674,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 		state: "off",
 		alpha: 0
 	};
-	
+
 	// Wave testing code...
 	/*
 	var testWave = 50;
