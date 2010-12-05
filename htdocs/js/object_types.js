@@ -903,7 +903,7 @@ o.spikes = {
 
 	role: "trap",
 	team: 1,
-	
+
 	speed: 0,
 	hitPoints: Infinity,
 	damage: 10,
@@ -912,15 +912,15 @@ o.spikes = {
 	spriteSheet: "objects",
 	spriteX: 0,
 	spriteY: 256,
-	
+
 	animated: true,
 	animNumFrames: 1,
-	
+
 	spawnFramesX: 224,
 	spawnFramesY: 256,
 	spawnFrameCount: 3,
 
-	gibletSize: "medium",
+	collidable: false,
 
 	onInit: function () {
 		this.addState(horde.Object.states.SPAWNING);
@@ -931,7 +931,7 @@ o.spikes = {
 			this.spriteX = 96;
 		}
 	}
-	
+
 };
 
 o.owlbear = {
@@ -1852,13 +1852,13 @@ o.doppelganger = {
 	role: "monster",
 	team: 1,
 	badass: true,
-	
+
 	animated: true,
 	spriteSheet: "characters",
 	spriteY: 0,
 	spriteY: 768,
 	spriteYOverlay: 928,
-	
+
 	damage: 20,
 	hitPoints: 5000,
 	speed: 200,
@@ -1870,7 +1870,7 @@ o.doppelganger = {
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 	},
-	
+
 	onKilled: function (attacker, engine) {
 		for (var id in engine.objects) {
 			var obj = engine.objects[id];
@@ -1883,9 +1883,9 @@ o.doppelganger = {
 	},
 
 	onUpdate: function (elapsed, engine) {
-		
+
 		switch (this.phase) {
-			
+
 			// Charge out of the gates
 			case 0:
 				if (!this.phaseInit) {
@@ -1893,30 +1893,31 @@ o.doppelganger = {
 					this.animDelay = 100;
 					this.phaseInit = true;
 				}
-				if (this.position.y > 60) {
+				if (this.position.y > 100) {
 					this.nextPhase();
 				}
 				break;
-			
-			// Dash to center
+
+			// Dash to first waypoint
 			case 1:
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
+					this.waypoints = this.getPattern();
+					this.currentWaypoint = this.waypoints.shift();
 					this.phaseInit = true;
-					this.targetPos = new horde.Vector2((640 / 2) - 16, (480 / 2) - 16);
 				}
-				this.moveToward(this.targetPos);
-				var diff = this.targetPos.clone().subtract(this.position).abs();
-				if (diff.x < 16 && diff.y < 16) {
+				this.moveToward(this.currentWaypoint);
+				var diff = this.currentWaypoint.clone().subtract(this.position).abs().magnitude();
+				if (diff < 10) {
+					this.position = this.currentWaypoint.clone();
 					this.nextPhase();
 				}
 				break;
-			
+
 			// Shake
 			case 2:
 				if (!this.phaseInit) {
-					this.numDashes = 0;
 					this.setDirection(new horde.Vector2(0, 1));
 					this.stopMoving();
 					this.phaseTimer.start(500);
@@ -1927,15 +1928,13 @@ o.doppelganger = {
 					this.nextPhase();
 				}
 				break;
-				
-			// Dash around dropping spikes
+
+			// Follow waypoints dropping spikes
 			case 3:
 				if (!this.phaseInit) {
-					this.numDashes++;
+					this.currentWaypoint = this.waypoints.shift();
 					this.speed = 400;
 					this.animDelay = 100;
-					this.setDirection(horde.randomDirection());
-					this.phaseTimer.start(1500);
 					this.phaseInit = true;
 					this.spikeTimer = new horde.Timer();
 					this.spikeTimer.start(200);
@@ -1950,33 +1949,36 @@ o.doppelganger = {
 					}
 					this.spikeTimer.reset();
 				}
-				if (this.phaseTimer.expired()) {
-					if (this.numDashes >= 4) {
-						// Finished dashing
-						this.nextPhase();
+				this.moveToward(this.currentWaypoint);
+				var diff = this.currentWaypoint.clone().subtract(this.position).abs().magnitude();
+				if (diff < 10) {
+					this.position = this.currentWaypoint.clone();
+					if (this.waypoints.length > 0) {
+						this.currentWaypoint = this.waypoints.shift();
 					} else {
-						// Keep dashing!
-						this.setPhase(3);
+						this.nextPhase();
 					}
 				}
 				break;
-			
+
 			// Chase hero slowly
 			case 4:
 				if (!this.phaseInit) {
 					this.speed = 100;
 					this.animDelay = 200;
-					this.phaseTimer.start(10000);
+					this.phaseTimer.start(7500);
 					this.phaseInit = true;
 				}
 				var player = engine.getPlayerObject();
-				this.chase(player);
+				if (player.wounds < player.hitPoints) {
+					this.chase(player);
+				}
 				// TODO: Shoot swords
 				if (this.phaseTimer.expired()) {
 					this.nextPhase();
 				}
 				break;
-			
+
 			// Dash to upper left
 			case 5:
 				if (!this.phaseInit) {
@@ -1986,14 +1988,13 @@ o.doppelganger = {
 					this.targetPos = new horde.Vector2(32, 66);
 				}
 				this.moveToward(this.targetPos);
-				var diff = this.targetPos.clone().subtract(this.position).abs();
-				if (diff.x < 2 && diff.y < 2) {
-					this.position.x = 32;
-					this.position.y = 66;
+				var diff = this.targetPos.clone().subtract(this.position).abs().magnitude();
+				if (diff < 10) {
+					this.position = this.targetPos.clone();
 					this.nextPhase();
 				}
 				break;
-			
+
 			// Summon spike walls and shoot spears
 			case 6:
 				if (!this.phaseInit) {
@@ -2036,18 +2037,33 @@ o.doppelganger = {
 				if (!this.phaseInit) {
 					this.speed = 200;
 					this.animDelay = 200;
-					this.phaseInit = true;
-					this.phaseTimer.start(15000);
 					this.weapons = [{type: "e_dopp_axe", count: null}];
 					this.cooldown = false;
-					this.setDirection(horde.randomDirection());
+					this.waypoints = this.getPattern();
+					this.currentWaypoint = this.waypoints.shift();
+					this.axeTimer = new horde.Timer();
+					this.axeTimer.start(3000);
+					this.axeTimer.update(3000);
+					this.phaseInit = true;
 				}
-				if (this.phaseTimer.expired()) {
-					this.nextPhase();
+				this.axeTimer.update(elapsed);
+				if (this.axeTimer.expired()) {
+					this.chase(engine.getPlayerObject());
+					engine.spawnObject(this, "e_dopp_axe");
+					this.axeTimer.reset();
 				}
-				movementTypes.wander.apply(this, arguments);
-				return "shoot";
-			
+				this.moveToward(this.currentWaypoint);
+				var diff = this.currentWaypoint.clone().subtract(this.position).abs().magnitude();
+				if (diff < 10) {
+					this.position = this.currentWaypoint.clone();
+					if (this.waypoints.length > 0) {
+						this.currentWaypoint = this.waypoints.shift();
+					} else {
+						this.nextPhase();
+					}
+				}
+				break;
+
 			// Dash to center
 			case 9:
 				if (!this.phaseInit) {
@@ -2057,12 +2073,13 @@ o.doppelganger = {
 					this.targetPos = new horde.Vector2((640 / 2) - 16, (480 / 2) - 16);
 				}
 				this.moveToward(this.targetPos);
-				var diff = this.targetPos.clone().subtract(this.position).abs();
-				if (diff.x < 5 && diff.y < 5) {
+				var diff = this.targetPos.clone().subtract(this.position).abs().magnitude();
+				if (diff < 10) {
+					this.position = this.targetPos.clone();
 					this.nextPhase();
 				}
 				break;
-				
+
 			// Spawn some shit...
 			case 10:
 				if (!this.phaseInit) {
@@ -2082,19 +2099,69 @@ o.doppelganger = {
 					this.setPhase(1);
 				}
 				break;
-	
+
 		}
-	
+
 	},
-	
+
+	getPattern: function () {
+		switch (horde.randomRange(1, 3)) {
+
+			// Spiral
+			case 1:
+				return [
+					new horde.Vector2(64, 320),
+					new horde.Vector2(64, 96),
+					new horde.Vector2(544, 96),
+					new horde.Vector2(544, 320),
+					new horde.Vector2(128, 320),
+					new horde.Vector2(128, 160),
+					new horde.Vector2(480, 160),
+					new horde.Vector2(480, 256),
+					new horde.Vector2(192, 256)
+				];
+				break;
+			
+			// Snake
+			case 2:
+				return [
+					new horde.Vector2(576, 352),
+					new horde.Vector2(32, 352),
+					new horde.Vector2(32, 288),
+					new horde.Vector2(576, 288),
+					new horde.Vector2(576, 224),
+					new horde.Vector2(32, 224),
+					new horde.Vector2(32, 160),
+					new horde.Vector2(576, 160),
+					new horde.Vector2(576, 96),
+					new horde.Vector2(32, 96)
+				];
+				break;
+
+			// Hourglass
+			case 3:
+				return [
+					new horde.Vector2(576, 64),
+					new horde.Vector2(32, 64),
+					new horde.Vector2(288, 192),
+					new horde.Vector2(32, 352),
+					new horde.Vector2(576, 352),
+					new horde.Vector2(352, 224),
+					new horde.Vector2(576, 64)
+				];
+				break;
+
+		}
+	},
+
 	makeSpikeWalls: function (engine) {
 
 		horde.sound.play("wizard_reappear");
-		
+
 		var safeSpots = 3;
 		var spinUpTime = 5000;
 		var wallSpeedMod = 2;
-	
+
 		if (this.wounds > (this.hitPoints * 0.66)) {
 			// 1/3 HP (or lower)
 			safeSpots = 1;
@@ -2106,25 +2173,25 @@ o.doppelganger = {
 			spinUpTime = 7500;
 			wallSpeedMod = 1.5;
 		}
-		
+
 		this.phaseTimer.start(spinUpTime - 1500);
-		
+
 		// Make top wall
 		var spike = [];
 		for (var a = 0; a < 18; ++a) {
 			spike.push(true);
 		}
-		
+
 		for (var j = 0; j < safeSpots; ++j) {
-			c = 0;
+			var c = 0;
 			var found = false;
 			while (found === false) {
-				c = horde.randomRange(1, (spike.length - 1));
+				c = horde.randomRange(3, (spike.length - 1));
 				found = (spike[c] === true);
 			}
 			spike[c] = false;
 		}
-		
+
 		for (var x = 0; x < spike.length; ++x) {
 			if (spike[x] === true) {
 				var obj = horde.makeObject("spike_wall");
@@ -2134,7 +2201,7 @@ o.doppelganger = {
 				engine.addObject(obj);
 			}
 		}
-		
+
 		// Make left wall
 		var spike = [];
 		for (var a = 0; a < 10; ++a) {
@@ -2142,10 +2209,10 @@ o.doppelganger = {
 		}
 
 		for (var j = 0; j < safeSpots; ++j) {
-			c = 0;
+			var c = 0;
 			var found = false;
 			while (found === false) {
-				c = horde.randomRange(1, (spike.length - 1));
+				c = horde.randomRange(3, (spike.length - 1));
 				found = (spike[c] === true);
 			}
 			spike[c] = false;
@@ -2162,9 +2229,9 @@ o.doppelganger = {
 				engine.addObject(obj);
 			}
 		}	
-		
+
 	}
-	
+
 };
 
 o.e_dopp_axe = {
@@ -2186,7 +2253,7 @@ o.e_dopp_axe = {
 		this.spawnTimer = new horde.Timer();
 		this.spawnTimer.start(50);
 	},
-	
+
 	onUpdate: function (elapsed, engine) {
 		if (!engine.objectExists(this.ownerId)) {
 			this.die();
