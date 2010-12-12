@@ -21,6 +21,9 @@
 	</div>
 	
 	<div class="nav">
+	  {% if logout_url %}
+      <a href="{{ logout_url }}">logout</a>
+    {% endif %}
 		<ul>
 			<li><a href="http://goo.gl/Yurpd" target="_blank">Blog</a></li>
 			<li><a href="http://goo.gl/As1FV" target="_blank">Support</a></li>
