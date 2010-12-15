@@ -124,3 +124,8 @@ canvas {
 #tip span {
 	color: #f1f1f2;
 }
+
+.ad.leaderboard {
+	margin-top: 10px;
+	text-align: center;
+}

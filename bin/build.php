@@ -59,7 +59,7 @@ function buildWeb ($version) {
 	$tpl = str_replace('{{VERSION}}', $version, $tpl);
 	// DEMO
 	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
-	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
+	$demo_tpl = file_get_contents(ROOT . 'template/web_demo.template.html');
 	$demo_tpl = str_replace('{{GAME_CODE}}', $demo_js, $demo_tpl);
 	$demo_tpl = str_replace('{{VERSION}}', $version, $demo_tpl);
 	// SHARED

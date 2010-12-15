@@ -7,7 +7,7 @@
 	<meta name="keywords" content="onslaught arena, html5, chrome webstore, indie, browser-based, lost decade games, javascript, chiptunes, arcade, retro, oldschool, geoff blair, matt hackett, joshua morse">
 	<link rel="icon" href="img/favicon.ico" type="image/x-icon">
 	<link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-	<link rel="stylesheet" href="css/horde.css?v=1.1.0">
+	<link rel="stylesheet" href="css/horde.css?v=1.2.1">
 	<title>Onslaught! Arena</title>
 </head>
 <body>
@@ -19,7 +19,7 @@
 			is an HTML5 game made by <a href="http://www.lostdecadegames.com/">Lost Decade Games</a>.
 		</p>
 	</div>
-	
+
 	<div class="nav">
 		<ul>
 			<li><a href="http://goo.gl/Yurpd" target="_blank">Blog</a></li>
@@ -28,14 +28,28 @@
 			<li><a href="http://goo.gl/CNHBo" target="_blank">Facebook</a></li>
 		</ul>
 	</div>
-	
+
+	<div class="ad leaderboard">
+		<script type="text/javascript"><!--
+		google_ad_client = "ca-pub-1209743261472499";
+		/* onslaugh_arena_demo_1 */
+		google_ad_slot = "1042513023";
+		google_ad_width = 728;
+		google_ad_height = 90;
+		//-->
+		</script>
+		<script type="text/javascript"
+		src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+		</script>
+	</div>
+
 	<div id="stage">
 		<div id="tip">
 			<div id="tip_controls"></div>
 			<div id="tip_message" title="Click to toggle tips display."></div>
 		</div>
 	</div>
-	
+
 	<script>
 		window.onslaughtScores = '{{ scores }}';
 		window.ldgHash = "{{ user_hash }}";
@@ -45,7 +59,7 @@
 	<script>
 		soundManager.url = "lib/sm2/";
 	</script>
-	
+
 	<script>
 	(function () {
 		(function(){var c={};c.canvasFallbackContent='<div class="fallback"><p>Your browser does not appear to support <a href="http://en.wikipedia.org/wiki/HTML5">HTML5</a>.</p><p>Please try one of the following, more standards compliant browsers: <a href="http://www.google.com/chrome">Chrome</a>, <a href="http://www.apple.com/safari/">Safari</a>, <a href="http://www.mozilla.com/firefox/">Firefox</a> or <a href="http://www.opera.com/">Opera</a>.</p></div>';c.setInterval=function(f,a,b){return window.setInterval(function(){a.call(b)},
@@ -75,7 +89,7 @@ function(){this.lastUpdate=0;this.canvases={};this.map=null;this.spawnPoints=[];
 false;this.cloudTimer=null;this.woundsToSpeed=10;this.introTimer=new c.Timer;this.introPhase=0;this.wonGame=this.introPhaseInit=false;this.wonGamePhase=0;this.weaponPickup={type:null,state:"off",alpha:1,scale:1,position:new c.Vector2};var a=["The <span>Beholder</span> drops special <span>loot</span>!","Pick up <span>meat</span> to restore 10% of your <span>health</span>.","The <span>Last Boss</span> can be found on <span>Wave 50</span>.","Enemies deal <span>more melee damage</span> than their projectile weapons.",
 "Hold down the left <span>mouse button</span> to auto <span>fire</span>.","<span>Gelatinous Cube</span> dislikes magic weapons.","You earn <span>1,000</span> points for each <span>wave</span> you survive!","Certain enemy <span>projectiles</span> can't be destroyed. Learn to <span>dodge</span>!","Toggle <span>fullscreen</span> mode by clicking the <span>screen icon</span> in the lower right.","Toggle <span>audio</span> by clicking the <span>trumpet icon</span> in the lower right.","Taking <span>damage</span> lowers your <span>score</span>. Try not to get hit!",
 "Your game is <span>saved automatically</span> after you defeat each boss.","You can press the <span>M</span> key to toggle <span>muting</span>.","You can press the <span>F</span> key to toggle <span>fullscreen</span> mode.","Press <span>P</span> to <span>pause</span> the game."],b=-1,d=document.getElementById("tip_message"),e=function(){do var h=c.randomRange(0,a.length-1);while(h===b);b=h;if(d.innerHTML=="")d.innerHTML=a[h];else{setTimeout(function(){d.className="fade-in";d.innerHTML=a[h]},1E3);
-d.className="fade-out"}};e();setInterval(e,15E3);var g=document.getElementById("tip_controls");c.on("click",function(){this.getData("hide_tips")==0?this.putData("hide_tips",1):this.putData("hide_tips",0);i(this.getData("hide_tips"))},g,this);var i=function(h){if(h==0){g.className="hide";g.innerHTML="hide tips";d.style.display=""}else{g.className="show";g.innerHTML="show tips";d.style.display="none"}};i(this.getData("hide_tips"))};var f=c.Engine.prototype;f.cacheBust=function(){return"?cachebust=1.1.0"};
+d.className="fade-out"}};e();setInterval(e,15E3);var g=document.getElementById("tip_controls");c.on("click",function(){this.getData("hide_tips")==0?this.putData("hide_tips",1):this.putData("hide_tips",0);i(this.getData("hide_tips"))},g,this);var i=function(h){if(h==0){g.className="hide";g.innerHTML="hide tips";d.style.display=""}else{g.className="show";g.innerHTML="show tips";d.style.display="none"}};i(this.getData("hide_tips"))};var f=c.Engine.prototype;f.cacheBust=function(){return"?cachebust=1.2.1"};
 f.resize=function(){var a=window.innerWidth,b=window.innerHeight,d=document.getElementById("stage");b=b-d.offsetTop;d.style.height=b+"px";if(this.enableFullscreen){height=b-50;if(height<480)height=480;if(height>768)height=768;d=Math.round(height*1.333)}else{d=640;height=480}var e=this.canvases.display;e.style.width=d+"px";e.style.height=height+"px";a=Math.max(a/2-d/2,0);b=Math.max(b/2-height/2,30);e.style.left=a+"px";e.style.top=b+"px";e=document.getElementById("tip");e.style.top=b-30+"px";e.style.left=
 a+"px";e.style.width=d+"px"};f.run=function(){this.init();this.lastUpdate=c.now();this.start()};f.start=function(){this.interval=c.setInterval(0,this.update,this)};f.stop=function(){clearInterval(this.interval)};f.togglePause=function(){var a=false;return function(){if(!this.getPlayerObject().hasState(c.Object.states.DYING))if(this.paused){this.paused=false;c.sound.setMuted(a);c.sound.play("unpause");c.sound.play(this.currentMusic)}else{this.paused=true;this.initOptions();a=c.sound.isMuted();c.sound.play("pause");
 c.sound.stop(this.currentMusic)}}}();f.addObject=function(a){this.objectIdSeed++;var b="o"+this.objectIdSeed;a.id=b;this.objects[b]=a;return b};f.getBarColor=function(a,b){var d=b/a*100;return d>50?"rgb(98, 187, 70)":d>25?"rgb(246, 139, 31)":"rgb(238, 28, 36)"};f.spawnObject=function(a,b,d){d=d||a.facing;b=c.makeObject(b,true);for(var e=a;e.ownerId!==null;)if(this.objects[e.ownerId])e=this.objects[e.ownerId];else break;b.ownerId=e.id;b.team=a.team;b.centerOn(a.boundingBox().center());b.setDirection(d);
@@ -170,7 +184,7 @@ this.getObjectDrawOrder(),d;for(d in b)this.drawObject(a,this.objects[b[d].id])}
 e,g,i,0,0,k,m);l.globalCompositeOperation="source-in";l.fillStyle=n;l.fillRect(0,0,k,m);l.restore();a.drawImage(this.canvases.buffer,0,0,k,m,h,j,k,m)};f.drawUI=function(a){var b=this.getPlayerObject(),d=b.getWeaponInfo(),e=c.objectTypes[d.type];d=d.count?d.count:"";a.drawImage(this.images.getImage("objects"),e.spriteX,e.spriteY,32,32,4,412,32,32);a.drawImage(this.images.getImage("objects"),32,32,32,32,4,443,32,32);a.save();a.textAlign="left";a.font="Bold 38px Cracked";a.globalAlpha=0.75;a.fillStyle=
 "rgb(0, 0, 0)";a.fillText(d,48,444);a.fillText(this.scoreCount,48,474);a.globalAlpha=1;a.fillStyle="rgb(241, 241, 242)";a.fillText(d,46,440);a.fillText(this.scoreCount,46,472);a.restore();e={width:280,height:24,x:180,y:432};var g=e.width-Math.round(e.width*b.wounds/b.hitPoints),i=e.width-Math.round(e.width*this.woundsTo/b.hitPoints);if(this.woundsTo<b.wounds){d=g;g=i}else{d=i;g=g}a.save();a.fillStyle="rgb(241, 241, 242)";a.fillRect(e.x-2,e.y-2,e.width+2,e.height+4);a.fillRect(e.x+e.width,e.y,2,e.height);
 a.fillStyle="rgb(0, 0, 0)";a.fillRect(e.x,e.y,e.width,e.height);a.fillStyle=this.getBarColor(b.hitPoints,b.hitPoints-b.wounds);a.globalAlpha=0.4;a.fillRect(e.x,e.y,g,e.height);a.fillRect(e.x,e.y,d,e.height);a.fillRect(e.x,e.y+5,d,e.height-10);a.fillRect(e.x,e.y+10,d,e.height-20);a.restore();b=(b.hitPoints-b.wounds)/b.hitPoints*100;d=352;if(b>50)d=224;else if(b>25)d=288;a.drawImage(this.images.getImage("objects"),d,64,42,42,e.x-32,424,42,42);a.drawImage(this.images.getImage("objects"),c.sound.isMuted()?
-96:0,96,96,58,506,416,96,58);d=this.enableFullscreen?596:564;a.drawImage(this.preloader.getImage("ui"),d,910,32,32,604,443,32,32)};f.drawTitle=function(a){a.drawImage(this.preloader.getImage("ui"),0,430,640,480,0,0,640,480);var b="High Score: "+this.getData("high_score");a.save();a.font="Bold 36px Cracked";a.textAlign="center";a.fillStyle="rgb(0, 0, 0)";a.fillText(b,322,456);a.fillStyle="rgb(230, 230, 230)";a.fillText(b,320,454);a.restore();b="v1.1.0";if(c.isDemo())b+=" demo";a.save();a.font="Bold 14px Monospace";
+96:0,96,96,58,506,416,96,58);d=this.enableFullscreen?596:564;a.drawImage(this.preloader.getImage("ui"),d,910,32,32,604,443,32,32)};f.drawTitle=function(a){a.drawImage(this.preloader.getImage("ui"),0,430,640,480,0,0,640,480);var b="High Score: "+this.getData("high_score");a.save();a.font="Bold 36px Cracked";a.textAlign="center";a.fillStyle="rgb(0, 0, 0)";a.fillText(b,322,456);a.fillStyle="rgb(230, 230, 230)";a.fillText(b,320,454);a.restore();b="v1.2.1";if(c.isDemo())b+=" demo";a.save();a.font="Bold 14px Monospace";
 a.textAlign="right";a.fillStyle="rgb(0, 0, 0)";a.fillText(b,638,478);a.fillStyle="rgb(230, 230, 230)";a.fillText(b,636,476);a.restore();a.save();a.font="Bold 14px Monospace";a.fillStyle="rgb(0, 0, 0)";a.fillText("Lost Decade Games \u00a9 2010",6,478);a.fillStyle="rgb(230, 230, 230)";a.fillText("Lost Decade Games \u00a9 2010",4,476);a.restore()};f.drawPointer=function(a){var b=this.pointerYStart+this.pointerY*24-24;a.save();a.drawImage(this.images.getImage("objects"),320,192,36,26,228,b,36,26);a.restore()};
 f.canContinue=function(){var a=this.getData("checkpoint_wave");return Boolean(a)};f.drawTitlePointerOptions=function(a){var b=this.pointerYStart-22,d;if(c.isDemo()){d=this.pointerY==0?638:430;a.drawImage(this.preloader.getImage("ui"),800,d,128,26,270,b,128,26)}else{d=this.canContinue()?this.pointerY==0?638:430:534;a.drawImage(this.preloader.getImage("ui"),640,d,116,20,270,b,116,20)}d=this.pointerY==1?664:456;a.drawImage(this.preloader.getImage("ui"),640,d,132,26,270,b+24,132,26);d=this.pointerY==
 2?690:482;a.drawImage(this.preloader.getImage("ui"),640,d,90,22,270,b+48,90,22);d=this.saveHighScores()?this.pointerY==3?714:506:610;a.drawImage(this.preloader.getImage("ui"),640,d,146,28,270,b+72,146,28)};f.drawPausedPointerOptions=function(a){var b=this.pointerYStart-22,d;if(this.verifyQuit){d=this.pointerY==0?1932:1860;a.drawImage(this.preloader.getImage("ui"),564,d,158,26,270,b,158,26)}else{d=this.pointerY==0?1788:1718;a.drawImage(this.preloader.getImage("ui"),564,d,106,26,270,b,106,26)}if(this.verifyQuit){d=
@@ -291,7 +305,7 @@ function(a,b,d,e){this.delay=500;this.lastSpawnElapsed=0;this.location=new c.Rec
 
 	}());
 	</script>
-	
+
 	<script type="text/javascript">
 	  var _gaq = _gaq || [];
 	  _gaq.push(['_setAccount', 'UA-16927444-5']);
@@ -302,6 +316,6 @@ function(a,b,d,e){this.delay=500;this.lastSpawnElapsed=0;this.location=new c.Rec
 	    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 	  })();
 	</script>
-	
+
 </body>
 </html>
