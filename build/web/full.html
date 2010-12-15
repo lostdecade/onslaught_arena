@@ -21,6 +21,9 @@
 	</div>
 
 	<div class="nav">
+	  {% if logout_url %}
+      <a href="{{ logout_url }}">logout</a>
+    {% endif %}
 		<ul>
 			<li><a href="http://goo.gl/Yurpd" target="_blank">Blog</a></li>
 			<li><a href="http://goo.gl/As1FV" target="_blank">Support</a></li>
@@ -47,6 +50,11 @@
 	</script>
 
 	<script>
+	/*
+	This content (c) copyright 2010 Lost Decade Games, LLC.
+	Guys, we worked hard on this. Please don't do anything shady with it.
+	Thanks!
+	*/
 	(function () {
 		(function(){var c={};c.canvasFallbackContent='<div class="fallback"><p>Your browser does not appear to support <a href="http://en.wikipedia.org/wiki/HTML5">HTML5</a>.</p><p>Please try one of the following, more standards compliant browsers: <a href="http://www.google.com/chrome">Chrome</a>, <a href="http://www.apple.com/safari/">Safari</a>, <a href="http://www.mozilla.com/firefox/">Firefox</a> or <a href="http://www.opera.com/">Opera</a>.</p></div>';c.setInterval=function(f,a,b){return window.setInterval(function(){a.call(b)},
 f)};c.setTimeout=function(f,a,b){return window.setTimeout(function(){a.call(b)},f)};c.on=function(f,a,b,d){b.addEventListener(f,function(e){a.call(d,e)},false)};c.stopEvent=function(f){f.cancelBubble=true;f.stopPropagation();f.preventDefault()};c.now=function(){return Date.now()};c.makeCanvas=function(f,a,b,d){var e=document.createElement("canvas");e.id=f;e.width=Number(a)||0;e.height=Number(b)||0;if(d!==true){e.innerHTML=c.canvasFallbackContent;document.getElementById("stage").appendChild(e)}return e};
