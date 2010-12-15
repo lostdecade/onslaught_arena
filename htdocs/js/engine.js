@@ -332,6 +332,14 @@ proto.getObjectCountByType = function horde_Engine_proto_getObjectCountByType (t
 	return count;
 };
 
+proto.isAlive = function horde_Engine_proto_isAlive (objectId) {
+	if (this.objects[objectId]) {
+		var o = this.objects[objectId];
+		return (o.alive && o.wounds < o.hitPoints);
+	}
+	return false;
+};
+
 proto.preloadComplete = function () {
 	this.state = "intro";
 	this.logoAlpha = 0;

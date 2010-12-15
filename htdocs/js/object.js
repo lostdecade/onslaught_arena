@@ -50,23 +50,23 @@ horde.Object = function () {
 	this.collidable = true;
 	this.bounce = true;
 	this.piercing = false;
-	
+
 	// Default sounds
 	this.soundDamage = null;
 	this.soundDies = null;
-	
+
 	this.damageType = "physical";
-	
+
 	this.drawIndex = 1; // Controls what order objects are drawn, lower is first
-	
+
 	// AI stuff
 	this.moveChangeElapsed = 0;
 	this.moveChangeDelay = 500;
-	
+
 	this.wounds = 0; // Amount of damage object has sustained
 	this.weapons = [];
 	this.gold = 0; // Amount of gold this object has earned
-	
+
 	// Stats!
 	this.kills = 0;
 	this.timesWounded = 0;
@@ -76,14 +76,15 @@ horde.Object = function () {
 	this.shotsPerWeapon = {};
 	this.meatEaten = 0;
 	this.cheater = false;
-	
+
 	// Behavior phase stuff
 	this.phase = 0;
 	this.phaseInit = false;
-	
+
 	// Loot tables for enemies
 	this.lootTable = [];
 
+	this.killSwitch = false;
 };
 
 horde.Object.states = {
@@ -227,14 +228,33 @@ proto.isDead = function horde_Object_proto_isDead () {
  * @param {number} elapsed Elapsed time in milliseconds since last update
  * @return {void}
  */
-proto.update = function horde_Object_proto_update (elapsed) {
-	
+proto.update = function horde_Object_proto_update (elapsed, engine) {
+
+	// If the owner has died, kill off this object
+	if (
+		this.killSwitch === false
+		&& this.ownerId !== null
+		&& !engine.isAlive(this.ownerId)
+	) {
+		switch (this.role) {
+			case "projectile":
+			case "trap":
+				this.ttl = 1000;
+				this.ttlElapsed = 0;
+				break;
+			case "monster":
+				this.wound(this.hitPoints);
+				break;
+		}
+		this.killSwitch = true;
+	}
+
 	this.updateStates(elapsed);
 
 	if (this.deathTimer) {
 		this.deathTimer.update(elapsed);
 	}
-	
+
 	if (this.hasState(horde.Object.states.DYING)) {
 		if (this.deathTimer.expired()) {
 			this.deathFrameIndex++;
@@ -245,7 +265,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			}
 		}
 	}
-	
+
 	if (this.hasState(horde.Object.states.INVINCIBLE)) {
 		this.alpha += ((10 / 1000) * elapsed) * this.alphaMod;
 		if (this.alpha >= 1) {
@@ -257,11 +277,11 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.alphaMod = 1;
 		}
 	}
-	
+
 	if (this.hasState(horde.Object.states.STUNNED)) {
 		return;
 	}
-	
+
 	if (this.animated) {
 		this.animElapsed += elapsed;
 		if (this.animElapsed >= this.animDelay) {
@@ -288,7 +308,7 @@ proto.update = function horde_Object_proto_update (elapsed) {
 	if (this.spriteAlign) {
 		this.angle = this.facing.angle();
 	}
-	
+
 	if (this.rotate) {
 		this.angle += ((this.rotateSpeed / 1000) * elapsed);
 	}
@@ -310,16 +330,16 @@ proto.update = function horde_Object_proto_update (elapsed) {
 			this.cooldownElapsed = 0;
 		}
 	}
-	
+
 	if (this.phaseTimer) {
 		this.phaseTimer.update(elapsed);
 	}
-	
+
 	if (this.hasState(horde.Object.states.DYING)) {
 		// Don't proceed with calling any AI behavior if this thing is dying...
 		return;
 	}
-	
+
 	return this.execute("onUpdate", arguments);
 };
 
