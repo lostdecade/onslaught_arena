@@ -57,11 +57,18 @@ function buildWeb ($version) {
 	$tpl = file_get_contents(ROOT . 'template/web.template.html');
 	$tpl = str_replace('{{GAME_CODE}}', $compiled_js, $tpl);
 	$tpl = str_replace('{{VERSION}}', $version, $tpl);
+	// No ads for full game
+	$tpl = str_replace('{{AD_LEADERBOARD}}', '', $tpl);
 	// DEMO
 	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
-	$demo_tpl = file_get_contents(ROOT . 'template/web_demo.template.html');
+	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
 	$demo_tpl = str_replace('{{GAME_CODE}}', $demo_js, $demo_tpl);
 	$demo_tpl = str_replace('{{VERSION}}', $version, $demo_tpl);
+	$demo_tpl = str_replace(
+		'{{AD_LEADERBOARD}}',
+		file_get_contents(ROOT . 'template/ad_leaderboard.html'),
+		$demo_tpl
+	);
 	// SHARED
 	$web_root = ROOT . 'build/web/';
 	$htdocs = ROOT . 'htdocs';
