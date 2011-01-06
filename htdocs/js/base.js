@@ -234,3 +234,14 @@ horde.x = function (s, p) {
 	}
 	return r;
 };
+
+(function define_logger () {
+
+	var log = [];
+
+	horde.log = function horde_log (info) {
+		log.push(info);
+		console.log(info);
+	};
+
+}());

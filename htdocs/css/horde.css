@@ -121,8 +121,21 @@ canvas {
 	opacity: 0;
 }
 
+.full #tip {
+	display: none;
+}
+
 #tip span {
 	color: #f1f1f2;
+}
+
+#tip a {
+	color: #f1f1f2;
+	text-decoration: none;
+}
+
+#tip a:hover {
+	text-decoration: underline;
 }
 
 .ad.leaderboard {

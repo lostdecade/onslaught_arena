@@ -55,6 +55,7 @@ function buildWeb ($version) {
 	// FULL
 	$compiled_js = file_get_contents(ROOT . 'horde.js');
 	$tpl = file_get_contents(ROOT . 'template/web.template.html');
+	$tpl = str_replace('{{TYPE}}', 'full', $tpl);
 	$tpl = str_replace('{{GAME_CODE}}', $compiled_js, $tpl);
 	$tpl = str_replace('{{VERSION}}', $version, $tpl);
 	// No ads for full game
@@ -62,6 +63,7 @@ function buildWeb ($version) {
 	// DEMO
 	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
 	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
+	$demo_tpl = str_replace('{{TYPE}}', 'demo', $demo_tpl);
 	$demo_tpl = str_replace('{{GAME_CODE}}', $demo_js, $demo_tpl);
 	$demo_tpl = str_replace('{{VERSION}}', $version, $demo_tpl);
 	$demo_tpl = str_replace(

@@ -44,6 +44,8 @@ horde.Engine = function horde_Engine () {
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
 
+	this.running = false;
+
 	this.gateDirection = ""; // Set to "up" or "down"
 	this.gateState = "down"; // "up" or "down"
 	this.gatesX = 0;
@@ -80,7 +82,15 @@ horde.Engine = function horde_Engine () {
 		scale: 1,
 		position: new horde.Vector2()
 	};
-	
+
+	//this.initTips();
+
+};
+
+var proto = horde.Engine.prototype;
+
+proto.initTips = function horde_Engine_proto_initTips () {
+
 	// Super Ghouls 'n Tips
 	var tips = [
 		"The <span>Beholder</span> drops special <span>loot</span>!",
@@ -101,56 +111,59 @@ horde.Engine = function horde_Engine () {
 	];
 	var lastTipIndex = -1;
 	var tip = document.getElementById("tip_message");
-	var rotateTip = function () {
-		do {
-			var index = horde.randomRange(0, tips.length - 1);
-		} while (index === lastTipIndex);
+	if (tip) {
+		var rotateTip = function () {
+			do {
+				var index = horde.randomRange(0, tips.length - 1);
+			} while (index === lastTipIndex);
 
-		lastTipIndex = index;
+			lastTipIndex = index;
 
-		if (tip.innerHTML == "") {
-			tip.innerHTML = tips[index];
-			return;
-		}
+			if (tip.innerHTML == "") {
+				tip.innerHTML = tips[index];
+				return;
+			}
 
-		setTimeout(function () {
-			tip.className = "fade-in";
-			tip.innerHTML = tips[index];
-		}, 1000);
+			setTimeout(function () {
+				tip.className = "fade-in";
+				tip.innerHTML = tips[index];
+			}, 1000);
 
-		tip.className = "fade-out";
-	};
-	rotateTip();
-	setInterval(rotateTip, 15000);
-
-	var tipControls = document.getElementById("tip_controls");
-
-	horde.on("click", function() {
-		if (this.getData(TIPS_KEY) == 0) {
-			this.putData(TIPS_KEY, 1);
-		} else {
-			this.putData(TIPS_KEY, 0);
-		}
-		updateTipControls(this.getData(TIPS_KEY));
-	}, tipControls, this);
-
-	var updateTipControls = function (hideTips) {
-		if (hideTips == 0) {
-			tipControls.className = "hide";
-			tipControls.innerHTML = "hide tips";
-			tip.style.display = "";
-		} else {
-			tipControls.className = "show";
-			tipControls.innerHTML = "show tips";
-			tip.style.display = "none";
-		}
-	};
-
-	updateTipControls(this.getData(TIPS_KEY));
+			tip.className = "fade-out";
+		};
+		rotateTip();
+		setInterval(rotateTip, 15000);
 		
-};
+		var tipControls = document.getElementById("tip_controls");
+		if (tipControls) {
 
-var proto = horde.Engine.prototype;
+			horde.on("click", function() {
+				if (this.getData(TIPS_KEY) == 0) {
+					this.putData(TIPS_KEY, 1);
+				} else {
+					this.putData(TIPS_KEY, 0);
+				}
+				updateTipControls(this.getData(TIPS_KEY));
+			}, tipControls, this);
+
+			var updateTipControls = function (hideTips) {
+				if (hideTips == 0) {
+					tipControls.className = "hide";
+					tipControls.innerHTML = "hide tips";
+					tip.style.display = "";
+				} else {
+					tipControls.className = "show";
+					tipControls.innerHTML = "show tips";
+					tip.style.display = "none";
+				}
+			};
+
+			updateTipControls(this.getData(TIPS_KEY));
+		}
+
+	}
+
+};
 
 proto.cacheBust = function () {
 	if (VERSION.indexOf("VERSION") !== -1) {
@@ -207,7 +220,10 @@ proto.run = function horde_Engine_proto_run () {
  * @return {void}
  */
 proto.start = function horde_Engine_proto_start () {
-	this.interval = horde.setInterval(0, this.update, this);
+	if (!this.running) {
+		this.interval = horde.setInterval(0, this.update, this);
+		this.running = true;
+	}
 };
 
 /**
@@ -215,7 +231,10 @@ proto.start = function horde_Engine_proto_start () {
  * @return {void}
  */
 proto.stop = function horde_Engine_proto_stop () {
-	clearInterval(this.interval);
+	if (this.running) {
+		clearInterval(this.interval);
+		this.running = false;
+	}
 };
 
 /**
