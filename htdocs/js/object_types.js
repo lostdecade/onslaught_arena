@@ -1512,37 +1512,42 @@ o.imp = {
 
 	moveChangeElapsed: 0,
 	moveChangeDelay: 3000,
-	
+
 	soundDamage: "imp_damage",
 	soundDies: "imp_dies",
-	
+
 	phase: 0,
 	phaseInit: false,
-	
+
 	lootTable: [
 		{type: null, weight: 7},
 		{type: "item_food", weight: 1},
 		{type: "WEAPON_DROP", weight: 2}
 	],
-	
+
 	onInit: function () {
 		this.phaseTimer = new horde.Timer();
 		this.moveChangeDelay = horde.randomRange(500, 1000);
 	},
-	
+
 	onKilled: function (attacker, engine) {
 		if (attacker.role === "projectile") {
 			attacker.die();
 		}
-		for (var x = 0; x < 2; x++) {
-			engine.spawnObject(this, "dire_bat", horde.randomDirection());
+		for (var x = 0; x < 2; ++x) {
+			engine.spawnObject(
+				this,
+				"dire_bat",
+				horde.randomDirection(),
+				false
+			);
 		}
 	},
-	
+
 	onUpdate: function (elapsed, engine) {
-		
+
 		switch (this.phase) {
-			
+
 			// Move past the gates
 			case 0:
 				if (!this.phaseInit) {
@@ -1553,7 +1558,7 @@ o.imp = {
 					this.phaseInit = false;
 				}
 				break;
-			
+
 			// Wander slowly
 			case 1:
 				if (!this.phaseInit) {
@@ -1568,7 +1573,7 @@ o.imp = {
 					this.phaseInit = false;
 				}
 				break;
-			
+
 			// Wander fast!
 			case 2:
 				if (!this.phaseInit) {
@@ -1583,9 +1588,9 @@ o.imp = {
 					this.phaseInit = false;
 				}
 				break;
-			
+
 		}
-		
+
 	}
 };
 

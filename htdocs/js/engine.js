@@ -308,7 +308,12 @@ proto.getBarColor = function (max, current) {
  * @param {string} type Type of object to spawn
  * @return {void}
  */
-proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facing) {
+proto.spawnObject = function horde_Engine_proto_spawnObject (
+	parent,
+	type,
+	facing,
+	takeOwnership
+) {
 	var f = facing || parent.facing;
 	var o = horde.makeObject(type, true);
 	var owner = parent;
@@ -319,8 +324,10 @@ proto.spawnObject = function horde_Engine_proto_spawnObject (parent, type, facin
 			break;
 		}
 	}
-	o.ownerId = owner.id;
-	o.team = parent.team;
+	if (takeOwnership !== false) {
+		o.ownerId = owner.id;
+		o.team = parent.team;
+	}
 	o.centerOn(parent.boundingBox().center());
 	o.setDirection(f);
 	o.init();
