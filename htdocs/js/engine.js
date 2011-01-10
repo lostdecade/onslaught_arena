@@ -56,25 +56,25 @@ horde.Engine = function horde_Engine () {
 	this.pointerYStart = 0;
 	this.maxPointerY = 0;
 	this.pointerOptionsStart = 0;
-	
+
 	this.targetReticle = {
 		position: new horde.Vector2(),
 		angle: 0,
 		moving: false
 	};
-	
+
 	this.enableFullscreen = true;
 	this.enableClouds = false;
 	this.cloudTimer = null;
 	this.woundsToSpeed = 10;
-	
+
 	this.introTimer = new horde.Timer();
 	this.introPhase = 0;
 	this.introPhaseInit = false;
-	
+
 	this.wonGame = false;
 	this.wonGamePhase = 0;
-	
+
 	this.weaponPickup = {
 		type: null,
 		state: "off",
@@ -83,8 +83,7 @@ horde.Engine = function horde_Engine () {
 		position: new horde.Vector2()
 	};
 
-	//this.initTips();
-
+	// Flag enabling/disabling touch device mode
 	this.touchMove = false;
 
 };
@@ -2525,47 +2524,35 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			if (this.targetReticle.angle > (Math.PI * 2)) {
 				this.targetReticle.angle = 0;
 			}
-			if (this.mouse.wasButtonClicked(buttons.LEFT)) {
-				this.targetReticle.position = mouseV.clone();
+			if (
+				this.mouse.wasButtonClicked(buttons.LEFT)
+				|| this.mouse.isButtonDown(buttons.LEFT)
+			) {
+				var mouseBounds = new horde.Rect(
+					48, 80, SCREEN_WIDTH - 96, SCREEN_HEIGHT - 192
+				);
+				var trp = this.targetReticle.position;
+				// Adjust the X position
+				if (mouseV.x < mouseBounds.left) {
+					trp.x = mouseBounds.left;
+				} else if (mouseV.x > mouseBounds.left + mouseBounds.width) {
+					trp.x = mouseBounds.left + mouseBounds.width;
+				} else {
+					trp.x = mouseV.x;
+				}
+				// Adjust the Y position
+				if (mouseV.y < mouseBounds.top) {
+					trp.y = mouseBounds.top;
+				} else if (mouseV.y > mouseBounds.top + mouseBounds.height) {
+					trp.y = mouseBounds.top + mouseBounds.height;
+				} else {
+					trp.y = mouseV.y;
+				}
 			}
 		}
 
 		var move = new horde.Vector2();
 		var shoot = new horde.Vector2();
-
-		if (kb.isKeyDown(keys.W)) {
-			move.y = -1;
-			this.nextTutorial(1);
-		}
-		if (kb.isKeyDown(keys.A)) {
-			move.x = -1;
-			this.nextTutorial(1);
-		}
-		if (kb.isKeyDown(keys.S)) {
-			move.y = 1;
-			this.nextTutorial(1);
-		}
-		if (kb.isKeyDown(keys.D)) {
-			move.x = 1;
-			this.nextTutorial(1);
-		}
-		
-		if (kb.isKeyDown(keys.UP)) {
-			shoot.y = -1;
-			this.nextTutorial(2);
-		}
-		if (kb.isKeyDown(keys.DOWN)) {
-			shoot.y = 1;
-			this.nextTutorial(2);
-		}
-		if (kb.isKeyDown(keys.LEFT)) {
-			shoot.x = -1;
-			this.nextTutorial(2);
-		}
-		if (kb.isKeyDown(keys.RIGHT)) {
-			shoot.x = 1;
-			this.nextTutorial(2);
-		}
 
 		if (this.touchMove) {
 
@@ -2586,6 +2573,44 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			).magnitude();
 			if (distance < 3) {
 				move.zero();
+			}
+
+		} else {
+
+			// Moving
+			if (kb.isKeyDown(keys.W)) {
+				move.y = -1;
+				this.nextTutorial(1);
+			}
+			if (kb.isKeyDown(keys.A)) {
+				move.x = -1;
+				this.nextTutorial(1);
+			}
+			if (kb.isKeyDown(keys.S)) {
+				move.y = 1;
+				this.nextTutorial(1);
+			}
+			if (kb.isKeyDown(keys.D)) {
+				move.x = 1;
+				this.nextTutorial(1);
+			}
+
+			// Shooting
+			if (kb.isKeyDown(keys.UP)) {
+				shoot.y = -1;
+				this.nextTutorial(2);
+			}
+			if (kb.isKeyDown(keys.DOWN)) {
+				shoot.y = 1;
+				this.nextTutorial(2);
+			}
+			if (kb.isKeyDown(keys.LEFT)) {
+				shoot.x = -1;
+				this.nextTutorial(2);
+			}
+			if (kb.isKeyDown(keys.RIGHT)) {
+				shoot.x = 1;
+				this.nextTutorial(2);
 			}
 
 		}
