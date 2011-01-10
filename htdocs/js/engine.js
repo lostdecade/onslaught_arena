@@ -85,6 +85,8 @@ horde.Engine = function horde_Engine () {
 
 	//this.initTips();
 
+	this.autoTarget = false;
+
 };
 
 var proto = horde.Engine.prototype;
@@ -2551,7 +2553,16 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			shoot.x = 1;
 			this.nextTutorial(2);
 		}
-		
+
+		if (this.autoTarget) {
+			var hostile = this.getNearestHostile(player);
+			if (hostile !== null) {
+				shoot = hostile.boundingBox().center().subtract(
+					player.boundingBox().center()
+				).normalize();
+			}
+		}
+
 		// Move the player
 		player.stopMoving();
 		if ((move.x !== 0) || (move.y !== 0)) {
@@ -2585,7 +2596,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
-		// Fire using the targeting reticle
 		if (this.mouse.isButtonDown(buttons.LEFT)) {
 			var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
 			this.objectAttack(player, v);
@@ -2606,6 +2616,36 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		this.mouse.storeButtonStates();
 	}
 
+};
+
+proto.getNearestHostile = function (object) {
+	var nearest = {
+		obj: null,
+		distance: Infinity
+	};
+	for (var id in this.objects) {
+		var o = this.objects[id];
+		if (
+			o.team != object.team
+			&& (o.role == "monster" || o.role == "projectile")
+			&& o.hitPoints !== Infinity
+			&& this.isAlive(o.id)
+			&& !(o.hasState(horde.Object.states.INVINCIBLE) || o.hasState(horde.Object.states.INVISIBLE))
+		) {
+			var distance = object.boundingBox().center().subtract(
+				o.boundingBox().center()
+			).magnitude();
+			if (distance < nearest.distance) {
+				nearest.obj = o;
+				nearest.distance = distance;
+			}
+		}
+	}
+	if (nearest.obj === null) {
+		return null;
+	} else {
+		return nearest.obj;
+	}
 };
 
 proto.objectAttack = function (object, v) {
