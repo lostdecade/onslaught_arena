@@ -85,7 +85,7 @@ horde.Engine = function horde_Engine () {
 
 	//this.initTips();
 
-	this.autoTarget = false;
+	this.touchMove = false;
 
 };
 
@@ -747,6 +747,9 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	];
 	player.centerOn(horde.Vector2.fromSize(this.view).scale(0.5));
 	this.playerObjectId = this.addObject(player);
+	if (this.touchMove) {
+		this.targetReticle.position = player.boundingBox().center();
+	}
 };
 
 horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
@@ -2515,7 +2518,17 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			return;
 		}
 
-		this.updateTargetReticle();
+		if (!this.touchMove) {
+			this.updateTargetReticle();
+		} else {
+			this.targetReticle.angle += (((Math.PI * 2) / 5000) * this.lastElapsed);
+			if (this.targetReticle.angle > (Math.PI * 2)) {
+				this.targetReticle.angle = 0;
+			}
+			if (this.mouse.wasButtonClicked(buttons.LEFT)) {
+				this.targetReticle.position = mouseV.clone();
+			}
+		}
 
 		var move = new horde.Vector2();
 		var shoot = new horde.Vector2();
@@ -2554,13 +2567,27 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.nextTutorial(2);
 		}
 
-		if (this.autoTarget) {
+		if (this.touchMove) {
+
+			// Auto Target
 			var hostile = this.getNearestHostile(player);
 			if (hostile !== null) {
 				shoot = hostile.boundingBox().center().subtract(
 					player.boundingBox().center()
 				).normalize();
 			}
+
+			// Move towards reticle
+			move = this.targetReticle.position.clone().subtract(
+				player.boundingBox().center()
+			).normalize();
+			var distance = this.targetReticle.position.clone().subtract(
+				player.boundingBox().center()
+			).magnitude();
+			if (distance < 3) {
+				move.zero();
+			}
+
 		}
 
 		// Move the player
@@ -2596,7 +2623,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
-		if (this.mouse.isButtonDown(buttons.LEFT)) {
+		if (this.mouse.isButtonDown(buttons.LEFT) && !this.touchMove) {
 			var v = this.targetReticle.position.clone().subtract(player.boundingBox().center()).normalize();
 			this.objectAttack(player, v);
 			this.heroFiring = true;
