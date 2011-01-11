@@ -194,6 +194,11 @@ proto.resize = function horde_Engine_proto_resize () {
 		height = 480;
 	}
 	var c = this.canvases["display"];
+	// iOS
+	/*
+	Basically width/height on the canvas needs to be the entire resolution of the viewport.
+	So like on iPad that's 1024x768. Just remove all chrome (like the nav) from the page and resize the canvas to 100%.
+	*/
 	c.style.width = width + "px";
 	c.style.height = height + "px";
 	var gameLeft = Math.max((windowWidth / 2) - (width / 2), 0);

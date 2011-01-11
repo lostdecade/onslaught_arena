@@ -9,6 +9,13 @@ horde.Mouse = function (canvas) {
 	horde.on("mousemove", this.handleMouseMove, window, this);
 	horde.on("mousedown", this.handleMouseDown, window, this);
 	horde.on("mouseup", this.handleMouseUp, window, this);
+
+	/*
+	// iOS
+	horde.on("touchmove", this.handleMouseMove, window, this);
+	horde.on("touchstart", this.handleMouseDown, window, this);
+	horde.on("touchend", this.handleMouseUp, window, this);	
+	*/
 };
 
 var Mouse = horde.Mouse;
@@ -20,6 +27,15 @@ Mouse.Buttons = {
 };
 
 proto.handleMouseMove = function (e) {
+	/*
+	// iOS
+	var touch = e.touches[0];
+	e = {
+		clientX: touch.pageX,
+		clientY: touch.pageY
+	};
+	*/
+
 	var offset = horde.getOffset(this.canvas);
 	this.mouseX = (((e.clientX - offset.x) * 640) / this.canvas.offsetWidth);
 	this.mouseY = (((e.clientY - offset.y) * 480) / this.canvas.offsetHeight);
@@ -27,12 +43,22 @@ proto.handleMouseMove = function (e) {
 };
 
 proto.handleMouseDown = function (e) {
+	// iOS
+	/*
+	this.buttonStates[Mouse.Buttons.LEFT] = true;
+	or e.button = Mouse.Buttons.LEFT;
+	*/
 	this.buttonStates[e.button] = true;
 	horde.stopEvent(e);
 	if (window.focus) window.focus();
 };
 
 proto.handleMouseUp = function (e) {
+	// iOS
+	/*
+	this.buttonStates[Mouse.Buttons.LEFT] = true;
+	or e.button = Mouse.Buttons.LEFT;
+	*/
 	this.buttonStates[e.button] = false;
 };
 

@@ -2,7 +2,12 @@
 
 horde.sound = {};
 
-// TODO: Fallback to HTML5 (lolz!)
+// iOS
+/*
+var api = "html5";
+^ This will work like shit on Mobile Safari probably and will not work at all on embedded native cocoa app.
+But it's fine, I'm working on a JS->ObjC bridge.
+*/
 var api = "sm2";
 var format = ".mp3";
 var muted = false;
