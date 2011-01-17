@@ -2112,6 +2112,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.toggleFullscreen();
 		}
 
+		// Code: html5 = HTML5 shield
+		if (this.keyboard.historyMatch(horde.Keyboard.html5Code)) {
+			var p = this.getPlayerObject();
+			p.spriteY = 992;
+		}
+
 		if (!horde.isDemo()) {
 
 			// Code: lddqd = god mode

@@ -117,6 +117,14 @@ Keyboard.cyclopsCode = [
 	Keys.S
 ];
 
+Keyboard.html5Code = [
+	72,
+	84,
+	77,
+	76,
+	53
+];
+
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.
