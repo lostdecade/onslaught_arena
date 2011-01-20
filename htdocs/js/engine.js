@@ -23,7 +23,6 @@ var GLOW_INCREMENT = 0.2;
 var GATE_CUTOFF_Y = 64;
 var NUM_GATES = 3;
 var SCORE_COUNT = 10;
-var TIPS_KEY = "hide_tips";
 
 /**
  * Creates a new Engine object
@@ -84,86 +83,12 @@ horde.Engine = function horde_Engine () {
 
 	// Flag enabling/disabling touch device mode
 	this.touchMove = false;
+	this.canMute = true;
+	this.canFullscreen = true;
 
 };
 
 var proto = horde.Engine.prototype;
-
-proto.initTips = function horde_Engine_proto_initTips () {
-
-	// Super Ghouls 'n Tips
-	var tips = [
-		"The <span>Beholder</span> drops special <span>loot</span>!",
-		"Pick up <span>meat</span> to restore 10% of your <span>health</span>.",
-		"The <span>Last Boss</span> can be found on <span>Wave 50</span>.",
-		"Enemies deal <span>more melee damage</span> than their projectile weapons.",
-		"Hold down the left <span>mouse button</span> to auto <span>fire</span>.",
-		"<span>Gelatinous Cube</span> dislikes magic weapons.",
-		"You earn <span>1,000</span> points for each <span>wave</span> you survive!",
-		"Certain enemy <span>projectiles</span> can't be destroyed. Learn to <span>dodge</span>!",
-		"Toggle <span>fullscreen</span> mode by clicking the <span>screen icon</span> in the lower right.",
-		"Toggle <span>audio</span> by clicking the <span>trumpet icon</span> in the lower right.",
-		"Taking <span>damage</span> lowers your <span>score</span>. Try not to get hit!",
-		"Your game is <span>saved automatically</span> after you defeat each boss.",
-		"You can press the <span>M</span> key to toggle <span>muting</span>.",
-		"You can press the <span>F</span> key to toggle <span>fullscreen</span> mode.",
-		"Press <span>P</span> to <span>pause</span> the game."
-	];
-	var lastTipIndex = -1;
-	var tip = document.getElementById("tip_message");
-	if (tip) {
-		var rotateTip = function () {
-			do {
-				var index = horde.randomRange(0, tips.length - 1);
-			} while (index === lastTipIndex);
-
-			lastTipIndex = index;
-
-			if (tip.innerHTML == "") {
-				tip.innerHTML = tips[index];
-				return;
-			}
-
-			setTimeout(function () {
-				tip.className = "fade-in";
-				tip.innerHTML = tips[index];
-			}, 1000);
-
-			tip.className = "fade-out";
-		};
-		rotateTip();
-		setInterval(rotateTip, 15000);
-		
-		var tipControls = document.getElementById("tip_controls");
-		if (tipControls) {
-
-			horde.on("click", function() {
-				if (this.getData(TIPS_KEY) == 0) {
-					this.putData(TIPS_KEY, 1);
-				} else {
-					this.putData(TIPS_KEY, 0);
-				}
-				updateTipControls(this.getData(TIPS_KEY));
-			}, tipControls, this);
-
-			var updateTipControls = function (hideTips) {
-				if (hideTips == 0) {
-					tipControls.className = "hide";
-					tipControls.innerHTML = "hide tips";
-					tip.style.display = "";
-				} else {
-					tipControls.className = "show";
-					tipControls.innerHTML = "show tips";
-					tip.style.display = "none";
-				}
-			};
-
-			updateTipControls(this.getData(TIPS_KEY));
-		}
-
-	}
-
-};
 
 proto.cacheBust = function () {
 	if (VERSION.indexOf("VERSION") !== -1) {
@@ -204,10 +129,6 @@ proto.resize = function horde_Engine_proto_resize () {
 	var gameTop = Math.max((stageHeight / 2) - (height / 2), 30);
 	c.style.left = gameLeft + "px";
 	c.style.top = gameTop + "px";
-	var tip = document.getElementById("tip");
-	tip.style.top = (gameTop - 30) + "px";
-	tip.style.left = gameLeft + "px";
-	tip.style.width = width + "px";
 };
 
 /**
@@ -2093,12 +2014,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Toggle sound with "M" for "mute".
-		if (this.keyboard.isKeyPressed(77)) {
+		if (this.canMute && this.keyboard.isKeyPressed(77)) {
 			horde.sound.toggleMuted();
 		}
 
 		// Toggle fullscreen with "F".
-		if (this.keyboard.isKeyPressed(70)) {
+		if (this.canFullscreen && this.keyboard.isKeyPressed(70)) {
 			this.toggleFullscreen();
 		}
 
@@ -2364,7 +2285,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					break;
 				case 1: // New game
 					this.continuing = false;
-					this.showTutorial = true;
+					this.showTutorial = !this.touchMove;
 					this.state = "intro_cinematic";
 					break;
 				case 2: // Credits
@@ -2602,7 +2523,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.nextTutorial(TUTORIAL_NUM_TIPS + 1);
 				this.mouse.clearButtons();
 			} else if (
-				mouseV.x >= 604
+				this.canFullscreen
+				&& mouseV.x >= 604
 				&& mouseV.x <= 636
 				&& mouseV.y >= 443
 				&& mouseV.y <= 475
@@ -2610,7 +2532,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.toggleFullscreen();
 				this.mouse.clearButtons();
 			} else if (
-				((mouseV.x >= 506) && (mouseV.x <= 602))
+				this.canMute
+				&& ((mouseV.x >= 506) && (mouseV.x <= 602))
 				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
 			) {
 				// Toggle mute
@@ -3656,19 +3579,23 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	);
 
 	// Mute button
-	ctx.drawImage(
-		this.images.getImage("objects"),
-		(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
-		506, 416, 96, 58
-	);
+	if (this.canMute) {
+		ctx.drawImage(
+			this.images.getImage("objects"),
+			(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
+			506, 416, 96, 58
+		);
+	}
 
 	// Fullscreen toggle icon
-	var spriteX = (this.enableFullscreen ? 596 : 564);
-	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		spriteX, 910, 32, 32,
-		604, 443, 32, 32
-	);
+	if (this.canFullscreen) {
+		var spriteX = (this.enableFullscreen ? 596 : 564);
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			spriteX, 910, 32, 32,
+			604, 443, 32, 32
+		);
+	}
 	
 };
 
