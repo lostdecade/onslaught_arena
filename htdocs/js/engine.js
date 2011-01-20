@@ -328,7 +328,9 @@ proto.init = function horde_Engine_proto_init () {
 		this.stop();
 		if (this.state != "running" || this.wonGame) return;
 		this.keyboard.keyStates = {};
-		if (!this.paused) this.togglePause();
+		if (!this.paused) {
+			this.togglePause();
+		}
 	}, window, this);
 
 	horde.on("focus", function () {
@@ -2523,14 +2525,17 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.nextTutorial(TUTORIAL_NUM_TIPS + 1);
 				this.mouse.clearButtons();
 			} else if (
-				this.canFullscreen
-				&& mouseV.x >= 604
+				mouseV.x >= 604
 				&& mouseV.x <= 636
 				&& mouseV.y >= 443
 				&& mouseV.y <= 475
 			) {
-				this.toggleFullscreen();
-				this.mouse.clearButtons();
+				if (this.canFullscreen) {
+					this.toggleFullscreen();
+					this.mouse.clearButtons();
+				} else {
+					this.togglePause();
+				}
 			} else if (
 				this.canMute
 				&& ((mouseV.x >= 506) && (mouseV.x <= 602))
@@ -3593,6 +3598,12 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		ctx.drawImage(
 			this.preloader.getImage("ui"),
 			spriteX, 910, 32, 32,
+			604, 443, 32, 32
+		);
+	} else {
+		ctx.drawImage(
+			this.preloader.getImage("ui"),
+			596+32, 910, 32, 32,
 			604, 443, 32, 32
 		);
 	}
