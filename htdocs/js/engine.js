@@ -3975,8 +3975,8 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
  * @return {String} The data (or undefined on failure)
  */
 proto.getData = function horde_Engine_proto_getData (key, value) {
-	if (typeof localStorage == "object") {
-		return localStorage.getItem(key);
+	if (window.localStorage && window.localStorage.getItem) {
+		return window.localStorage.getItem(key);
 	}
 	return undefined;
 };
@@ -3987,8 +3987,8 @@ proto.getData = function horde_Engine_proto_getData (key, value) {
  * @param {String} value The data to store
  */
 proto.putData = function horde_Engine_proto_putData (key, value) {
-	if (typeof localStorage == "object") {
-		localStorage.setItem(key, value);
+	if (window.localStorage && window.localStorage.setItem) {
+		window.localStorage.setItem(key, value);
 	}
 };
 
@@ -3997,8 +3997,8 @@ proto.putData = function horde_Engine_proto_putData (key, value) {
  * @param {String} key The key of the data to clear
  */
 proto.clearData = function horde_Engine_proto_clearData (key) {
-	if (typeof localStorage == "object") {
-		localStorage.removeItem(key);
+	if (window.localStorage && window.localStorage.removeItem) {
+		window.localStorage.removeItem(key);
 	}
 };
 
