@@ -83,8 +83,10 @@ horde.Engine = function horde_Engine () {
 
 	// Flag enabling/disabling touch device mode
 	this.touchMove = false;
+
 	this.canMute = true;
 	this.canFullscreen = true;
+	this.wasdMovesArrowsAttack = true;
 
 };
 
@@ -2025,6 +2027,11 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.toggleFullscreen();
 		}
 
+		// Toggle keyboard controls with "K".
+		if (this.keyboard.isKeyPressed(75)) {
+			this.wasdMovesArrowsAttack = !this.wasdMovesArrowsAttack;
+		}
+
 		// Code: html5 = HTML5 shield
 		if (this.keyboard.historyMatch(horde.Keyboard.html5Code)) {
 			var p = this.getPlayerObject();
@@ -2471,38 +2478,62 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		} else {
 
+			if (this.wasdMovesArrowsAttack) {
+				var controls = {
+					moveUp: keys.W,
+					moveLeft: keys.A,
+					moveDown: keys.S,
+					moveRight: keys.D,
+					attackUp: keys.UP,
+					attackDown: keys.DOWN,
+					attackLeft: keys.LEFT,
+					attackRight: keys.RIGHT
+				};
+			} else {
+				var controls = {
+					moveUp: keys.UP,
+					moveDown: keys.DOWN,
+					moveLeft: keys.LEFT,
+					moveRight: keys.RIGHT,
+					attackUp: keys.W,
+					attackLeft: keys.A,
+					attackDown: keys.S,
+					attackRight: keys.D
+				};
+			}
+
 			// Moving
-			if (kb.isKeyDown(keys.W)) {
+			if (kb.isKeyDown(controls.moveUp)) {
 				move.y = -1;
 				this.nextTutorial(1);
 			}
-			if (kb.isKeyDown(keys.A)) {
+			if (kb.isKeyDown(controls.moveLeft)) {
 				move.x = -1;
 				this.nextTutorial(1);
 			}
-			if (kb.isKeyDown(keys.S)) {
+			if (kb.isKeyDown(controls.moveDown)) {
 				move.y = 1;
 				this.nextTutorial(1);
 			}
-			if (kb.isKeyDown(keys.D)) {
+			if (kb.isKeyDown(controls.moveRight)) {
 				move.x = 1;
 				this.nextTutorial(1);
 			}
 
 			// Shooting
-			if (kb.isKeyDown(keys.UP)) {
+			if (kb.isKeyDown(controls.attackUp)) {
 				shoot.y = -1;
 				this.nextTutorial(2);
 			}
-			if (kb.isKeyDown(keys.DOWN)) {
+			if (kb.isKeyDown(controls.attackDown)) {
 				shoot.y = 1;
 				this.nextTutorial(2);
 			}
-			if (kb.isKeyDown(keys.LEFT)) {
+			if (kb.isKeyDown(controls.attackLeft)) {
 				shoot.x = -1;
 				this.nextTutorial(2);
 			}
-			if (kb.isKeyDown(keys.RIGHT)) {
+			if (kb.isKeyDown(controls.attackRight)) {
 				shoot.x = 1;
 				this.nextTutorial(2);
 			}
