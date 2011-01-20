@@ -3,7 +3,6 @@
 var VERSION = "{{VERSION}}";
 var SCREEN_WIDTH = 640;
 var SCREEN_HEIGHT = 480;
-var URL_HIGH_SCORES = "/onslaught_arena/high_scores";
 var URL_STORE = "https://chrome.google.com/extensions/detail/khodnfbkbanejphecblcofbghjdgfaih";
 
 var DEFAULT_HIGH_SCORE = 1000;
@@ -942,11 +941,6 @@ proto.update = function horde_Engine_proto_update () {
 			this.render();
 			break;
 
-		case "high_scores":
-			this.handleInput();
-			this.render();
-			break;
-			
 		case "intro_cinematic":
 			this.handleInput();
 			this.updateIntroCinematic(elapsed);
@@ -1396,10 +1390,6 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 		}
 	}
 
-};
-
-proto.saveHighScores = function horde_Engine_proto_saveHighScores () {
-	return !horde.isDemo();
 };
 
 proto.openGates = function horde_Engine_proto_openGates () {
@@ -2340,20 +2330,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
-		// High scores
-		if (this.saveHighScores()) {
-			startY += POINTER_HEIGHT;
-			if (
-				(mouseV.x >= startX && mouseV.x <= stopX)
-				&& (mouseV.y >= startY && mouseV.y < (startY + 20))
-			) {
-				if (this.mouse.hasMoved && this.pointerY !== 3) newPointerY = 3;
-				if (this.mouse.isButtonDown(buttons.LEFT)) {
-					this.keyboard.keyStates[keys.SPACE] = true;
-				}
-			}
-		}
-
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 			horde.sound.play("select_pointer");
@@ -2393,9 +2369,6 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					break;
 				case 2: // Credits
 					this.state = "credits";
-					break;
-				case 3: // High scores
-					this.state = "high_scores";
 					break;
 			}
 
@@ -2453,21 +2426,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 	}
 
-	// Want to see all high scores? Click here!
-	if (this.state === "high_scores") {
-		if (this.mouse.isButtonDown(buttons.LEFT)) {
-			if ((mouseV.x > 76) && (mouseV.x < 560)) {
-				if ((mouseV.y > 392) && (mouseV.y < 416)) {
-					location.href = URL_HIGH_SCORES;
-					return;
-				}
-			}
-		}
-	}
-
 	if (
 		(this.state === "credits")
-		|| (this.state === "high_scores")
 	) {
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			kb.clearKeys();
@@ -2890,12 +2850,6 @@ proto.render = function horde_Engine_proto_render () {
 		case "credits":
 			this.drawTitle(ctx);
 			this.drawCredits(ctx);
-			break;
-
-		// High Scores
-		case "high_scores":
-			this.drawTitle(ctx);
-			this.drawHighScores(ctx);
 			break;
 
 		case "intro_cinematic":
@@ -3839,18 +3793,6 @@ proto.drawTitlePointerOptions = function horde_Engine_proto_drawTitlePointerOpti
 		POINTER_X, (startY + (POINTER_HEIGHT * 2)), 90, 22
 	);
 
-	// High scores
-	if (this.saveHighScores()) {
-		spriteY = ((this.pointerY == 3) ? 714 : 506);
-	} else {
-		spriteY = 610;
-	}
-	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		640, spriteY, 146, 28,
-		POINTER_X, (startY + (POINTER_HEIGHT * 3)), 146, 28
-	);
-
 };
 
 proto.drawPausedPointerOptions = function horde_Engine_proto_drawPausedPointerOptions (ctx) {
@@ -3900,7 +3842,7 @@ proto.initOptions = function () {
 
 	switch (this.state) {
 		case "title":
-			this.pointerYStart = 300;
+			this.pointerYStart = 314;
 
 			if (horde.isDemo() || this.canContinue()) {
 				this.pointerY = 0;
@@ -3909,11 +3851,7 @@ proto.initOptions = function () {
 				this.pointerY = 1;
 				this.pointerOptionsStart = 1;
 			}
-			if (this.saveHighScores()) {
-				this.maxPointerY = 3;
-			} else {
-				this.maxPointerY = 2;
-			}
+			this.maxPointerY = 2;
 			break;
 		case "running":
 			this.pointerYStart = 378;
@@ -3930,68 +3868,6 @@ proto.initOptions = function () {
 			break;
 	}
 
-};
-
-proto.drawHighScores = function horde_Engine_proto_drawHighScores (ctx) {
-	ctx.save();
-	ctx.globalAlpha = OVERLAY_ALPHA;
-	ctx.fillRect(0, 0, this.view.width, this.view.height);
-
-	ctx.globalAlpha = 1;
-	ctx.drawImage(
-		this.preloader.getImage("ui"),
-		0, 910, 564, 404,
-		38, 38, 564, 404
-	);
-
-	try {
-		var scores = JSON.parse(window.onslaughtScores);
-	} catch (e) {
-		var scores = null;
-	}
-
-	ctx.font = "Bold 40px Cracked";
-
-	/*
-	// Debug data
-	scores = [
-		{name: "test1", value: 1000},
-		{name: "test2", value: 900},
-		{name: "test3", value: 800},
-		{name: "test4", value: 700},
-		{name: "test5", value: 600},
-		{name: "test6", value: 200},
-		{name: "test7", value: 500},
-		{name: "test8", value: 400},
-		{name: "test9", value: 300},
-		{name: "test10", value: 100}
-	];
-	*/
-
-	if (scores && scores.length) {
-		var height = 50;
-		var max = 5;
-		if (scores.length < max) max = scores.length;
-
-		for (var i = 0; i < max; ++i) {
-			var score = scores[i];
-			var name = ((i+1) + ".   " + score.name);
-
-			ctx.fillStyle = COLOR_WHITE;
-			ctx.textAlign = "left";
-			ctx.fillText(name, 100, (160 + (i * height)));
-
-			ctx.fillStyle = "rgb(255, 203, 5)";
-			ctx.textAlign = "right";
-			ctx.fillText(score.value, 500, (160 + (i * height)));
-		}
-	} else {
-		ctx.fillStyle = COLOR_WHITE;
-		ctx.textAlign = "center";
-		ctx.fillText("None yet. Submit yours!", 320, 240);
-	}
-
-	ctx.restore();
 };
 
 proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
@@ -4163,27 +4039,6 @@ proto.endGame = function () {
 	this.updateGameOver();
 	this.state = "game_over";
 	this.timePlayed = (horde.now() - this.gameStartTime);
-};
-
-proto.sendHighScore = function (highScore, meta) {
-	if (window.ldgHash) {
-		var hash = decodeURIComponent(window.ldgHash);
-	} else {
-		var hash = "ldgftw";
-	}
-	var data = "high_score=" + highScore;
-	data += "&x=" + encodeURIComponent(horde.x(data, hash));
-	data += "&app_id=onslaught_arena";
-	if (meta) {
-		data += "&m=" + encodeURIComponent(horde.x(JSON.stringify(meta), hash));
-	}
-	data += "&y=" + encodeURIComponent(horde.x(HIGH_SCORE_KEY, hash));
-	data += "&z=" + encodeURIComponent(horde.x(this.state, hash));
-	data += "&t=" + horde.Timer.now();
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST", "/api");
-	xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
-	xhr.send(data);
 };
 
 proto.toggleFullscreen = function () {
