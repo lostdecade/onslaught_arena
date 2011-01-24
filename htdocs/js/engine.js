@@ -1100,6 +1100,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			break;
 		
 		case 11:
+			// Two spikes in the middle to the left and right
 			var locs = [
 				{x: 192, y: 224},
 				{x: 416, y: 224}
@@ -1131,6 +1132,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			break;
 	
 		case 31:
+			// Two spikes in the middle above and below
 			var locs = [
 				{x: 304, y: 114},
 				{x: 304, y: 304}
