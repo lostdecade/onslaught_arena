@@ -2,12 +2,6 @@
 
 horde.sound = {};
 
-// iOS
-/*
-var api = "html5";
-^ This will work like shit on Mobile Safari probably and will not work at all on embedded native cocoa app.
-But it's fine, I'm working on a JS->ObjC bridge.
-*/
 var api = "sm2";
 var format = ".mp3";
 var muted = false;
@@ -16,6 +10,9 @@ var sounds = {};
 horde.sound.init = function horde_sound_init (callback) {
 
 	switch (api) {
+		case "ios":
+			callback();
+			break;
 		case "sm2":
 			soundManager.useFastPolling = true;
 			soundManager.useHighPerformance = true;
@@ -112,6 +109,10 @@ horde.sound.play = function horde_sound_play (id) {
 		return false;
 	}
 	switch (api) {
+		case "ios":
+			//location.href = ("jsbridge://play/" + id);
+			location.href = ("jsbridge://" + id);
+			break;
 		case "sm2":
 			soundManager.play(id);
 			break;
@@ -127,6 +128,9 @@ horde.sound.play = function horde_sound_play (id) {
 
 horde.sound.stop = function horde_sound_stop (id) {
 	switch (api) {
+		case "ios":
+			//location.href = ("jsbridge://stop/" + id);
+			break;
 		case "sm2":
 			soundManager.stop(id);
 			break;
@@ -139,6 +143,9 @@ horde.sound.stop = function horde_sound_stop (id) {
 
 horde.sound.stopAll = function horde_sound_stopAll () {
 	switch (api) {
+		case "ios":
+			//location.href = ("jsbridge://stopAll");
+			break;
 		case "sm2":
 			soundManager.stopAll();
 			break;
