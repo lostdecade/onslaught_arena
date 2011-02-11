@@ -3221,11 +3221,6 @@ proto.getArenaOffset = function horde_Engine_proto_getArenaOffset () {
 	return (SCREEN_WIDTH * Math.floor(waveId / 10));
 };
 
-proto.drawArena = function horde_Engine_proto_drawArena (ctx) {
-	this.drawFloor(ctx);
-	this.drawWalls(ctx);
-};
-
 proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	ctx.save();
