@@ -2,7 +2,7 @@
 
 horde.sound = {};
 
-var api = "ios";
+var api = "sm2";
 var format = ".mp3";
 var muted = false;
 var sounds = {};
