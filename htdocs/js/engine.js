@@ -2723,6 +2723,29 @@ proto.objectAttack = function (object, v) {
 			}
 			break;
 
+		// Shoot 5 firebursts out in a spread pattern
+		/*
+		case "h_fireburst":
+			var h = v.heading();
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h - 0.4
+			));
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h - 0.2
+			));
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h
+			));
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h + 0.2
+			));
+			this.spawnObject(object, weaponType, horde.Vector2.fromHeading(
+				h + 0.4
+			));
+			object.shotsFired += 5;
+			break;
+			*/
+
 		case "e_ring_fire":
 			var len = (Math.PI * 2);
 			var step = (len / 10);

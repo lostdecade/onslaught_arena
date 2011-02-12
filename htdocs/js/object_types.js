@@ -283,6 +283,26 @@ o.h_firebomb = {
 	damageType: "magic"
 };
 
+/*
+o.h_fireburst = {
+	role: "projectile",
+	size: new horde.Size(32, 32),
+	cooldown: 350,
+	speed: 250,
+	hitPoints: 1,
+	damage: 3,
+	spriteSheet: "objects",
+	spriteX: 96,
+	spriteY: 64,
+	ttl: 350,
+	soundAttacks: "fire_attack",
+	spriteAlign: true,
+	damageType: "magic",
+	priority: 1,
+	bounce: false
+};
+*/
+
 // ENEMIES
 
 var movementTypes = {

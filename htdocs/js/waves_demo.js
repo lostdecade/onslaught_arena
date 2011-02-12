@@ -11,9 +11,9 @@ horde.populateWaves = function (engine) {
 	w.addSpawnPoint(0, 5000);
 	w.addSpawnPoint(1, 5000);
 	w.addSpawnPoint(2, 5000);
-	w.addObjects(0, "bat", 2);
-	w.addObjects(1, "bat", 2);
-	w.addObjects(2, "bat", 2);
+	w.addObjects(0, "bat", 1);
+	w.addObjects(1, "bat", 1);
+	w.addObjects(2, "bat", 1);
 	engine.waves.push(w);
 
 	// Wave 2
@@ -42,22 +42,12 @@ horde.populateWaves = function (engine) {
 	w.addSpawnPoint(0, 1000);
 	w.addSpawnPoint(1, 1000);
 	w.addSpawnPoint(2, 1000);
-	w.addObjects(0, "demoblin", 2);
-	w.addObjects(1, "demoblin", 3);
-	w.addObjects(2, "demoblin", 2);
+	w.addObjects(0, "demoblin", 1);
+	w.addObjects(1, "wizard", 3);
+	w.addObjects(2, "demoblin", 1);
 	engine.waves.push(w);
 
-	// Wave 5
-	var w = new horde.SpawnWave();
-	w.addSpawnPoint(0, 10000);
-	w.addSpawnPoint(1, 10000);
-	w.addSpawnPoint(2, 10000);
-	w.addObjects(0, "wizard", 2);
-	w.addObjects(1, "wizard", 2);
-	w.addObjects(2, "wizard", 2);
-	engine.waves.push(w);
-	
-	// Wave 6: Gelatinous Cube
+	// Wave 5: Gelatinous Cube
 	var w = new horde.SpawnWave();
 	w.addSpawnPoint(1, 1000);
 	w.addObjects(1, "cube", 1);
