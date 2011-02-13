@@ -18,4 +18,5 @@ Winning a boss fight enables you to save your game and continue if you die!
 ❇ CHANGELOG  ❇
 ❇❇❇❇❇❇❇❇❇❇❇
 
+• 2/12/2010: v1.2.8 removes the broken High Score table, fixes some issues and supports "k" to toggle keyboard controls.
 • 12/28/2010: v1.2.5 fixes the "500 Internal Server Error" some users were seeing.

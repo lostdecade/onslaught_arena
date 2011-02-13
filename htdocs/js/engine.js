@@ -131,6 +131,10 @@ proto.resize = function horde_Engine_proto_resize () {
 	var gameTop = Math.max((stageHeight / 2) - (height / 2), 30);
 	c.style.left = gameLeft + "px";
 	c.style.top = gameTop + "px";
+	var tip = document.getElementById("tip");
+	tip.style.top = (gameTop - 30) + "px";
+	tip.style.left = gameLeft + "px";
+	tip.style.width = width + "px";
 };
 
 /**
