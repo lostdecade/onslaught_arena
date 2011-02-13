@@ -3,11 +3,8 @@
 	"description": "Battle hordes of classic medieval monsters in this fast-paced arcade shooter!",
 	"version": "1.2.8",
 	"app": {
-		"urls": [
-			"http://play.lostdecadegames.com/"
-		],
 		"launch": {
-			"web_url": "http://play.lostdecadegames.com/onslaught_arena/"
+			"local_path": "htdocs/full.html"
 		}
 	},
 	"icons": {

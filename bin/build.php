@@ -96,10 +96,14 @@ function buildChromeApp ($version) {
 	$json = str_replace('\\/', '/', $json);
 	$build_root = ROOT . 'build/chrome';
 	mkdir($build_root);
+	$build_root .= '/unpacked';
+	mkdir($build_root);
 	exec("cp -r {$app_root}icons {$build_root}/");
 	file_put_contents("{$build_root}/manifest.json", $json);
-	exec("cd {$build_root}; zip -r onslaught_arena_{$version}.zip manifest.json icons");
-	exec("rm -rf {$build_root}/icons {$build_root}/manifest.json");
+	$web_root = ROOT . 'build/web';
+	mkdir("{$build_root}/htdocs");
+	exec("cp -r {$web_root}/full.html {$web_root}/css {$web_root}/font {$web_root}/img {$web_root}/lib {$web_root}/sound {$build_root}/htdocs");
+	exec("cd {$build_root}; zip -r ../onslaught_arena_{$version}.zip manifest.json icons htdocs");
 }
 
 // Source JavaScript files; order matters!

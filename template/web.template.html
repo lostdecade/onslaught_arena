@@ -21,9 +21,6 @@
 	</div>
 
 	<div class="nav">
-		{% if logout_url %}
-			<a href="{{ logout_url }}">logout</a>
-		{% endif %}
 		<ul>
 			<li><a href="http://goo.gl/Yurpd" target="_blank">Blog</a></li>
 			<li><a href="http://goo.gl/As1FV" target="_blank">Support</a></li>
@@ -39,11 +36,6 @@
 			<div id="tip_message">Hate ads? Love indie games? <a href="http://goo.gl/COiGK" target="_blank">Buy the full version on the Chrome Web Store!</a></div>
 		</div>
 	</div>
-
-	<script>
-		window.onslaughtScores = '{{ scores }}';
-		window.ldgHash = "{{ user_hash }}";
-	</script>
 
 	<script src="lib/sm2/soundmanager2.js"></script>
 	<script>

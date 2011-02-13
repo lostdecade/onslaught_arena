@@ -1308,17 +1308,6 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 			horde.sound.play("victory");
 			this.gotNewHighScore = true;
 		}
-
-		if (this.saveHighScores()) {
-			var meta = {
-				won: this.wonGame,
-				wave: this.currentWaveId + 1,
-				timePlayed: this.timePlayed,
-				player: this.getPlayerObject(),
-				fullscreen: this.enableFullscreen
-			};
-			this.sendHighScore(totalScore, meta);
-		}
 	}
 
 };
