@@ -85,7 +85,7 @@ horde.Engine = function horde_Engine () {
 	this.touchMove = false;
 
 	this.canMute = true;
-	this.canFullscreen = true;
+	this.canFullscreen = false;
 	this.wasdMovesArrowsAttack = true;
 
 };
