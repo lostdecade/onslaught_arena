@@ -61,7 +61,7 @@ horde.Engine = function horde_Engine () {
 		moving: false
 	};
 
-	this.enableFullscreen = true;
+	this.enableFullscreen = false;
 	this.enableClouds = false;
 	this.cloudTimer = null;
 	this.woundsToSpeed = 10;
@@ -317,12 +317,7 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
-	
-	var fullscreenPref = this.getData("fullscreen");
-	if (fullscreenPref == 0) {
-		this.enableFullscreen = false;
-	}
-	
+
 	this.resize();
 	horde.on("resize", this.resize, window, this);
 	
