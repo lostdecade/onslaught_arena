@@ -14,9 +14,13 @@ Throw battle axes, daggers, broadswords, fireballs and other unlockable weapons 
 ➤ SAVE STATES
 Winning a boss fight enables you to save your game and continue if you die!
 
+➤ OFFLINE PLAY
+Once downloaded, Onslaught! Arena is yours to play anytime you like, even without an Internet connection!
+
 ❇❇❇❇❇❇❇❇❇❇❇
 ❇ CHANGELOG  ❇
 ❇❇❇❇❇❇❇❇❇❇❇
 
+• 2/13/2010: v1.2.24 removes fullscreen option (performance reasons), switch to packaged, more HTML5 goodness!
 • 2/12/2010: v1.2.8 removes the broken High Score table, fixes some issues and supports "k" to toggle keyboard controls.
 • 12/28/2010: v1.2.5 fixes the "500 Internal Server Error" some users were seeing.
