@@ -132,9 +132,11 @@ proto.resize = function horde_Engine_proto_resize () {
 	c.style.left = gameLeft + "px";
 	c.style.top = gameTop + "px";
 	var tip = document.getElementById("tip");
-	tip.style.top = (gameTop - 30) + "px";
-	tip.style.left = gameLeft + "px";
-	tip.style.width = width + "px";
+	if (tip) {
+		tip.style.top = (gameTop - 30) + "px";
+		tip.style.left = gameLeft + "px";
+		tip.style.width = width + "px";
+	}
 };
 
 /**
@@ -2028,10 +2030,12 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 		}
 
 		// Code: html5 = HTML5 shield
+		/*
 		if (this.keyboard.historyMatch(horde.Keyboard.html5Code)) {
 			var p = this.getPlayerObject();
 			p.spriteY = 992;
 		}
+		*/
 
 		if (!horde.isDemo()) {
 

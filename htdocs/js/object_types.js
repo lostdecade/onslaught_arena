@@ -12,7 +12,7 @@ o.hero = {
 	damage: 0,
 	damageType: null,
 	spriteSheet: "characters",
-	spriteY: 0,
+	spriteY: 992,
 	animated: true,
 	soundAttacks: "hero_attacks",
 	soundDamage: "hero_damage",

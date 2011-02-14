@@ -100,9 +100,14 @@ function buildChromeApp ($version) {
 	mkdir($build_root);
 	exec("cp -r {$app_root}icons {$build_root}/");
 	file_put_contents("{$build_root}/manifest.json", $json);
+	$compiled_js = file_get_contents(ROOT . 'horde.js');
+	$tpl = file_get_contents(ROOT . 'template/chrome.template.html');
+	$tpl = str_replace('{{GAME_CODE}}', $compiled_js, $tpl);
+	$tpl = str_replace('{{VERSION}}', $version, $tpl);
 	$web_root = ROOT . 'build/web';
 	mkdir("{$build_root}/htdocs");
-	exec("cp -r {$web_root}/full.html {$web_root}/css {$web_root}/font {$web_root}/img {$web_root}/lib {$web_root}/sound {$build_root}/htdocs");
+	file_put_contents("{$build_root}/htdocs/index.html", $tpl);
+	exec("cp -r {$web_root}/css {$web_root}/font {$web_root}/img {$web_root}/sound {$build_root}/htdocs");
 	exec("cd {$build_root}; zip -r ../onslaught_arena_{$version}.zip manifest.json icons htdocs");
 }
 
