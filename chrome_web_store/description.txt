@@ -1,4 +1,5 @@
-❤ NOW ONLY $1.99! ❤
+❤ Play the DEMO game for FREE right now:
+http://play.lostdecadegames.com/onslaught_arena/demo
 
 Onslaught! Arena is a fast-paced, arcade-style medieval fantasy shoot 'em up. Fans of retro classics like Archon, Gauntlet and Smash TV may enjoy its intense hardcore gameplay. Features include:
 
@@ -17,9 +18,28 @@ Winning a boss fight enables you to save your game and continue if you die!
 ➤ OFFLINE PLAY
 Once downloaded, Onslaught! Arena is yours to play anytime you like, even without an Internet connection!
 
-❇❇❇❇❇❇❇❇❇❇❇
-❇ CHANGELOG  ❇
-❇❇❇❇❇❇❇❇❇❇❇
+-------------------------------------------------------------------------------------------------------------
+
+HOW TO PLAY
+
+• Move with the W, A, S & D keys. W = Up, A = Left, S = Down, D = Right.
+• Move the targeting reticle using the mouse. (It's the red circle on the arena floor.)
+• Fire your weapon using the LEFT mouse button. Hold the button down to auto-fire. Weapons will fire toward the targeting reticle.
+• You can also fire using the ARROW KEYS.
+• Press "K" in-game to swap moving and firing controls. (Move with ARROW KEYS, fire with WASD.)
+
+-------------------------------------------------------------------------------------------------------------
+
+Get updates and more from Lost Decade Games via the following:
+
+• Read our blog: http://blog.lostdecadegames.com/
+• Follow us on Twitter: http://twitter.com/lostdecadegames
+• Friend us on Facebook: http://www.facebook.com/pages/Lost-Decade-Games/139862159378069
+• Need help? http://www.lostdecadegames.com/support
+
+-------------------------------------------------------------------------------------------------------------
+
+CHANGE LOG
 
 • 2/13/2010: v1.2.24 removes fullscreen option (performance reasons), switch to packaged, more HTML5 goodness!
 • 2/12/2010: v1.2.8 removes the broken High Score table, fixes some issues and supports "k" to toggle keyboard controls.
