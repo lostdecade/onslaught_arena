@@ -63,7 +63,8 @@ o.blood_pool = {
 	ttl: 1250,
 	spriteSheet: "objects",
 	spriteX: 128,
-	spriteY: 32
+	spriteY: 32,
+	drawIndex: 0
 };
 
 // HERO WEAPONS
