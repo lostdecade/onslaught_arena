@@ -1203,13 +1203,14 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			this.spawnWaveExtras(actualWave);
 		}
 		var waveTextString = "Wave " + actualWave;
-		if (actualWave > 1 && (actualWave % 10) === 1) {
+		if (actualWave > 1) {
+		//if (actualWave > 1 && (actualWave % 10) === 1) {
 			// CHECKPOINT REACHED!
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
 			if (!this.continuing) {
-				waveTextString = "Game Saved!";
+				waveTextString += " & Game Saved!";
 			}
 		}
 		if (this.waves[this.currentWaveId].bossWave) {

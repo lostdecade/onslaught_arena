@@ -25,6 +25,7 @@ o.hero = {
 
 	onInit: function () {
 		if (this.isMeatboy) {
+			this.hitPoints = 1;
 			this.spriteY = 1024;
 			this.bloodTimer = new horde.Timer();
 			this.bloodTimer.start(100);
