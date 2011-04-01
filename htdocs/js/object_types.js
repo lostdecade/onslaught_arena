@@ -20,6 +20,30 @@ o.hero = {
 	weapons: [
 		{type: "h_sword", count: null}
 	],
+	isMeatboy: true,
+	bloodTimer: null,
+
+	onInit: function () {
+		if (this.isMeatboy) {
+			this.spriteY = 1024;
+			this.bloodTimer = new horde.Timer();
+			this.bloodTimer.start(300);
+		}
+	},
+
+	onUpdate: function (elapsed, engine) {
+		if (this.isMeatboy) {
+			this.bloodTimer.update(elapsed);
+			if (this.bloodTimer.expired() && this.isMoving()) {
+				var id = engine.spawnObject(this, "blood_pool");
+				var o = engine.objects[id];
+				o.position.x += horde.randomRange(-1, 1);
+				o.position.y += horde.randomRange(-1, 1);
+				this.bloodTimer.start(horde.randomRange(200, 350));
+			}
+		}
+	},
+
 	onKilled: function (attacker, engine) {
 		var num = 10;
 		for (var i = 0; i < num; ++i) {
@@ -29,6 +53,17 @@ o.hero = {
 			engine.addObject(skull);
 		}
 	}
+
+};
+
+o.blood_pool = {
+	role: "fluff",
+	size: new horde.Size(32, 32),
+	speed: 0,
+	ttl: 1250,
+	spriteSheet: "objects",
+	spriteX: 128,
+	spriteY: 32
 };
 
 // HERO WEAPONS
