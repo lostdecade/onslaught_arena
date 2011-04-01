@@ -27,7 +27,7 @@ o.hero = {
 		if (this.isMeatboy) {
 			this.spriteY = 1024;
 			this.bloodTimer = new horde.Timer();
-			this.bloodTimer.start(300);
+			this.bloodTimer.start(100);
 		}
 	},
 
@@ -37,9 +37,10 @@ o.hero = {
 			if (this.bloodTimer.expired() && this.isMoving()) {
 				var id = engine.spawnObject(this, "blood_pool");
 				var o = engine.objects[id];
-				o.position.x += horde.randomRange(-1, 1);
-				o.position.y += horde.randomRange(-1, 1);
-				this.bloodTimer.start(horde.randomRange(200, 350));
+				o.position.x += horde.randomRange(-8, 8);
+				o.position.y += horde.randomRange(-8, 8);
+				o.angle = horde.randomRange(0, Math.PI * 1.5);
+				this.bloodTimer.start(horde.randomRange(75, 150));
 			}
 		}
 	},
@@ -61,6 +62,7 @@ o.blood_pool = {
 	size: new horde.Size(32, 32),
 	speed: 0,
 	ttl: 1250,
+	collidable: false,
 	spriteSheet: "objects",
 	spriteX: 128,
 	spriteY: 32,
