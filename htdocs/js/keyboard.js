@@ -125,6 +125,13 @@ Keyboard.html5Code = [
 	53
 ];
 
+Keyboard.meatboyCode = [
+	Keys.M,
+	Keys.E,
+	Keys.A,
+	Keys.T
+];
+
 proto.supressKeys = function (e) {
 	switch (e.keyCode) {
 		// Note: intentional fallthroughs.

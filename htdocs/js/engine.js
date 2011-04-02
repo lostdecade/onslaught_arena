@@ -2035,6 +2035,13 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 
 		if (!horde.isDemo()) {
 
+			// Code: meat = Super Meat Boy mode
+			if (this.keyboard.historyMatch(horde.Keyboard.meatboyCode)) {
+				var p = this.getPlayerObject();
+				p.isMeatboy = true;
+				p.initMeatBoy();
+			}
+
 			// Code: lddqd = god mode
 			if (this.keyboard.historyMatch(horde.Keyboard.godModeCode)) {
 				this.keyboard.clearHistory();
@@ -3574,58 +3581,62 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.fillText(wCount, 46, 440);
 	ctx.fillText(this.scoreCount, 46, 472);
 	ctx.restore();
-	
-	// Health bar
-	var bar = {
-		width: 280,
-		height: 24,
-		x: 180, // centered
-		y: 432
-	};
-	
-	var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
-	var width2 = (bar.width - Math.round((bar.width * this.woundsTo) / o.hitPoints));
 
-	if (this.woundsTo < o.wounds) {
-		var width = width1;
-		var toWidth = width2;
-	} else {
-		var width = width2;
-		var toWidth = width1;
+	if (o.hitPoints > 1) {
+
+		// Health bar
+		var bar = {
+			width: 280,
+			height: 24,
+			x: 180, // centered
+			y: 432
+		};
+
+		var width1 = (bar.width - Math.round((bar.width * o.wounds) / o.hitPoints));
+		var width2 = (bar.width - Math.round((bar.width * this.woundsTo) / o.hitPoints));
+
+		if (this.woundsTo < o.wounds) {
+			var width = width1;
+			var toWidth = width2;
+		} else {
+			var width = width2;
+			var toWidth = width1;
+		}
+
+		// Outside border
+		ctx.save();
+		ctx.fillStyle = COLOR_WHITE;
+		ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
+		ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
+		ctx.fillStyle = COLOR_BLACK;
+		ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
+
+		// The bar itself
+		ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
+		ctx.globalAlpha = 0.4;
+
+		ctx.fillRect(bar.x, bar.y, toWidth, bar.height);
+
+		ctx.fillRect(bar.x, bar.y, width, bar.height);
+		ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
+		ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
+		ctx.restore();
+
+		// Heart icon
+		var percentage = (((o.hitPoints - o.wounds) / o.hitPoints) * 100);
+		var spriteX = 352;
+		if (percentage > 50) {
+			spriteX = 224;
+		} else if (percentage > 25) {
+			spriteX = 288;
+		}
+		ctx.drawImage(
+			this.images.getImage("objects"),
+			spriteX, 64, 42, 42,
+			(bar.x - 32), 424, 42, 42
+		);
+
 	}
-
-	// Outside border
-	ctx.save();
-	ctx.fillStyle = COLOR_WHITE;
-	ctx.fillRect(bar.x - 2, bar.y - 2, bar.width + 2, bar.height + 4);
-	ctx.fillRect(bar.x + bar.width, bar.y, 2, bar.height);
-	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillRect(bar.x, bar.y, bar.width, bar.height);
-
-	// The bar itself
-	ctx.fillStyle = this.getBarColor(o.hitPoints, (o.hitPoints - o.wounds));
-	ctx.globalAlpha = 0.4;
-
-	ctx.fillRect(bar.x, bar.y, toWidth, bar.height);
-
-	ctx.fillRect(bar.x, bar.y, width, bar.height);
-	ctx.fillRect(bar.x, bar.y + 5, width, bar.height - 10);
-	ctx.fillRect(bar.x, bar.y + 10, width, bar.height - 20);
-	ctx.restore();
-
-	// Heart icon
-	var percentage = (((o.hitPoints - o.wounds) / o.hitPoints) * 100);
-	var spriteX = 352;
-	if (percentage > 50) {
-		spriteX = 224;
-	} else if (percentage > 25) {
-		spriteX = 288;
-	}
-	ctx.drawImage(
-		this.images.getImage("objects"),
-		spriteX, 64, 42, 42,
-		(bar.x - 32), 424, 42, 42
-	);
 
 	// Mute button
 	if (this.canMute) {

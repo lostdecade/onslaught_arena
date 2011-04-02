@@ -20,16 +20,20 @@ o.hero = {
 	weapons: [
 		{type: "h_sword", count: null}
 	],
-	isMeatboy: true,
+	isMeatboy: false,
 	bloodTimer: null,
 
 	onInit: function () {
 		if (this.isMeatboy) {
-			this.hitPoints = 1;
-			this.spriteY = 1024;
-			this.bloodTimer = new horde.Timer();
-			this.bloodTimer.start(100);
+			this.initMeatBoy();
 		}
+	},
+
+	initMeatBoy: function () {
+		this.hitPoints = 1;
+		this.spriteY = 1024;
+		this.bloodTimer = new horde.Timer();
+		this.bloodTimer.start(100);
 	},
 
 	onUpdate: function (elapsed, engine) {
