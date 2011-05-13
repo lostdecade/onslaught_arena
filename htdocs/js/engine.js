@@ -2977,12 +2977,12 @@ proto.drawCoinPickup = function horde_Engine_proto_drawCoinPickup (ctx) {
 };
 
 proto.getCoinFontData = function horde_Engine_proto_getCoinFontData (amount) {
-	if (amount < 100) {
+	if (amount == 100) {
 		return {
 			fillStyle: "rgb(255, 203, 5)",
 			size: 24
 		};
-	} else if (amount < 500) {
+	} else if (amount == 500) {
 		return {
 			fillStyle: "rgb(255, 244, 96)",
 			size: 36
@@ -3213,7 +3213,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayDamage = object.totalDamageTaken;
 	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText("-" + displayDamage + " x 10", textX, 180 + (textHeight * 2));
+	ctx.fillText("-" + displayDamage + " x 100", textX, 180 + (textHeight * 2));
 
 	// Total score
 	var displayScore = "";
@@ -3252,7 +3252,7 @@ proto.getTotalScore = function () {
 
 	var score = (wavesComplete * 1000);
 	score += player.gold;
-	score -= (player.totalDamageTaken * 10);
+	score -= (player.totalDamageTaken * 100);
 
 	if (player.cheater === true) {
 		score /= 2;
@@ -3654,7 +3654,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		var bar = {
 			width: 280,
 			height: 24,
-			x: 180, // centered
+			x: 212,
 			y: 432
 		};
 

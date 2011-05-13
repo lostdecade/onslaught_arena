@@ -3211,7 +3211,7 @@ o.item_food = {
 
 o.item_coin = {
 	role: "powerup_coin",
-	coinAmount: 10,
+	coinAmount: 100,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 64,
@@ -3221,7 +3221,7 @@ o.item_coin = {
 
 o.item_chest = {
 	role: "powerup_coin",
-	coinAmount: 100,
+	coinAmount: 500,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 32,
@@ -3231,7 +3231,7 @@ o.item_chest = {
 
 o.item_gold_chest = {
 	role: "powerup_coin",
-	coinAmount: 500,
+	coinAmount: 5000,
 	speed: 0,
 	spriteSheet: "objects",
 	spriteX: 0,
