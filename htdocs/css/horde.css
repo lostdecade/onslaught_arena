@@ -86,7 +86,7 @@ canvas {
 
 	padding: 5px;
 
-	color: #faa61a;
+	color: #f1f1f2;
 	font-family: Tahoma, Arial, Sans;
 	font-size: 14px;
 	font-weight: bold;
@@ -128,16 +128,16 @@ canvas {
 }
 
 #tip span {
-	color: #f1f1f2;
+	font-style: italic;
 }
 
 #tip a {
-	color: #f1f1f2;
-	text-decoration: none;
+	color: #faa61a;
+	text-decoration: underline;
 }
 
 #tip a:hover {
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .ad.leaderboard {

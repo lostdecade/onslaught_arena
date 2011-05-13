@@ -2606,7 +2606,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			} else if (
 				mouseV.x >= 604
 				&& mouseV.x <= 636
-				&& mouseV.y >= 443
+				&& mouseV.y >= 442
 				&& mouseV.y <= 475
 			) {
 				if (this.canFullscreen) {
@@ -2617,8 +2617,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				}
 			} else if (
 				this.canMute
-				&& ((mouseV.x >= 506) && (mouseV.x <= 602))
-				&& ((mouseV.y >= 416) && (mouseV.y <= 474))
+				&& ((mouseV.x >= 570) && (mouseV.x <= 602))
+				&& ((mouseV.y >= 442) && (mouseV.y <= 484))
 			) {
 				// Toggle mute
 				horde.sound.toggleMuted();
@@ -3607,7 +3607,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	ctx.drawImage(
 		this.images.getImage("objects"),
 		32, 32, 32, 32,
-		4, 443, 32, 32
+		4, 442, 32, 32
 	);
 			
 	// Draw gold amount and weapon count
@@ -3685,9 +3685,9 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Mute button
 	if (this.canMute) {
 		ctx.drawImage(
-			this.images.getImage("objects"),
-			(horde.sound.isMuted() ? 96 : 0), 96, 96, 58,
-			506, 416, 96, 58
+			this.preloader.getImage("ui"),
+			(horde.sound.isMuted() ? 692 : 660), 910, 32, 32,
+			570, 442, 32, 32
 		);
 	}
 
@@ -3697,13 +3697,13 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		ctx.drawImage(
 			this.preloader.getImage("ui"),
 			spriteX, 910, 32, 32,
-			604, 443, 32, 32
+			604, 442, 32, 32
 		);
 	} else {
 		ctx.drawImage(
 			this.preloader.getImage("ui"),
 			596+32, 910, 32, 32,
-			604, 443, 32, 32
+			604, 442, 32, 32
 		);
 	}
 	
