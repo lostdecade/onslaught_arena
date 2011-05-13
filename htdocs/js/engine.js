@@ -81,6 +81,14 @@ horde.Engine = function horde_Engine () {
 		position: new horde.Vector2()
 	};
 
+	this.coinPickup = {
+		type: null,
+		state: "off",
+		alpha: 1,
+		scale: 1,
+		position: new horde.Vector2()
+	};
+
 	// Flag enabling/disabling touch device mode
 	this.touchMove = false;
 
@@ -888,6 +896,7 @@ proto.update = function horde_Engine_proto_update () {
 				this.updateObjects(elapsed);
 				this.updateFauxGates(elapsed);
 				this.updateWeaponPickup(elapsed);
+				this.updateCoinPickup(elapsed);
 			}
 			if (this.showTutorial) {
 				this.updateTutorial(elapsed);
@@ -926,6 +935,17 @@ proto.update = function horde_Engine_proto_update () {
 
 proto.updateWeaponPickup = function horde_Engine_proto_updateWeaponPickup (elapsed) {
 	var w = this.weaponPickup;
+	if (w.state === "on") {
+		w.scale += ((4.5 / 1000) * elapsed);
+		w.alpha -= ((2.5 / 1000) * elapsed);
+		if (w.alpha <= 0) {
+			w.state = "off";
+		}
+	}
+};
+
+proto.updateCoinPickup = function horde_Engine_proto_updateCoinPickup (elapsed) {
+	var w = this.coinPickup;
 	if (w.state === "on") {
 		w.scale += ((4.5 / 1000) * elapsed);
 		w.alpha -= ((2.5 / 1000) * elapsed);
@@ -1209,9 +1229,11 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
+			/*
 			if (!this.continuing) {
 				waveTextString += " & Game Saved!";
 			}
+			*/
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName) + "!";
@@ -1699,6 +1721,13 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o.gold += o2.coinAmount;
 						horde.sound.play("coins");
 
+						var c = this.coinPickup;
+						c.type = o2.type;
+						c.scale = 1;
+						c.alpha = 0.9;
+						c.position = o2.position.clone();
+						c.state = "on";
+
 						if (this.isSpecialLoot(o2.type)) {
 							for (var j in this.objects) {
 								if (this.objects[j].type === "pickup_arrow") {
@@ -1710,12 +1739,14 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						o2.die();
 						o.addWeapon(o2.wepType, o2.wepCount);
 						horde.sound.play("pickup_weapon");
+
 						var w = this.weaponPickup;
 						w.type = o2.type;
 						w.scale = 1;
 						w.alpha = 0.9;
 						w.position = o2.position.clone();
 						w.state = "on";
+
 						if (this.isSpecialLoot(o2.type)) {
 							for (var j in this.objects) {
 								if (this.objects[j].type === "pickup_arrow") {
@@ -2850,6 +2881,7 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawFauxGates(ctx);
 			this.drawWalls(ctx);
 			this.drawWeaponPickup(ctx);
+			this.drawCoinPickup(ctx);
 			this.drawWaveText(ctx);
 			this.drawUI(ctx);
 			if (this.paused) {
@@ -2906,6 +2938,26 @@ proto.drawWeaponPickup = function horde_Engine_proto_drawWeaponPickup (ctx) {
 	}
 };
 
+proto.drawCoinPickup = function horde_Engine_proto_drawCoinPickup (ctx) {
+	var w = this.coinPickup;
+	if (w.state === "on") {
+		var type = horde.makeObject(w.type);
+		ctx.save();
+		ctx.translate(
+			w.position.x + (type.size.width / 2),
+			w.position.y + (type.size.height / 2)
+		);
+		ctx.globalAlpha = w.alpha;
+		ctx.drawImage(
+			this.images.getImage(type.spriteSheet),
+			type.spriteX, type.spriteY + 1, type.size.width - 1, type.size.height - 1,
+			-((type.size.width / 2) * w.scale), -((type.size.height / 2) * w.scale),
+			type.size.width * w.scale, type.size.height * w.scale
+		);
+		ctx.restore();
+	}
+};
+
 proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 
 	if (
@@ -2924,7 +2976,7 @@ proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
 
 		b.save();
 		b.clearRect(0, 0, bw, bh);
-		b.font = ("Bold " + size + "px Cracked");
+		b.font = ("Bold " + size + "px MedievalSharp");
 		b.textBaseline = "top";
 		b.lineWidth = 3;
 		b.strokeStyle = COLOR_BLACK;
@@ -3095,7 +3147,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	var textHeight = 55;
 	
 	ctx.save();
-	ctx.font = "Bold 40px Cracked";
+	ctx.font = "Bold 40px MedievalSharp";
 
 	var increment;
 	var max = 0;
@@ -3260,7 +3312,7 @@ proto.drawPaused = function horde_Engine_proto_drawPaused (ctx) {
 
 	var player = this.getPlayerObject();
 
-	ctx.font = "Bold 36px Cracked";
+	ctx.font = "Bold 36px MedievalSharp";
 	ctx.textAlign = "left";
 
 	ctx.fillStyle = "rgb(237, 28, 36)";
@@ -3294,7 +3346,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	ctx.fillRect(0, this.tutorialY, this.view.width, TUTORIAL_HEIGHT);
 
 	ctx.globalAlpha = 1;
-	ctx.font = "Bold 30px Cracked";
+	ctx.font = "Bold 22px MedievalSharp";
 	ctx.textAlign = "center";
 
 	var tips = [
@@ -3311,7 +3363,7 @@ proto.drawTutorial = function horde_Engine_proto_drawTutorial (ctx) {
 	ctx.fillStyle = "rgb(230, 230, 230)";
 	ctx.fillText(tips[this.tutorialIndex], 320, (this.tutorialY + 34));
 
-	ctx.font = "20px Cracked";
+	ctx.font = "20px MedievalSharp";
 
 	var pressHere = "Press here or ESC to skip";
 	ctx.fillStyle = COLOR_BLACK;
@@ -3569,7 +3621,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "left";
-	ctx.font = "Bold 38px Cracked";
+	ctx.font = "Bold 38px MedievalSharp";
 
 	ctx.globalAlpha = 0.75;
 	ctx.fillStyle = COLOR_BLACK;
@@ -3683,7 +3735,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
 
 	ctx.save();
-	ctx.font = "Bold 36px Cracked";
+	ctx.font = "Bold 36px MedievalSharp";
 	ctx.textAlign = "center";
 
 	ctx.fillStyle = COLOR_BLACK;

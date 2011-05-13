@@ -1,6 +1,8 @@
 @font-face {
-	font-family: Cracked;
-	src: url(../font/cracked.ttf);
+	font-family: 'MedievalSharp';
+	font-style: normal;
+	font-weight: normal;
+	src: local('MedievalSharp'), url('../font/MedievalSharp.ttf') format('woff');
 }
 
 html {
@@ -48,7 +50,7 @@ canvas {
 	padding: 5px 10px;
 	overflow: hidden;
 	background: #636467;
-	font-family: Cracked, Tahoma, Arial;
+	font-family: MedievalSharp, Tahoma, Arial;
 	font-size: 24px;
 }
 
