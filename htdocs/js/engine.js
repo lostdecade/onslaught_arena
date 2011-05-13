@@ -11,6 +11,7 @@ var HIGH_SCORE_KEY = "high_score";
 var COLOR_BLACK = "rgb(0, 0, 0)";
 var COLOR_WHITE = "rgb(241, 241, 242)";
 var TEXT_HEIGHT = 20; // Ehh, kind of a hack, because stupid ctx.measureText only gives width (why??).
+var WAVE_TEXT_HEIGHT = 40;
 
 var OVERLAY_ALPHA = 0.7;
 var POINTER_HEIGHT = 24;
@@ -325,6 +326,7 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
 	this.canvases["buffer"] = horde.makeCanvas("buffer", this.view.width, this.view.height, true);
+	this.canvases["waveText"] = horde.makeCanvas("waveText", this.view.width, this.view.height, true);
 
 	this.resize();
 	horde.on("resize", this.resize, window, this);
@@ -1224,16 +1226,8 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		}
 		var waveTextString = "Wave " + actualWave;
 		if (actualWave > 1) {
-		//if (actualWave > 1 && (actualWave % 10) === 1) {
-			// CHECKPOINT REACHED!
-			// Triggers on the first wave after a boss: 11, 21, 31, 41
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
-			/*
-			if (!this.continuing) {
-				waveTextString += " & Game Saved!";
-			}
-			*/
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName) + "!";
@@ -1254,12 +1248,33 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 		this.waveText.string = waveTextString;
 		this.waveText.alpha = 0;
-		this.waveText.size = 30;
-		this.waveText.state = "show";
+		this.waveText.size = 1;
+		this.waveText.state = "init";
+
+		// Initialize the waveText buffer
+		var b = this.canvases.waveText.getContext("2d");
+		var text = this.waveText.string;
+
+		b.clearRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+		b.save();
+		b.font = ("Bold " + WAVE_TEXT_HEIGHT + "px MedievalSharp");
+		b.lineWidth = 3;
+		b.textBaseline = "top";
+		b.strokeStyle = COLOR_BLACK;
+		b.fillStyle = "rgb(230, 103, 8)";
+
+		b.strokeText(text, 0, 0);
+		b.fillText(text, 0, 0);
+
+		var metrics = b.measureText(text);
+		this.waveText.width = metrics.width;
+		b.restore();
+
 		this.continuing = false;
 	}
 	switch (this.waveText.state) {
-		case "show":
+		case "init":
 			this.waveText.alpha += ((2 / 1000) * elapsed);
 			if (this.waveText.alpha >= 1) {
 				this.waveText.alpha = 1;
@@ -1277,7 +1292,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 		case "hide":
 			// hide the text
 			this.waveText.alpha -= ((1.5 / 1000) * elapsed);
-			this.waveText.size += ((200 / 1000) * elapsed);
+			this.waveText.size += ((20 / 1000) * elapsed);
 			if (this.waveText.alpha <= 0) {
 				this.waveText.alpha = 0;
 				this.waveText.state = "off";
@@ -2959,48 +2974,25 @@ proto.drawCoinPickup = function horde_Engine_proto_drawCoinPickup (ctx) {
 };
 
 proto.drawWaveText = function horde_Engine_proto_drawWaveText (ctx) {
-
-	if (
-		this.waveText.state == "show"
-		|| this.waveText.state == "hide"
-		|| this.waveText.state == "display"
-	) {
-
-		var text = this.waveText.string;
-		var size = parseInt(this.waveText.size);
-
-		var b = this.canvases.buffer.getContext("2d");
-
-		var bw = (SCREEN_WIDTH / 2);
-		var bh = (SCREEN_HEIGHT / 2);
-
-		b.save();
-		b.clearRect(0, 0, bw, bh);
-		b.font = ("Bold " + size + "px MedievalSharp");
-		b.textBaseline = "top";
-		b.lineWidth = 3;
-		b.strokeStyle = COLOR_BLACK;
-		b.fillStyle = "rgb(230, 103, 8)";
-
-		var metrics = b.measureText(text);
-		var x = ((bw / 2) - (metrics.width / 2));
-		var y = ((bh / 2) - (size / 2) - 20);
-
-		b.strokeText(text, x, y);
-		b.fillText(text, x, y);
-		b.restore();
-
-		ctx.save();
-		ctx.globalAlpha = this.waveText.alpha;
-		ctx.drawImage(
-			this.canvases.buffer,
-			0, 0, bw, bh,
-			0, 0, SCREEN_WIDTH, SCREEN_HEIGHT
-		);
-		ctx.restore();
-
+	// Back out immediately if we shoudn't draw
+	if (this.waveText.state == "off") {
+		return;
 	}
-		
+
+	var size = parseInt(this.waveText.size);
+	var width = (this.waveText.width * size);
+	var height = WAVE_TEXT_HEIGHT * size;
+	var x = (SCREEN_WIDTH/2) - (width/2);
+	var y = (SCREEN_HEIGHT/2) - (height/2);
+
+	ctx.save();
+	ctx.globalAlpha = this.waveText.alpha;
+	ctx.drawImage(
+		this.canvases.waveText,
+		0, 0, this.waveText.width, WAVE_TEXT_HEIGHT,
+		x, y, width, height
+	);
+	ctx.restore();
 };
 
 /**
@@ -3621,7 +3613,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "left";
-	ctx.font = "Bold 38px MedievalSharp";
+	ctx.font = "Bold 32px MedievalSharp";
 
 	ctx.globalAlpha = 0.75;
 	ctx.fillStyle = COLOR_BLACK;
