@@ -83,10 +83,9 @@ horde.Engine = function horde_Engine () {
 	};
 
 	this.coinPickup = {
-		type: null,
+		amount: 0,
 		state: "off",
 		alpha: 1,
-		scale: 1,
 		position: new horde.Vector2()
 	};
 
@@ -949,8 +948,8 @@ proto.updateWeaponPickup = function horde_Engine_proto_updateWeaponPickup (elaps
 proto.updateCoinPickup = function horde_Engine_proto_updateCoinPickup (elapsed) {
 	var w = this.coinPickup;
 	if (w.state === "on") {
-		w.scale += ((4.5 / 1000) * elapsed);
-		w.alpha -= ((2.5 / 1000) * elapsed);
+		w.position.y -= ((50 / 1000) * elapsed);
+		w.alpha -= ((0.7 / 1000) * elapsed);
 		if (w.alpha <= 0) {
 			w.state = "off";
 		}
@@ -1737,9 +1736,9 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 						horde.sound.play("coins");
 
 						var c = this.coinPickup;
-						c.type = o2.type;
-						c.scale = 1;
-						c.alpha = 0.9;
+						c.amount = o2.coinAmount;
+						c.y = 0;
+						c.alpha = 1;
 						c.position = o2.position.clone();
 						c.state = "on";
 
@@ -2956,20 +2955,43 @@ proto.drawWeaponPickup = function horde_Engine_proto_drawWeaponPickup (ctx) {
 proto.drawCoinPickup = function horde_Engine_proto_drawCoinPickup (ctx) {
 	var w = this.coinPickup;
 	if (w.state === "on") {
-		var type = horde.makeObject(w.type);
+		var meta = this.getCoinFontData(w.amount);
+		var text = ("+" + w.amount);
+
 		ctx.save();
+		ctx.fillStyle = meta.fillStyle;
+		ctx.font = ("Bold " + meta.size + "px MedievalSharp");
+		ctx.lineWidth = 2;
+		ctx.strokeStyle = COLOR_BLACK;
+		ctx.textAlign = "center";
+		ctx.textBaseline = "top";
 		ctx.translate(
-			w.position.x + (type.size.width / 2),
-			w.position.y + (type.size.height / 2)
+			w.position.x,
+			w.position.y
 		);
 		ctx.globalAlpha = w.alpha;
-		ctx.drawImage(
-			this.images.getImage(type.spriteSheet),
-			type.spriteX, type.spriteY + 1, type.size.width - 1, type.size.height - 1,
-			-((type.size.width / 2) * w.scale), -((type.size.height / 2) * w.scale),
-			type.size.width * w.scale, type.size.height * w.scale
-		);
+		ctx.strokeText(text, 0, 0);
+		ctx.fillText(text, 0, 0);
 		ctx.restore();
+	}
+};
+
+proto.getCoinFontData = function horde_Engine_proto_getCoinFontData (amount) {
+	if (amount < 100) {
+		return {
+			fillStyle: "rgb(255, 203, 5)",
+			size: 24
+		};
+	} else if (amount < 500) {
+		return {
+			fillStyle: "rgb(255, 244, 96)",
+			size: 36
+		};
+	} else {
+		return {
+			fillStyle: "rgb(255, 248, 160)",
+			size: 50
+		};
 	}
 };
 
