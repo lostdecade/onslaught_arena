@@ -6,8 +6,16 @@ var api = "html5";
 var format = ".mp3";
 var muted = false;
 var sounds = {};
+var disabled = false;
 
 horde.sound.init = function horde_sound_init (callback) {
+
+	if (typeof(Audio) == "undefined") {
+		disabled = true;
+		return;
+	} else {
+		disabled = false;
+	}
 
 	switch (api) {
 		case "ios":
@@ -46,6 +54,8 @@ horde.sound.init = function horde_sound_init (callback) {
 };
 
 horde.sound.create = function horde_sound_create (id, url, loops, volume) {
+
+	if (disabled) return;
 
 	loops = Boolean(loops);
 	url += format;
@@ -92,6 +102,7 @@ horde.sound.create = function horde_sound_create (id, url, loops, volume) {
 };
 
 horde.sound.isPlaying = function (id) {
+	if (disabled) return;
 	switch (api) {
 		case "sm2":
 			var sound = soundManager.getSoundById(id);
@@ -105,6 +116,7 @@ horde.sound.isPlaying = function (id) {
 };
 
 horde.sound.play = function horde_sound_play (id) {
+	if (disabled) return;
 	if (muted) {
 		return false;
 	}
@@ -127,6 +139,7 @@ horde.sound.play = function horde_sound_play (id) {
 };
 
 horde.sound.stop = function horde_sound_stop (id) {
+	if (disabled) return;
 	switch (api) {
 		case "ios":
 			//location.href = ("jsbridge://stop/" + id);
@@ -142,6 +155,7 @@ horde.sound.stop = function horde_sound_stop (id) {
 };
 
 horde.sound.stopAll = function horde_sound_stopAll () {
+	if (disabled) return;
 	switch (api) {
 		case "ios":
 			//location.href = ("jsbridge://stopAll");
@@ -163,6 +177,7 @@ horde.sound.stopAll = function horde_sound_stopAll () {
 };
 
 horde.sound.pauseAll = function horde_sound_pauseAll () {
+	if (disabled) return;
 	switch (api) {
 		case "sm2":
 			soundManager.pauseAll();
@@ -178,6 +193,7 @@ horde.sound.pauseAll = function horde_sound_pauseAll () {
 };
 
 horde.sound.resumeAll = function horde_sound_resumeAll () {
+	if (disabled) return;
 	switch (api) {
 		case "sm2":
 			soundManager.resumeAll();
