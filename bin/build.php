@@ -79,7 +79,6 @@ function buildWeb ($version) {
 	file_put_contents("{$web_root}demo.html", $demo_tpl);
 	exec("cp -r {$htdocs}/img {$web_root}");
 	exec("cp -r {$htdocs}/css {$web_root}");
-	exec("cp -r {$htdocs}/lib {$web_root}");
 	exec("cp -r {$htdocs}/font {$web_root}");
 	exec("cp -r {$htdocs}/sound {$web_root}");
 	exec("cp -r {$htdocs}/robots.txt {$web_root}");	
