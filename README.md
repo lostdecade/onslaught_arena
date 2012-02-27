@@ -19,7 +19,9 @@ After some additional spit and polish it was entered in the [Freeplay Awards](ht
 These guys made this:
 
 [Geoff Blair](http://geoffblair.com): Programming & Design
-
-[Matt Hackett](http://richtaur.com/): Art, Design & Additional Programming
-
+[Matt Hackett](http://www.richtaur.com/): Art, Design & Additional Programming
 [Joshua Morse](http://jmflava.com/): Music & Sound Effects
+
+## License
+
+GPL (General Public License). You can distribute modified versions of the source code, but they must also be open source under the GPL. The game assets (graphics, music, etc.) can be redistributed for free, but cannot be resold without our permission.

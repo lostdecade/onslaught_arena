@@ -337,12 +337,12 @@ proto.init = function horde_Engine_proto_init () {
 	}, document.body, this);
 	
 	horde.on("blur", function () {
-		this.stop();
 		if (this.state != "running" || this.wonGame) return;
 		this.keyboard.keyStates = {};
 		if (!this.paused) {
 			this.togglePause();
 		}
+		this.stop();
 	}, window, this);
 
 	horde.on("focus", function () {
