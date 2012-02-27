@@ -1,6 +1,8 @@
 @font-face {
-	font-family: Cracked;
-	src: url(../font/cracked.ttf);
+	font-family: 'MedievalSharp';
+	font-style: normal;
+	font-weight: normal;
+	src: local('MedievalSharp'), url('../font/MedievalSharp.ttf') format('woff');
 }
 
 html {
@@ -48,7 +50,7 @@ canvas {
 	padding: 5px 10px;
 	overflow: hidden;
 	background: #636467;
-	font-family: Cracked, Tahoma, Arial;
+	font-family: MedievalSharp, Tahoma, Arial;
 	font-size: 24px;
 }
 
@@ -84,7 +86,7 @@ canvas {
 
 	padding: 5px;
 
-	color: #faa61a;
+	color: #f1f1f2;
 	font-family: Tahoma, Arial, Sans;
 	font-size: 14px;
 	font-weight: bold;
@@ -126,16 +128,16 @@ canvas {
 }
 
 #tip span {
-	color: #f1f1f2;
+	font-style: italic;
 }
 
 #tip a {
-	color: #f1f1f2;
-	text-decoration: none;
+	color: #faa61a;
+	text-decoration: underline;
 }
 
 #tip a:hover {
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .ad.leaderboard {

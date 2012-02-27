@@ -58,8 +58,11 @@ function buildWeb ($version) {
 	$tpl = str_replace('{{TYPE}}', 'full', $tpl);
 	$tpl = str_replace('{{GAME_CODE}}', $compiled_js, $tpl);
 	$tpl = str_replace('{{VERSION}}', $version, $tpl);
-	// No ads for full game
-	$tpl = str_replace('{{AD_LEADERBOARD}}', '', $tpl);
+	$tpl = str_replace(
+		'{{AD_LEADERBOARD}}',
+		file_get_contents(ROOT . 'template/ad_leaderboard.html'),
+		$tpl
+	);
 	// DEMO
 	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
 	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
