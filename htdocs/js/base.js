@@ -105,8 +105,32 @@ horde.getOffset = function horde_getOffset (node) {
 		offset.x += node.offsetLeft;
 		offset.y += node.offsetTop;
 	}
+
+	scrollTop = horde.getScrollTop();
+	offset.x -= scrollTop.x;
+	offset.y -= scrollTop.y;
+
 	return offset;
 };
+
+
+/**
+ * Returns object of the number of pixels the window is scrolled
+ * in both the x and y directions with top left as 0,0
+ * @return {object} Object containing "x" : scrollLeft and "y" : scrollTop
+ */
+horde.getScrollTop = function horde_getScrollTop() {
+	if (typeof pageYOffset !== 'undefined') {
+		//most browsers
+		return { x: pageXOffset, y: pageYOffset };
+	}
+	else {
+		var B = document.body; //IE 'quirks'
+		var D = document.documentElement; //IE with doctype
+		D = (D.clientHeight) ? D : B;
+		return { x: D.scrollLeft, y: D.scrollTop };
+	}
+}
 
 /**
  * Returns a random number between min and max
