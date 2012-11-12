@@ -144,3 +144,81 @@ canvas {
 	margin-top: 10px;
 	text-align: center;
 }
+
+/* Clay.io style overrides */
+body #clay .clay-notification, body #clay .clay-modal-wrapper {
+	border: 2px solid #cca204;
+	padding: 0;
+	font-family: MedievalSharp;
+	background: rgba( 0, 0, 0, 0.8 );
+	
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
+}
+body #clay .clay-notification .clay-notification-content a {
+	color: #fff;
+}
+
+body #clay .clay-modal, body #clay #clay-leaderboard-wrapper-inner {
+	background: transparent;	
+}
+
+body #clay .clay-notification .clay-notification-header {
+	background: transparent;
+	color: #cca204;
+	font-size: 1.5em;
+}
+
+body #clay .clay-notification .clay-notification-content {
+	background: transparent;
+	color: #fff;
+}
+
+body #clay h2.clay-banner {
+	background: transparent;
+	text-align: center;
+	color: #cca204;
+}
+
+body #clay h3.clay-powered-by {
+	background: transparent;
+	border-bottom: 1px solid #fff;
+}
+
+body #clay h2.clay-banner img {
+	display: none;	
+}
+
+body #clay table tbody tr td, body #clay table tbody tr th, body #clay table thead tr td, body #clay table thead tr th, body #clay table tbody tr.clay-leaderboard-me td, body #clay table tbody tr.clay-leaderboard-me th {
+	color: #fff;
+}
+
+body #clay table tbody tr td a, body #clay table tbody tr.clay-leaderboard-me td a {
+	color: #cca204;	
+}
+
+body #clay #clay-achievements-wrapper-content .clay-achievement-single {
+	color: #fff;
+}
+
+body #clay #clay-leaderboard-wrapper .clay-leaderboard-custom-html {
+	color: #fff;
+}
+
+body #clay #clay-leaderboard-wrapper .clay-leaderboard-custom-html a {
+	color: #cca204;
+}
+
+body #clay .close, #clay .clay-close, body #clay .clay-notification-close {
+	background: none;
+	color: white;
+	text-decoration: none;
+	font-size: 3em;
+	top: 0;
+}
+body #clay .clay-notification-close {
+	font-size: 1.5em;
+	top: 0;
+	right: 3px;
+}
