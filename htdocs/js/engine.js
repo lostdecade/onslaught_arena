@@ -42,7 +42,38 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
+	
+	// Clay.io: Load in the API
+	this.Clay = Clay = window.Clay = {};
+	Clay.gameKey = "onslaughtarena";
+	Clay.readyFunctions = [];
+	Clay.options = { debug: true };
+	Clay.ready = function( fn ) {
+	    Clay.readyFunctions.push( fn );
+	};
+	( function() {
+	    var clay = document.createElement("script");
+	    clay.src = ( "https:" == document.location.protocol ? "https://" : "http://" ) + "clay.io/api/api-src.js"; 
+	    var tag = document.getElementsByTagName("script")[0]; tag.parentNode.insertBefore(clay, tag);
+	} )();
 
+	this.clayLeaderboard = { show: function() { console.log( "Clay.io leaderboard not ready yet!" ) } };
+	
+	var _this = this;
+	Clay.ready( function() {
+		_this.loggedIn = Clay.Player.loggedIn;
+		_this.clayLeaderboard = new Clay.Leaderboard({ id: 385, filters: ['day', 'month', 'all'], 
+								tabs: [
+									{ title: 'Cumulative', id: 385, cumulative: true, limit: 20, filters: ['day', 'month', 'all'] },
+									{ title: 'My Best', id: 385, self: true, limit: 10 }
+								]  });
+	} );
+	
+	// Storage for each time putData is called - periodically that info is stored to Clay.io as well
+	horde.localData = {};
+	// Log which achievements have been granted so we don't keep trying to grant them
+	horde.achievementsGranted = {};
+	
 	this.running = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -690,7 +721,7 @@ proto.initPlayer = function horde_Engine_proto_initPlayer () {
 	}
 };
 
-horde.Engine.prototype.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
+proto.handleImagesLoaded = function horde_Engine_proto_handleImagesLoaded () {
 	this.imagesLoaded = true;
 };
 
@@ -1211,6 +1242,38 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			horde.sound.play("victory");
 			return;
 		}
+		
+		// Clay.io: Achievements
+		var achievementId = false;
+		switch( this.currentWaveId + 1 ) {
+			case 1:
+				achievementId = "wave1";
+				break;
+			case 5:
+				achievementId = "wave5";
+				break;
+			case 10:
+				achievementId = "wave10";
+				break;
+			case 20:
+				achievementId = "wave20";
+				break;
+			case 30:
+				achievementId = "wave30";
+				break;
+			case 40:
+				achievementId = "wave40";
+				break;
+			case 50:
+				achievementId = "wave50";
+				break;
+		}
+
+		if(achievementId && !horde.achievementsGranted[achievementId]) {
+			horde.achievementsGranted[achievementId] = true; // so we don't keep sending to Clay.io
+			(new Clay.Achievement({ id: achievementId })).award();
+		}
+		
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
 		if (this.continuing || this.waveHack) {
@@ -1331,11 +1394,18 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 		}
 	}
 
-	if ((this.statsIndex	>= 4) && !this.highScoreSaved) {
+	if ((this.statsIndex >= 4) && !this.highScoreSaved) {
 		this.highScoreSaved = true;
 
 		var highScore = Number(this.getData(HIGH_SCORE_KEY));
 		var totalScore = this.getTotalScore();
+		
+		// Clay.io: Post score to clay.io
+		var _this = this;
+		this.clayLeaderboard.post({ score: totalScore }, function() {
+			// Show the leaderboard
+			_this.showLeaderboard(true);
+		});
 
 		if (totalScore > highScore) {
 			this.putData(HIGH_SCORE_KEY, totalScore);
@@ -1345,6 +1415,49 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 	}
 
 };
+
+/**
+ * Displays the Clay.io leaderboard
+ * @param {Boolean} share If true, will give the player an option to share their score
+ */
+proto.showLeaderboard = function horde_Engine_proto_showLeaderboard (share) {
+	var share = typeof share === 'undefined' ? false : share;
+	
+	var html = []; // Post to social HTML. Array for readability
+	html.push("Share your score: " );
+	html.push("<a href='#' id='facebook-button'>Facebook</a>" );
+	html.push(" or <a href='#' id='twitter-button'>Twitter</a>" );
+	var _this = this;
+	if( share ) {
+		this.clayLeaderboard.show({ html: html.join("") }, function() {
+			document.getElementById('facebook-button').onclick = function() {
+				_this.postSocial('facebook');
+			}
+			document.getElementById('twitter-button').onclick = function() {
+				_this.postSocial('twitter');
+			}
+		});
+	}
+	else {
+		this.clayLeaderboard.show();
+	}
+}
+
+/**
+ * Takes a screenshot and posts it to the specified site through Clay.io
+ * @param {String} site facebook or twitter
+ */
+proto.postSocial = function horde_Engine_proto_postSocial (site) {
+	var screenshot = new Clay.Screenshot({ prompt: false, id: 'display' });
+	var _this = this;
+	screenshot.save(function( response ) {
+		if(site == 'facebook')
+			(new Clay.Facebook()).post({ message: "I just scored " + _this.getTotalScore() + " in Onslaught! Arena - (screenshot: " + response.url + ")", link: "http://onslaughtarena.clay.io" });
+		else if(site == 'twitter')
+			(new Clay.Twitter()).post({ message: "I just scored " + _this.getTotalScore() + " in Onslaught! Arena - (sreenshot: " + response.url + ")! Play me: http://onslaughtarena.clay.io" });
+	} );
+
+}
 
 proto.openGates = function horde_Engine_proto_openGates () {
 	if (this.gateState !== "up") {
@@ -1658,7 +1771,7 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 
 };
 
-horde.Engine.prototype.updateObjects = function (elapsed) {
+proto.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
 	var numMonstersAboveGate = 0;
@@ -1847,7 +1960,7 @@ horde.Engine.prototype.updateObjects = function (elapsed) {
 };
 
 // Deals damage from object "attacker" to "defender"
-horde.Engine.prototype.dealDamage = function (attacker, defender) {
+proto.dealDamage = function (attacker, defender) {
 
 	// Monsters don't damage projectiles
 	if (attacker.role === "monster" && defender.role === "projectile") {
@@ -2021,6 +2134,33 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 };
 
 /**
+ * Grabs the data for where to continue the game
+ */
+proto.grabContinueInfo = function horde_Engine_proto_grabContinueInfo () {
+	var _this = this;
+	this.getData("checkpoint_wave", function(response) {
+		var checkpointWave = response.data;
+		if (checkpointWave !== null && typeof checkpointWave !== 'undefined') {
+			// Checkpoint data exists
+			_this.currentWaveId = (checkpointWave - 1);
+			_this.getData("checkpoint_hero", function(response) {
+				var checkpointHero = response.data;
+				if (checkpointHero !== null) {
+					var player = _this.getPlayerObject();
+					player.load(checkpointHero);
+					// Start the player at full life but ding him for the amount of wounds he had
+					player.totalDamageTaken += player.wounds;
+					player.wounds = 0;
+				}
+				_this.continuing = true;
+				_this.showTutorial = false;
+				_this.state = "intro_cinematic";
+			});
+		}
+	}, true);
+}
+
+/**
  * Handles game input
  * @return {void}
  */
@@ -2032,6 +2172,8 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 	var newPointerY;
 	var usingPointerOptions = false;
+	
+	this.leaderboardHover = this.achievementsHover = this.loginHover = false;
 
 	if (this.state == "running") {
 
@@ -2307,6 +2449,61 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			}
 		}
 
+		// Clay.io: High Scores
+		startY = 444; // 444px from top
+		if (
+			(mouseV.x >= POINTER_X - 50 && mouseV.x <= POINTER_X + 50)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 18)) // 18 = height of button
+		) {
+			this.leaderboardHover = true;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				if(!this.leaderboardShowFlag) {
+					this.leaderboardShowFlag = true; // So the LB only shows once (with a 1 second 'cooldown')
+					this.showLeaderboard();
+					var _this = this;
+					setTimeout(function() {
+						_this.leaderboardShowFlag = false;
+					}, 1000);
+				}
+			}
+		}
+		// Clay.io: Achievements List
+		if (
+			(mouseV.x >= POINTER_X + 50 && mouseV.x <= POINTER_X + 150)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 20)) // 20 = height of button
+		) {
+			this.achievementsHover = true;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				if(!this.achievementsShowFlag) {
+					this.achievementsShowFlag = true; // So the LB only shows once (with a 1 second 'cooldown')
+					Clay.Achievement.showAll();
+					var _this = this;
+					setTimeout(function() {
+						_this.achievementsShowFlag = false;
+					}, 1000);
+				}
+			}
+		}
+		// Clay.io: Login
+		startY += 20;
+		if (
+			!this.loggedIn
+			&& (mouseV.x >= startX && mouseV.x <= stopX)
+			&& (mouseV.y >= startY && mouseV.y < (startY + 18)) // 18 = height of button
+		) {
+			this.loginHover = true;
+			if (this.mouse.isButtonDown(buttons.LEFT)) {
+				if(!this.loginShowFlag) {
+					this.loginShowFlag = true; // So the LB only shows once (with a 1 second 'cooldown')
+					Clay.Player.login();
+					var _this = this;
+					setTimeout(function() {
+						_this.loginShowFlag = false;
+					}, 1000);
+				}
+			}
+		}
+
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 			horde.sound.play("select_pointer");
@@ -2321,22 +2518,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 						location.href = URL_STORE;
 					} else {
 						// Continue
-						var checkpointWave = this.getData("checkpoint_wave");
-						if (checkpointWave !== null) {
-							// Checkpoint data exists
-							this.currentWaveId = (checkpointWave - 1);
-							var checkpointHero = this.getData("checkpoint_hero");
-							if (checkpointHero !== null) {
-								var player = this.getPlayerObject();
-								player.load(checkpointHero);
-								// Start the player at full life but ding him for the amount of wounds he had
-								player.totalDamageTaken += player.wounds;
-								player.wounds = 0;
-							}
-							this.continuing = true;
-							this.showTutorial = false;
-							this.state = "intro_cinematic";
-						}
+						this.grabContinueInfo();
 					}
 					break;
 				case 1: // New game
@@ -3104,7 +3286,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		}
 
 		this.drawObjectStats(this.getPlayerObject(), ctx);
-
+		
 		// Press anything to continue ...
 		if (this.statsIndex >= 4) {
 			ctx.drawImage(
@@ -3213,7 +3395,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 		displayDamage = object.totalDamageTaken;
 	}
 	ctx.fillStyle = "rgb(237, 28, 36)";
-	ctx.fillText("-" + displayDamage + " x 100", textX, 180 + (textHeight * 2));
+	ctx.fillText("-" + displayDamage + " x 10", textX, 180 + (textHeight * 2));
 
 	// Total score
 	var displayScore = "";
@@ -3252,7 +3434,7 @@ proto.getTotalScore = function () {
 
 	var score = (wavesComplete * 1000);
 	score += player.gold;
-	score -= (player.totalDamageTaken * 100);
+	score -= (player.totalDamageTaken * 10);
 
 	if (player.cheater === true) {
 		score /= 2;
@@ -3538,7 +3720,7 @@ proto.isBadassWeapon = function horde_Engine_proto_isBadassWeapon (o) {
 	);
 }
 
-horde.Engine.prototype.drawObjects = function (ctx) {
+proto.drawObjects = function (ctx) {
 	var drawOrder = this.getObjectDrawOrder();
 	for (var x in drawOrder) {
 		var o = this.objects[drawOrder[x].id];
@@ -3749,14 +3931,56 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
 
 	ctx.save();
-	ctx.font = "Bold 36px MedievalSharp";
+	ctx.font = "Bold 24px MedievalSharp";
 	ctx.textAlign = "center";
 
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(highScore, 322, 456);
+	ctx.fillText(highScore, 322, 444);
 
 	ctx.fillStyle = grey;
-	ctx.fillText(highScore, 320, 454);
+	ctx.fillText(highScore, 320, 442);
+	ctx.restore();
+	
+	// Clay.io: High scores button
+	var highScore = ("High Scores  ");
+
+	ctx.save();
+	ctx.font = "Bold 16px MedievalSharp";
+	ctx.textAlign = "right";
+
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText(highScore, 322, 462);
+
+	ctx.fillStyle = this.leaderboardHover ? "rgb(180, 180, 180)" : grey;
+	ctx.fillText(highScore, 320, 460);
+	ctx.restore();
+	
+	// Clay.io: Achievement list button
+	var highScore = ("  Achievements");
+
+	ctx.save();
+	ctx.font = "Bold 16px MedievalSharp";
+	ctx.textAlign = "left";
+
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText(highScore, 322, 462);
+
+	ctx.fillStyle = this.achievementsHover ? "rgb(180, 180, 180)" : grey;
+	ctx.fillText(highScore, 320, 460);
+	ctx.restore();
+
+	// Clay.io: Login button
+	var highScore = this.loggedIn ? ("Logged In as " + Clay.Player.data.username) : ("Login with Clay.io");
+
+	ctx.save();
+	ctx.font = "Bold 12px MedievalSharp";
+	ctx.textAlign = "center";
+
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText(highScore, 322, 476);
+
+	ctx.fillStyle = this.loginHover ? "rgb(180, 180, 180)" : grey;
+	ctx.fillText(highScore, 320, 474);
 	ctx.restore();
 
 	// Version
@@ -3767,22 +3991,33 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.textAlign = "right";
 
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(version, 638, 478);
+	ctx.fillText(version, 638, 480);
 
 	ctx.fillStyle = grey;
-	ctx.fillText(version, 636, 476);
+	ctx.fillText(version, 636, 478);
 	ctx.restore();
 	
 	// Copyright text
-	var copyright = "Lost Decade Games \u00A9 2010";
+	var copyright = "Lost Decade Games";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
 
 	ctx.fillStyle = COLOR_BLACK;
-	ctx.fillText(copyright, 6, 478);
+	ctx.fillText(copyright, 6, 462);
 
 	ctx.fillStyle = grey;
-	ctx.fillText(copyright, 4, 476);
+	ctx.fillText(copyright, 4, 460);
+	ctx.restore();
+	
+	var copyrightDate = "\u00A9 2010";
+	ctx.save();
+	ctx.font = "Bold 14px Monospace";
+
+	ctx.fillStyle = COLOR_BLACK;
+	ctx.fillText(copyrightDate, 6, 478);
+
+	ctx.fillStyle = grey;
+	ctx.fillText(copyrightDate, 4, 476);
 	ctx.restore();
 
 };
@@ -3804,8 +4039,30 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
 
 };
 
-proto.canContinue = function () {
-	var checkpointWave = this.getData("checkpoint_wave");
+/**
+ * @param {Boolean} checkAgain If true, will grab info from Clay again (set when logging in)
+ * @return {Boolean} true if the checkpoint is stored
+ */
+proto.canContinue = function (checkAgain) {
+	
+	if( this.canContinueVar ) { // already grabbed from Clay.io
+		var checkpointWave = this.canContinueVar;
+		return checkpointWave;
+	}
+
+	if(!this.grabbingContinueVar) {
+		this.grabbingContinueVar = true;
+		var _this = this;
+		Clay.ready(function() {
+			var checkpointWave = _this.getData("checkpoint_wave", function(response) {
+				_this.canContinueVar = Boolean(response.data);
+			});
+			Clay.Player.onUserReady( function() {
+				_this.canContinue(true); // refresh w/ new data
+			} );
+		});
+	}
+	var checkpointWave = this.getData("checkpoint_wave"); // fallback to local data (while the clay data loads);
 	return Boolean(checkpointWave);
 };
 
@@ -4060,11 +4317,32 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 };
 
 /**
- * Fetches some persistent data
+ * Fetches some persistent data. Grabs first from Clay.io, falls back to localStorage, and local variable
  * @param {String} key The key of the data to fetch
+ * @param {Function} callback Callback function if useClay is set to true (since data isn't immeditely available).
+ * 							  The first parameter of this function is an object { success: boolean, data: String }
+ * @param {Boolean} forceClay Forces fetch from Clay.io (instead of using local)
  * @return {String} The data (or undefined on failure)
  */
-proto.getData = function horde_Engine_proto_getData (key, value) {
+proto.getData = function horde_Engine_proto_getData (key, callback, forceClay) {
+	// Load in the Clay data if it exists, otherwise fallback to localStorage
+	if(callback) {
+		if(Clay.isReady && Clay.Player.loggedIn && (forceClay || !horde.localData[key])) {
+			var handler = function(response) {
+				horde.localData[key] = { value: response.data, times: 0, timeout: null }; // save locally for future reference
+				callback(response);
+			}
+			Clay.Player.fetchUserData(key, handler);
+		}
+		else if(horde.localData[key]) { // we're already storing the data locally, no need to fetch from Clay
+			callback({ data: horde.localData[key].value, usingVar: true });
+		}
+		else { // Data not stored locally, and can't fetch from Clay
+			callback({ data: window.localStorage.getItem(key), usingLocalStorage: true });			
+			horde.localData[key] = window.localStorage.getItem(key); // save locally for future reference
+		}
+		return undefined;
+	}
 	if (window.localStorage && window.localStorage.getItem) {
 		return window.localStorage.getItem(key);
 	}
@@ -4072,7 +4350,7 @@ proto.getData = function horde_Engine_proto_getData (key, value) {
 };
 
 /**
- * Saves some data persistently
+ * Saves some data persistently. Saves to localStorage, a variable, and Clay.io (after 3 seconds)
  * @param {String} key The key of the data to store
  * @param {String} value The data to store
  */
@@ -4080,6 +4358,30 @@ proto.putData = function horde_Engine_proto_putData (key, value) {
 	if (window.localStorage && window.localStorage.setItem) {
 		window.localStorage.setItem(key, value);
 	}
+	// Clay.io: Store to Clay.io as well (as primary source of storage, localStorage as backup)
+	// We store to Clay.io if new data isn't passed in 3s
+	// This is in place so we're not flooding Clay.io with data stores (there is a limit...)
+	if(!Clay.isReady)
+		return false;
+		
+	if(horde.localData[key] && horde.localData[key].timeout) {
+		clearTimeout(horde.localData[key].timeout);
+		var times = horde.localData[times] + 1; // log how many times the timeout is set, so every 10th, we'll store anyways
+	}
+	else {
+		var times = 0; // first time setting the timeout
+	}
+
+	// Store the data locally, and store to Clay after 3 seconds on non-changing data
+	( function() {
+		var localKey = key;
+		var localValue = value;
+		var localTimes = times;
+		horde.localData[key] = { value: localValue, times: localTimes, timeout: setTimeout(function() {
+			Clay.Player.saveUserData(localKey, localValue);
+			horde.localData[localKey].timeout = null;
+		}, 3000) };
+	} )();
 };
 
 /**

@@ -50,6 +50,11 @@ horde.Object = function () {
 	this.collidable = true;
 	this.bounce = true;
 	this.piercing = false;
+	
+	// Clay.io
+	this.achievementId = null; // Related Clay.io Achievement ID
+	this.deathsForAchievement = Infinity; // # of kills necessary necessary to earn achievement
+	this.ignoreLogDeath = false; // If set to true, the # of deaths isn't logged (in Clay.io data-storage)
 
 	// Default sounds
 	this.soundDamage = null;
@@ -213,7 +218,50 @@ proto.init = function horde_Object_proto_init () {
  */
 proto.die = function horde_Object_proto_die () {
 	this.alive = false;
+	
+	// Clay.io: Log the death for things like achievements
+	if((this.role == "monster" || this.role == "projectile") && !this.ignoreLogDeath) // Certain projectiles are ignored (ex. fire_sword_trail)
+		this.logDeath();
 };
+
+/**
+ * Logs when a monster or projectile "dies". This is later used for Clay.io achievements (ex. kill 1000 bats)
+ * @return {void}
+ */
+proto.logDeath = function horde_Object_proto_logDeath () {
+	// Clay.io: Update number of enemies killed
+	var deaths = 0;
+	var key = this.type + "_killed";
+	var _this = this;
+	horde.Engine.prototype.getData(key, function(response) {
+		deaths = (response.data ? response.data : 0) + 1;
+		horde.Engine.prototype.putData(key, deaths);
+
+		// Clay.io: check if there's an achievement for killing this specific thing x times
+		if(_this.achievementId && deaths > _this.deathsForAchievement && !horde.achievementsGranted[_this.achievementId])
+		{
+			horde.achievementsGranted[_this.achievementId] = true; // so we don't keep sending to Clay.io
+			(new Clay.Achievement({ id: _this.achievementId })).award();
+		}
+	});
+
+	if(this.role == "monster") {
+		// Update overall kills		
+		var key = "overall_killed";
+		horde.Engine.prototype.getData(key, function(response) {
+			deaths = (response.data ? response.data : 0) + 1;
+			horde.Engine.prototype.putData(key, deaths);
+			
+			// See if they're at achievement for overall kills
+			achievementId = "killenemies";
+			// 10,000 kills for the achievement
+			if(deaths > 10000 && !horde.achievementsGranted[achievementId]) {
+				horde.achievementsGranted[achievementId] = true; // so we don't keep sending to Clay.io
+				(new Clay.Achievement({ id: achievementId })).award();
+			}
+		});
+	}
+}
 
 /**
  * Returns whether or not this object is "dead" (this.alive === false)
