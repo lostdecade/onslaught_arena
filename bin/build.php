@@ -41,8 +41,8 @@ JAVASCRIPT;
 	}
 	$js = str_replace('{{VERSION}}', $version, $js);
 	file_put_contents(ROOT . 'tmp.js', $js);
-	$command = 
-		'closure ' . 
+	$command =
+		'closure-compiler ' .
 		" --js_output_file {$target}" .
 		' --compilation_level SIMPLE_OPTIMIZATIONS' .
 		' --js ' . ROOT . 'tmp.js';
@@ -84,7 +84,7 @@ function buildWeb ($version) {
 	exec("cp -r {$htdocs}/css {$web_root}");
 	exec("cp -r {$htdocs}/font {$web_root}");
 	exec("cp -r {$htdocs}/sound {$web_root}");
-	exec("cp -r {$htdocs}/robots.txt {$web_root}");	
+	exec("cp -r {$htdocs}/robots.txt {$web_root}");
 	exec("pngcrush -reduce -d {$web_root}img {$htdocs}/img/*.png");
 }
 
