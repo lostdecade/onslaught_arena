@@ -151,17 +151,22 @@ body #clay .clay-notification, body #clay .clay-modal-wrapper {
 	padding: 0;
 	font-family: MedievalSharp;
 	background: rgba( 0, 0, 0, 0.8 );
-	
+
 	-webkit-box-shadow: none;
 	-moz-box-shadow: none;
 	box-shadow: none;
 }
+
 body #clay .clay-notification .clay-notification-content a {
 	color: #fff;
 }
 
+#clay .clay-content {
+	max-width: 446px;
+}
+
 body #clay .clay-modal, body #clay #clay-leaderboard-wrapper-inner {
-	background: transparent;	
+	background: transparent;
 }
 
 body #clay .clay-notification .clay-notification-header {
@@ -187,7 +192,7 @@ body #clay h3.clay-powered-by {
 }
 
 body #clay h2.clay-banner img {
-	display: none;	
+	display: none;
 }
 
 body #clay table tbody tr td, body #clay table tbody tr th, body #clay table thead tr td, body #clay table thead tr th, body #clay table tbody tr.clay-leaderboard-me td, body #clay table tbody tr.clay-leaderboard-me th {
@@ -195,7 +200,7 @@ body #clay table tbody tr td, body #clay table tbody tr th, body #clay table the
 }
 
 body #clay table tbody tr td a, body #clay table tbody tr.clay-leaderboard-me td a {
-	color: #cca204;	
+	color: #cca204;
 }
 
 body #clay #clay-achievements-wrapper-content .clay-achievement-single {
