@@ -6,8 +6,8 @@ horde.Mouse = function (canvas) {
 	this.mouseY = 0;
 	this.canvas = canvas;
 	this.lastButtonStates = {};
-	horde.on("mousemove", this.handleMouseMove, window, this);
-	horde.on("mousedown", this.handleMouseDown, window, this);
+	horde.on("mousemove", this.handleMouseMove, canvas, this);
+	horde.on("mousedown", this.handleMouseDown, canvas, this);
 	horde.on("mouseup", this.handleMouseUp, window, this);
 
 	/*
