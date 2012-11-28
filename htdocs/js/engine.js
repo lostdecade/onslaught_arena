@@ -47,7 +47,9 @@ horde.Engine = function horde_Engine () {
 	this.Clay = Clay = window.Clay = {};
 	Clay.gameKey = "onslaughtarena";
 	Clay.readyFunctions = [];
-	Clay.options = { debug: true };
+	Clay.options = {
+		//debug: true
+	};
 	Clay.ready = function( fn ) {
 		Clay.readyFunctions.push( fn );
 	};
