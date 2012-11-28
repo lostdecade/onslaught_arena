@@ -1,5 +1,7 @@
 User-agent: *
-Disallow: /css
-Disallow: /img
-Disallow: /js
-Disallow: /sound
+Disallow: OnSlaughtWeb.html
+Disallow: OnSlaughtAddOnInstaller.html
+Disallow: css
+Disallow: img
+Disallow: js
+Disallow: sound
