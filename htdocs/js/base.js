@@ -6,6 +6,31 @@ var horde = {};
 
 horde.canvasFallbackContent = "<div class=\"fallback\"><p>Your browser does not appear to support <a href=\"http://en.wikipedia.org/wiki/HTML5\">HTML5</a>.</p><p>Please try one of the following, more standards compliant browsers: <a href=\"http://www.google.com/chrome\">Chrome</a>, <a href=\"http://www.apple.com/safari/\">Safari</a>, <a href=\"http://www.mozilla.com/firefox/\">Firefox</a> or <a href=\"http://www.opera.com/\">Opera</a>.</p></div>";
 
+// Bind a function to a particular context
+var bind = function (context, fn) {
+	if (typeof fn == "string") {
+		fn = context[fn];
+	}
+	return function () {
+		fn.apply(context, arguments);
+	};
+};
+
+// requestAnimationFrame shim
+if (typeof requestAnimationFrame == "undefined") {
+	var requestAnimationFrame = (
+		window.mozRequestAnimationFrame ||
+		window.msRequestAnimationFrame ||
+		window.oRequestAnimationFrame ||
+		window.webkitRequestAnimationFrame ||
+		function (callback) {
+			setTimeout(function () {
+				callback(Date.now());
+			}, 17); // ~60 FPS
+		}
+	);
+}
+
 /**
  * Context corrected window.setInterval() wrapper
  * @param {number} when Milliseconds between intervals
@@ -216,7 +241,7 @@ horde.directions = {
 				break;
 			case horde.directions.UP_LEFT:
 				return new horde.Vector2(-1, -1);
-				break;				
+				break;
 		}
 	},
 	fromVector: function (v) {

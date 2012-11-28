@@ -196,8 +196,8 @@ proto.run = function horde_Engine_proto_run () {
  */
 proto.start = function horde_Engine_proto_start () {
 	if (!this.running) {
-		this.interval = horde.setInterval(0, this.update, this);
 		this.running = true;
+		this.requestFrame();
 	}
 };
 
@@ -207,7 +207,6 @@ proto.start = function horde_Engine_proto_start () {
  */
 proto.stop = function horde_Engine_proto_stop () {
 	if (this.running) {
-		clearInterval(this.interval);
 		this.running = false;
 	}
 };
@@ -888,6 +887,7 @@ proto.update = function horde_Engine_proto_update () {
 	this.lastElapsed = elapsed;
 
 	if (this.imagesLoaded !== true) {
+		this.requestFrame();
 		return;
 	}
 
@@ -965,6 +965,12 @@ proto.update = function horde_Engine_proto_update () {
 
 	this.mouse.hasMoved = false;
 
+	this.requestFrame();
+};
+
+proto.requestFrame = function () {
+	if (!this.running) { return; }
+	requestAnimationFrame(bind(this, this.update));
 };
 
 proto.updateWeaponPickup = function horde_Engine_proto_updateWeaponPickup (elapsed) {
@@ -1289,26 +1295,22 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			this.spawnWaveExtras(actualWave);
 		}
 		var waveTextString = "Wave " + actualWave;
+		var waveMusic = "normal_battle_music";
 		if (actualWave > 1) {
 			this.putData("checkpoint_wave", this.currentWaveId);
 			this.putData("checkpoint_hero", JSON.stringify(this.getPlayerObject()));
 		}
 		if (this.waves[this.currentWaveId].bossWave) {
 			waveTextString = ("Boss: " + this.waves[this.currentWaveId].bossName) + "!";
-			if (horde.sound.isPlaying("normal_battle_music")) {
-				horde.sound.stop("normal_battle_music");
-			}
-			this.currentMusic = "final_battle_music";
-			horde.sound.play(this.currentMusic);
-		} else {
-			if (horde.sound.isPlaying("final_battle_music")) {
-				horde.sound.stop("final_battle_music");
-			}
-			if (!horde.sound.isPlaying("normal_battle_music")) {
-				this.currentMusic = "normal_battle_music";
-				horde.sound.play(this.currentMusic);
-			}
+			waveMusic = "final_battle_music";
 		}
+
+		if (this.currentMusic !== waveMusic) {
+			horde.sound.stop(this.currentMusic);
+			this.currentMusic = waveMusic;
+			horde.sound.play(this.currentMusic);
+		}
+
 		this.initSpawnWave(this.waves[this.currentWaveId]);
 		this.waveText.string = waveTextString;
 		this.waveText.alpha = 0;
