@@ -42,38 +42,38 @@ horde.Engine = function horde_Engine () {
 	this.images = null;
 	this.debug = false; // Debugging toggle
 	this.konamiEntered = false;
-	
+
 	// Clay.io: Load in the API
 	this.Clay = Clay = window.Clay = {};
 	Clay.gameKey = "onslaughtarena";
 	Clay.readyFunctions = [];
 	Clay.options = { debug: true };
 	Clay.ready = function( fn ) {
-	    Clay.readyFunctions.push( fn );
+		Clay.readyFunctions.push( fn );
 	};
 	( function() {
-	    var clay = document.createElement("script");
-	    clay.src = ( "https:" == document.location.protocol ? "https://" : "http://" ) + "clay.io/api/api-src.js"; 
-	    var tag = document.getElementsByTagName("script")[0]; tag.parentNode.insertBefore(clay, tag);
+  	var clay = document.createElement("script");
+	  clay.src = ( "https:" == document.location.protocol ? "https://" : "http://" ) + "clay.io/api/api-src.js";
+	  var tag = document.getElementsByTagName("script")[0]; tag.parentNode.insertBefore(clay, tag);
 	} )();
 
 	this.clayLeaderboard = { show: function() { console.log( "Clay.io leaderboard not ready yet!" ) } };
-	
+
 	var _this = this;
 	Clay.ready( function() {
 		_this.loggedIn = Clay.Player.loggedIn;
-		_this.clayLeaderboard = new Clay.Leaderboard({ id: 385, filters: ['day', 'month', 'all'], 
+		_this.clayLeaderboard = new Clay.Leaderboard({ id: 385, filters: ['day', 'month', 'all'],
 								tabs: [
 									{ title: 'Cumulative', id: 385, cumulative: true, limit: 20, filters: ['day', 'month', 'all'] },
 									{ title: 'My Best', id: 385, self: true, limit: 10 }
 								]  });
 	} );
-	
+
 	// Storage for each time putData is called - periodically that info is stored to Clay.io as well
 	horde.localData = {};
 	// Log which achievements have been granted so we don't keep trying to grant them
 	horde.achievementsGranted = {};
-	
+
 	this.running = false;
 
 	this.gateDirection = ""; // Set to "up" or "down"
@@ -351,7 +351,7 @@ proto.preloadComplete = function () {
  * @return {void}
  */
 proto.init = function horde_Engine_proto_init () {
-	
+
 	this.state = "intro";
 
 	this.canvases["display"] = horde.makeCanvas("display", this.view.width, this.view.height);
@@ -360,13 +360,13 @@ proto.init = function horde_Engine_proto_init () {
 
 	this.resize();
 	horde.on("resize", this.resize, window, this);
-	
+
 	this.mouse = new horde.Mouse(this.canvases["display"]);
-	
+
 	horde.on("contextmenu", function (e) {
 		horde.stopEvent(e);
 	}, document.body, this);
-	
+
 	horde.on("blur", function () {
 		if (this.state != "running" || this.wonGame) return;
 		this.keyboard.keyStates = {};
@@ -385,7 +385,7 @@ proto.init = function horde_Engine_proto_init () {
 	this.preloader.load({
 		"ui": "img/sheet_ui.png" + this.cacheBust()
 	}, this.preloadComplete, this);
-	
+
 	// Load the rest of the image assets
 	this.images = new horde.ImageLoader();
 	this.images.load({
@@ -399,9 +399,9 @@ proto.init = function horde_Engine_proto_init () {
 	if (highScore === null) {
 		this.putData(HIGH_SCORE_KEY, DEFAULT_HIGH_SCORE);
 	}
-	
+
 	this.initSound();
-	
+
 };
 
 /**
@@ -409,9 +409,9 @@ proto.init = function horde_Engine_proto_init () {
  * @return {void}
  */
 proto.initSound = function horde_Engine_proto_initSound () {
-	
+
 	horde.sound.init(function () {
-	
+
 		// Create all sound files
 		var musicDir = "sound/music/";
 		var sfxDir = "sound/effects/";
@@ -421,13 +421,13 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("normal_battle_music", musicDir + "normal_battle", true, 20);
 		s.create("final_battle_music", musicDir + "final_battle", true, 20);
 		s.create("victory", musicDir + "victory", true, 20);
-		
+
 		// UI
 		s.create("move_pointer", sfxDir + "move_pointer", false, 50);
 		s.create("select_pointer", sfxDir + "select_pointer", false, 50);
 		s.create("pause", sfxDir + "pause");
 		s.create("unpause", sfxDir + "unpause");
-		
+
 		// Environment
 		s.create("code_entered", sfxDir + "code_entered");
 		s.create("gate_opens", sfxDir + "gate_opens");
@@ -440,18 +440,18 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("eat_food", sfxDir + "eat_food", false, 30);
 		s.create("pickup_weapon", sfxDir + "pickup_weapon");
 		s.create("weapon_wall", sfxDir + "weapon_wall", false, 25);
-		
+
 		// Hero
 		s.create("fire_attack", sfxDir + "char_attacks_fire");
 		s.create("hero_attacks", sfxDir + "char_attacks");
 		s.create("hero_damage", sfxDir + "char_damage_3");
 		s.create("hero_dies", sfxDir + "char_dies");
-		
+
 		// Bat
 		// Attack: not needed
 		s.create("bat_damage", sfxDir + "bat_damage");
 		s.create("bat_dies", sfxDir + "bat_dies");
-		
+
 		// Goblin
 		s.create("goblin_attacks", sfxDir + "goblin_attacks");
 		s.create("goblin_damage", sfxDir + "goblin_damage");
@@ -476,7 +476,7 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		// Attack: not needed
 		s.create("skull_damage", sfxDir + "skull_damage", false, 25);
 		s.create("skull_dies", sfxDir + "skull_dies", false, 5);
-	
+
 		// Wizard
 		s.create("wizard_attacks", sfxDir + "wizard_attacks", false, 25);
 		// Damage: goblin_damage
@@ -527,9 +527,9 @@ proto.initSound = function horde_Engine_proto_initSound () {
 		s.create("dopp_attacks", sfxDir + "dopp_attacks", false, 50);
 		s.create("dopp_damage", sfxDir + "dopp_damage", false, 50);
 		s.create("dopp_dies", sfxDir + "dopp_dies");
-			
+
 	});
-	
+
 };
 
 proto.initGame = function () {
@@ -538,16 +538,16 @@ proto.initGame = function () {
 	this.enableClouds = false;
 
 	this.closeGates();
-	
+
 	this.objects = {};
 	this.state = "title";
 	this.initOptions();
-	
+
 	this.initMap();
 
 	this.initSpawnPoints();
 	this.initWaves();
-	
+
 	this.initPlayer();
 
 	this.gameOverBg = null;
@@ -561,7 +561,7 @@ proto.initGame = function () {
 	this.statsIndex = 0;
 	this.statsTimer = null;
 	this.highScoreSaved = false;
-	
+
 	this.wonGame = false;
 	this.wonGamePhase = 0;
 
@@ -578,7 +578,7 @@ proto.initGame = function () {
 	this.heroFiring = false;
 	this.heroFiringDirection = null;
 	this.woundsTo = 0;
-	
+
 	this.gameStartTime = horde.now();
 
 };
@@ -613,27 +613,27 @@ proto.initMap = function horde_Engine_proto_initMap () {
  * @return {void}
  */
 proto.initSpawnPoints = function horde_Engine_proto_initSpawnPoints () {
-	
+
 	this.spawnPoints = [];
-	
+
 	// Left gate (index 0)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		3 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
-	
+
 	// Center gate (index 1)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		9 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
-	
+
 	// Right gate (index 2)
 	this.spawnPoints.push(new horde.SpawnPoint(
 		15 * this.tileSize.width, -2 * this.tileSize.height,
 		this.tileSize.width * 2, this.tileSize.height * 2
 	));
-	
+
 };
 
 /**
@@ -667,7 +667,7 @@ proto.initSpawnWave = function horde_Engine_proto_initSpawnWave (wave) {
  * @return {void}
  */
 proto.initWaves = function horde_Engine_proto_initWaves () {
-	
+
 	this.waves = [];
 	this.waveTimer = new horde.Timer();
 	this.waveTimer.start(1);
@@ -701,7 +701,7 @@ proto.initWaves = function horde_Engine_proto_initWaves () {
 	*/
 
 	horde.populateWaves(this);
-	
+
 };
 
 /**
@@ -758,11 +758,11 @@ proto.updateLogo = function (elapsed) {
 };
 
 proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (elapsed) {
-	
+
 	this.introTimer.update(elapsed);
-	
+
 	switch (this.introPhase) {
-		
+
 		// Fade out
 		case 0:
 			if (!this.introPhaseInit) {
@@ -776,7 +776,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		// Fade in
 		case 1:
 			if (!this.introPhaseInit) {
@@ -790,7 +790,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		// Wait for a sec...
 		case 2:
 			if (!this.introPhaseInit) {
@@ -802,7 +802,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-			
+
 		// Open the gates
 		case 3:
 			if (!this.introPhaseInit) {
@@ -814,7 +814,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		// Move hero out
 		case 4:
 			if (!this.introPhaseInit) {
@@ -835,7 +835,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		case 5:
 		case 6:
 		case 8:
@@ -848,7 +848,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		case 7:
 			if (!this.introPhaseInit) {
 				this.closeGates();
@@ -859,7 +859,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 				this.introPhaseInit = false;
 			}
 			break;
-		
+
 		case 9:
 			if (!this.introPhaseInit) {
 				this.introTimer.start(1000);
@@ -874,7 +874,7 @@ proto.updateIntroCinematic = function horde_Engine_proto_updateIntroCinematic (e
 			break;
 
 	}
-	
+
 };
 
 proto.update = function horde_Engine_proto_update () {
@@ -913,7 +913,7 @@ proto.update = function horde_Engine_proto_update () {
 			this.updateFauxGates(elapsed);
 			this.render();
 			break;
-			
+
 		// The game!
 		case "running":
 			if (this.wonGame) {
@@ -988,15 +988,15 @@ proto.updateCoinPickup = function horde_Engine_proto_updateCoinPickup (elapsed) 
 };
 
 proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
-	
+
 	var player = this.getPlayerObject();
-	
+
 	if (this.roseTimer) {
 		this.roseTimer.update(elapsed);
 	}
-	
+
 	switch (this.wonGamePhase) {
-		
+
 		// Move Xam to the center of the room
 		case 0:
 			var center = new horde.Vector2(304, 192);
@@ -1006,7 +1006,7 @@ proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
 				this.wonGamePhase++;
 			}
 			break;
-			
+
 		case 1:
 			player.setDirection(new horde.Vector2(0, 1));
 			player.stopMoving();
@@ -1016,7 +1016,7 @@ proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
 			this.rosesThrown = 0;
 			this.wonGamePhase++;
 			break;
-			
+
 		case 2:
 			if (this.roseTimer.expired()) {
 				++this.rosesThrown;
@@ -1037,9 +1037,9 @@ proto.updateWonGame = function horde_Engine_proto_updateWonGame (elapsed) {
 				this.endGame();
 			}
 			break;
-		
+
 	}
-	
+
 };
 
 proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
@@ -1047,16 +1047,16 @@ proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
 	if (this.enableClouds !== true) {
 		return;
 	}
-	
+
 	if (this.cloudTimer === null) {
 		this.cloudTimer = new horde.Timer();
 		this.cloudTimer.start(2000);
 	}
-	
+
 	this.cloudTimer.update(elapsed);
-	
+
 	var clouds = 0;
-	
+
 	// Kill off clouds that are past the screen
 	for (var id in this.objects) {
 		var o = this.objects[id];
@@ -1085,7 +1085,7 @@ proto.updateClouds = function horde_Engine_proto_updateClouds (elapsed) {
 		}
 		this.cloudTimer.reset();
 	}
-	
+
 };
 
 /**
@@ -1117,7 +1117,7 @@ proto.updateSpawnPoints = function horde_Engine_proto_updateSpawnPoints (elapsed
 
 proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber) {
 	switch (waveNumber) {
-		
+
 		case 1:
 			// Spawn a couple weapons scrolls to give the player an early taste of the fun!
 			var player = this.getPlayerObject();
@@ -1151,7 +1151,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 			this.addObject(wep);
 
 			break;
-		
+
 		case 11:
 			// Two spikes in the middle to the left and right
 			var locs = [
@@ -1166,7 +1166,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 				this.addObject(s);
 			}
 			break;
-		
+
 		case 21:
 			// Spike sentries in each corner
 			var spikeLocs = [
@@ -1183,7 +1183,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 				this.addObject(s);
 			}
 			break;
-	
+
 		case 31:
 			// Two spikes in the middle above and below
 			var locs = [
@@ -1198,11 +1198,11 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 				this.addObject(s);
 			}
 			break;
-			
+
 		case 41:
 			this.enableClouds = true;
 			break;
-	
+
 		case 50:
 			// Despawn all traps; Doppelganger is hard enough!!
 			for (var id in this.objects) {
@@ -1212,7 +1212,7 @@ proto.spawnWaveExtras = function horde_Engine_proto_spawnWaveExtras (waveNumber)
 				}
 			}
 			break;
-		
+
 	}
 };
 
@@ -1242,7 +1242,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			horde.sound.play("victory");
 			return;
 		}
-		
+
 		// Clay.io: Achievements
 		var achievementId = false;
 		switch( this.currentWaveId + 1 ) {
@@ -1273,7 +1273,7 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			horde.achievementsGranted[achievementId] = true; // so we don't keep sending to Clay.io
 			(new Clay.Achievement({ id: achievementId })).award();
 		}
-		
+
 		this.currentWaveId++;
 		var actualWave = (this.currentWaveId + 1);
 		if (this.continuing || this.waveHack) {
@@ -1399,7 +1399,7 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
 
 		var highScore = Number(this.getData(HIGH_SCORE_KEY));
 		var totalScore = this.getTotalScore();
-		
+
 		// Clay.io: Post score to clay.io
 		var _this = this;
 		this.clayLeaderboard.post({ score: totalScore }, function() {
@@ -1422,7 +1422,7 @@ proto.updateGameOver = function horde_Engine_proto_updateGameOver (elapsed) {
  */
 proto.showLeaderboard = function horde_Engine_proto_showLeaderboard (share) {
 	var share = typeof share === 'undefined' ? false : share;
-	
+
 	var html = []; // Post to social HTML. Array for readability
 	html.push("Share your score: " );
 	html.push("<a href='#' id='facebook-button'>Facebook</a>" );
@@ -1485,7 +1485,7 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 			this.gateState = "down";
 		}
 	}
-	
+
 	if (this.gateDirection === "up") {
 		this.gatesX = horde.randomRange(-1, 1);
 		this.gatesY -= ((50 / 1000) * elapsed);
@@ -1496,7 +1496,7 @@ proto.updateFauxGates = function horde_Engine_proto_updateFauxGates (elapsed) {
 			this.gateState = "up";
 		}
 	}
-	
+
 };
 
 proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
@@ -1514,7 +1514,7 @@ proto.updateTutorial = function horde_Engine_proto_updateTutorial (elapsed) {
 			}
 		}
 	}
-	
+
 	if (this.tutorialDirection === "up") {
 		this.tutorialY -= (speed * elapsed);
 		if (this.tutorialY < -TUTORIAL_HEIGHT) {
@@ -1574,10 +1574,10 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
 
 	var origin = new horde.Vector2(rect.left, rect.top);
 	var size = new horde.Vector2(rect.width, rect.height);
-	
+
 	var begin = origin.clone().scale(1 / this.tileSize.width).floor();
 	var end = origin.clone().add(size).scale(1 / this.tileSize.width).floor();
-	
+
 	for (var tx = begin.x; tx <= end.x; tx++) {
 		for (var ty = begin.y; ty <= end.y; ty++) {
 			tiles.push({
@@ -1586,9 +1586,9 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
 			});
 		}
 	}
-	
+
 	return tiles;
-	
+
 };
 
 /**
@@ -1597,9 +1597,9 @@ proto.getTilesByRect = function horde_Engine_proto_getTilesByRect (rect) {
  * @return {boolean} True if object is colliding with tiles, otherwise false
  */
 proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (object) {
-	
+
 	var tilesToCheck = this.getTilesByRect(object.boundingBox());
-	
+
 	for (var i = 0, len = tilesToCheck.length; i < len; i++) {
 		var t = tilesToCheck[i];
 		if (this.map[t.y] && this.map[t.y][t.x] === 0) {
@@ -1607,29 +1607,29 @@ proto.checkTileCollision = function horde_Engine_proto_checkTileCollision (objec
 			return t;
 		}
 	}
-	
+
 	// No tile collision
 	return false;
-	
+
 };
 
 proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
-	
+
 	if (!object.badass && object.hasState(horde.Object.states.HURTING)) {
 		return false;
 	}
-	
+
 	var speed = object.speed;
 	if (object.hasState(horde.Object.states.SLOWED)) {
 		speed *= 0.20;
 	}
-	
+
 	var px = ((speed / 1000) * elapsed);
-		
+
 	var axis = [];
 	var collisionX = false;
 	var collisionY = false;
-	
+
 	// Check tile collision for X axis
 	if (object.direction.x !== 0) {
 		// the object is moving along the "x" axis
@@ -1655,7 +1655,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			}
 		}
 	}
-	
+
 	// Check tile collision for Y axis
 	if (object.direction.y !== 0) {
 		// the object is moving along the "y" axis
@@ -1678,9 +1678,9 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 			}
 		}
 	}
-	
+
 	if (object.collidable) {
-		
+
 		var yStop = 0;
 		if (
 			this.gateState === "down"
@@ -1689,7 +1689,7 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		) {
 			yStop = GATE_CUTOFF_Y;
 		}
-		
+
 		if (object.direction.y < 0 && object.position.y < yStop) {
 			object.position.y = yStop;
 			axis.push("y");
@@ -1698,9 +1698,9 @@ proto.moveObject = function horde_Engine_proto_moveObject (object, elapsed) {
 		if (axis.length > 0) {
 			object.wallCollide(axis);
 		}
-		
+
 	}
-	
+
 };
 
 proto.dropObject = function horde_Engine_proto_dropObject (object, type) {
@@ -1735,7 +1735,7 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 
 	var table = object.lootTable;
 	var len = table.length;
-	
+
 	var weightedTable = [];
 	for (var x = 0; x < len; x++) {
 		var entry = table[x];
@@ -1743,10 +1743,10 @@ proto.spawnLoot = function horde_Engine_proto_spawnLoot (object) {
 			weightedTable.push(entry.type);
 		}
 	}
-	
+
 	var rand = horde.randomRange(0, weightedTable.length - 1);
 	var type = weightedTable[rand];
-	
+
 	if (type !== null) {
 		var player = this.getPlayerObject();
 		if (type === "item_food" && player.wounds === 0) {
@@ -1775,11 +1775,11 @@ proto.updateObjects = function (elapsed) {
 
 	var numMonsters = 0;
 	var numMonstersAboveGate = 0;
-	
+
 	for (var id in this.objects) {
 
 		var o = this.objects[id];
-		
+
 		if (o.isDead()) {
 			if (o.role === "hero") {
 				this.endGame();
@@ -1796,7 +1796,7 @@ proto.updateObjects = function (elapsed) {
 				numMonstersAboveGate++;
 			}
 		}
-				
+
 		var action = o.update(elapsed, this);
 		switch (action) {
 			case "shoot":
@@ -1807,7 +1807,7 @@ proto.updateObjects = function (elapsed) {
 		if (o.isMoving() && !o.hasState(horde.Object.states.STUNNED)) {
 			this.moveObject(o, elapsed);
 		}
-		
+
 		if (
 			o.role === "fluff"
 			|| o.role === "powerup_food"
@@ -1816,7 +1816,7 @@ proto.updateObjects = function (elapsed) {
 		) {
 			continue;
 		}
-		
+
 		for (var x in this.objects) {
 			var o2 = this.objects[x];
 			if (
@@ -1895,7 +1895,7 @@ proto.updateObjects = function (elapsed) {
 
 		}
 
-		// Update glowing weapons			
+		// Update glowing weapons
 		if (this.isBadassWeapon(o)) {
 			if (o.glow === undefined) {
 				o.glow = {
@@ -1925,9 +1925,9 @@ proto.updateObjects = function (elapsed) {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	this.monstersAlive = numMonsters;
 	this.monstersAboveGates = (numMonstersAboveGate > 0);
 
@@ -1956,7 +1956,7 @@ proto.updateObjects = function (elapsed) {
 	if (Math.abs(player.wounds - this.woundsTo) <= 1) {
 		this.woundsTo = player.wounds
 	}
-	
+
 };
 
 // Deals damage from object "attacker" to "defender"
@@ -2033,7 +2033,7 @@ proto.dealDamage = function (attacker, defender) {
 
 	// Allow attackers to do stuff when they've hurt something
 	attacker.execute("onDamage", [defender, this]);
-	
+
 	// Track combat stats
 	var scorer = attacker;
 	if (scorer.ownerId !== null) {
@@ -2049,7 +2049,7 @@ proto.dealDamage = function (attacker, defender) {
 	// Deal damage and check for death
 	if (defender.wound(attacker.damage)) {
 		// defender has died
-		
+
 		// Assign gold/kills etc
 		scorer.gold += defender.worth;
 		scorer.kills++;
@@ -2057,7 +2057,7 @@ proto.dealDamage = function (attacker, defender) {
 		if (defender.lootTable.length > 0) {
 			this.spawnLoot(defender);
 		}
-		
+
 		// Handler piercing weapons
 		if (
 			attacker.role === "projectile"
@@ -2066,22 +2066,22 @@ proto.dealDamage = function (attacker, defender) {
 		) {
 			attacker.die();
 		}
-		
+
 	} else {
 		// defender did NOT die
-		
+
 		// Make the player invincible after some damage
 		if (attacker.damage > 0 && defender.role === "hero") {
 			defender.addState(horde.Object.states.INVINCIBLE, 2500);
 		}
-		
+
 		// Projectile failed to kill it's target; automatic death for projectile
 		if (attacker.role === "projectile" && attacker.hitPoints !== Infinity) {
 			attacker.die();
 		}
-		
+
 	}
-	
+
 };
 
 /**
@@ -2089,9 +2089,9 @@ proto.dealDamage = function (attacker, defender) {
  * @return {void}
  */
 proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
-	
+
 	this.targetReticle.moving = false;
-	
+
 	// Grab the current mouse position as a vector
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 
@@ -2130,7 +2130,7 @@ proto.updateTargetReticle = function horde_Engine_proto_updateTargetReticle () {
 	} else {
 		trp.y = mouseV.y;
 	}
-	
+
 };
 
 /**
@@ -2172,7 +2172,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 	var mouseV = new horde.Vector2(this.mouse.mouseX, this.mouse.mouseY);
 	var newPointerY;
 	var usingPointerOptions = false;
-	
+
 	this.leaderboardHover = this.achievementsHover = this.loginHover = false;
 
 	if (this.state == "running") {
@@ -2364,7 +2364,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 					}
 				}
 			}
-			
+
 			if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 				kb.clearKey(keys.ENTER);
@@ -2562,7 +2562,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 				this.keyboard.keyStates[keys.SPACE] = true;
 			}
 		}
-		
+
 		if (kb.isKeyPressed(keys.ENTER) || kb.isKeyPressed(keys.SPACE)) {
 
 			kb.clearKey(keys.ENTER);
@@ -2822,7 +2822,7 @@ proto.handleInput = function horde_Engine_proto_handleInput () {
 			this.heroFiring = false;
 			this.heroFiringDirection = null;
 		}
-		
+
 		this.keyboard.storeKeyStates();
 		this.mouse.storeButtonStates();
 	}
@@ -2869,11 +2869,11 @@ proto.objectAttack = function (object, v) {
 	if (weaponType === false) {
 		return;
 	}
-	
+
 	var weaponDef = horde.objectTypes[weaponType];
 
 	switch (weaponType) {
-		
+
 		case "e_minotaur_trident":
 			var h = v.heading();
 			for (var x = -0.5; x <= 0.5; x += 0.5) {
@@ -2885,7 +2885,7 @@ proto.objectAttack = function (object, v) {
 			}
 			object.shotsFired += 3;
 			break;
-		
+
 		// Shoot 2 knives in a spread pattern
 		case "h_knife":
 		case "h_fire_knife":
@@ -3016,7 +3016,7 @@ proto.objectAttack = function (object, v) {
 			this.spawnObject(object, weaponType, v);
 			object.shotsFired++;
 			break;
-			
+
 	}
 
 	// Increment shots per weapon counter
@@ -3040,7 +3040,7 @@ proto.objectAttack = function (object, v) {
 };
 
 proto.render = function horde_Engine_proto_render () {
-	
+
 	var ctx = this.canvases["display"].getContext("2d");
 
 	switch (this.state) {
@@ -3049,7 +3049,7 @@ proto.render = function horde_Engine_proto_render () {
 		case "intro":
 			this.drawLogo(ctx);
 			break;
-		
+
 		// Title Screen
 		case "title":
 			this.drawTitle(ctx);
@@ -3089,7 +3089,7 @@ proto.render = function horde_Engine_proto_render () {
 				this.drawTutorial(ctx);
 			}
 			break;
-		
+
 		case "game_over":
 			this.drawGameOver(ctx);
 			break;
@@ -3098,13 +3098,13 @@ proto.render = function horde_Engine_proto_render () {
 			this.drawBuyNow(ctx);
 			this.drawPointer(ctx);
 			break;
-		
+
 	}
 
 	if (this.debug === true) {
 		this.drawDebugInfo(ctx);
 	}
-	
+
 };
 
 proto.drawWeaponPickup = function horde_Engine_proto_drawWeaponPickup (ctx) {
@@ -3224,7 +3224,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		this.drawUI(ctx);
 		this.gameOverBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
 	}
-	
+
 	ctx.putImageData(this.gameOverBg, 0, 0);
 
 	ctx.save();
@@ -3238,7 +3238,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 	ctx.restore();
 
 	if (this.gameOverReady === true) {
-		
+
 		if (this.keyboard.isAnyKeyPressed() || this.mouse.isAnyButtonDown()) {
 			this.keyboard.clearKeys();
 			this.mouse.clearButtons();
@@ -3286,7 +3286,7 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 		}
 
 		this.drawObjectStats(this.getPlayerObject(), ctx);
-		
+
 		// Press anything to continue ...
 		if (this.statsIndex >= 4) {
 			ctx.drawImage(
@@ -3295,9 +3295,9 @@ proto.drawGameOver = function horde_Engine_proto_drawGameOver (ctx) {
 				153, 404, 334, 20
 			);
 		}
-		
+
 	}
-	
+
 };
 
 proto.drawBuyNow = function horde_Engine_proto_drawBuyNow (ctx) {
@@ -3341,7 +3341,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 
 	var textX = 350;
 	var textHeight = 55;
-	
+
 	ctx.save();
 	ctx.font = "Bold 40px MedievalSharp";
 
@@ -3417,7 +3417,7 @@ proto.drawObjectStats = function horde_Engine_proto_drawObjectStats (object, ctx
 	}
 
 	ctx.restore();
-	
+
 };
 
 /**
@@ -3454,7 +3454,7 @@ proto.drawLogo = function horde_Engine_proto_drawLogo (ctx) {
 	ctx.fillStyle = COLOR_BLACK;
 	ctx.fillRect(0, 0, this.view.width, this.view.height);
 	ctx.restore();
-		
+
 	// Draw the logo
 	if (this.logoAlpha > 0) {
 		ctx.save();
@@ -3813,7 +3813,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 		32, 32, 32, 32,
 		4, 442, 32, 32
 	);
-			
+
 	// Draw gold amount and weapon count
 	ctx.save();
 	ctx.textAlign = "left";
@@ -3910,7 +3910,7 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 			604, 442, 32, 32
 		);
 	}
-	
+
 };
 
 /**
@@ -3921,13 +3921,13 @@ proto.drawUI = function horde_Engine_proto_drawUI (ctx) {
 proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 
 	var grey = "rgb(230, 230, 230)";
-	
+
 	ctx.drawImage(
 		this.preloader.getImage("ui"),
 		0, 430, 640, 480,
 		0, 0, 640, 480
 	);
-	
+
 	var highScore = ("High Score: " + this.getData(HIGH_SCORE_KEY));
 
 	ctx.save();
@@ -3940,7 +3940,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = grey;
 	ctx.fillText(highScore, 320, 442);
 	ctx.restore();
-	
+
 	// Clay.io: High scores button
 	var highScore = ("High Scores  ");
 
@@ -3954,7 +3954,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = this.leaderboardHover ? "rgb(180, 180, 180)" : grey;
 	ctx.fillText(highScore, 320, 460);
 	ctx.restore();
-	
+
 	// Clay.io: Achievement list button
 	var highScore = ("  Achievements");
 
@@ -3996,7 +3996,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = grey;
 	ctx.fillText(version, 636, 478);
 	ctx.restore();
-	
+
 	// Copyright text
 	var copyright = "Lost Decade Games";
 	ctx.save();
@@ -4008,7 +4008,7 @@ proto.drawTitle = function horde_Engine_proto_drawTitle (ctx) {
 	ctx.fillStyle = grey;
 	ctx.fillText(copyright, 4, 460);
 	ctx.restore();
-	
+
 	var copyrightDate = "\u00A9 2010";
 	ctx.save();
 	ctx.font = "Bold 14px Monospace";
@@ -4044,7 +4044,7 @@ proto.drawPointer = function horde_Engine_proto_drawPointer (ctx) {
  * @return {Boolean} true if the checkpoint is stored
  */
 proto.canContinue = function (checkAgain) {
-	
+
 	if( this.canContinueVar ) { // already grabbed from Clay.io
 		var checkpointWave = this.canContinueVar;
 		return checkpointWave;
@@ -4202,7 +4202,7 @@ proto.drawCredits = function horde_Engine_proto_drawCredits (ctx) {
 proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) {
 
 	switch (this.introPhase) {
-		
+
 		case 0:
 			if (!this.introFadeOutBg) {
 				this.introFadeOutBg = ctx.getImageData(0, 0, this.view.width, this.view.height);
@@ -4221,7 +4221,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 				ctx.restore();
 			}
 			break;
-		
+
 		case 1:
 			this.drawFloor(ctx);
 			this.drawFauxGates(ctx);
@@ -4234,14 +4234,14 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 				ctx.restore();
 			}
 			break;
-		
+
 		case 2:
 		case 3:
 			this.drawFloor(ctx);
 			this.drawFauxGates(ctx);
 			this.drawWalls(ctx);
 			break;
-			
+
 		case 4:
 		case 5:
 		case 9:
@@ -4252,7 +4252,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			this.drawFauxGates(ctx);
 			this.drawWalls(ctx);
 			break;
-			
+
 		case 6:
 		case 7:
 		case 8:
@@ -4266,7 +4266,7 @@ proto.drawIntroCinematic = function horde_Engine_proto_drawIntroCinematic (ctx) 
 			break;
 	}
 
-	
+
 };
 
 /**
@@ -4298,13 +4298,13 @@ proto.drawFauxGates = function horde_Engine_proto_drawFauxGates (ctx) {
  * @return {void}
  */
 proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
-	
+
 	// Semi-transparent bar so we can see the text
 	ctx.save();
 	ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
 	ctx.fillRect(0, 0, this.view.width, 30);
 	ctx.restore();
-	
+
 	// Debugging info
 	ctx.save();
 	ctx.fillStyle = COLOR_WHITE;
@@ -4313,7 +4313,7 @@ proto.drawDebugInfo = function horde_Engine_proto_drawDebugInfo (ctx) {
 	ctx.textAlign = "right";
 	ctx.fillText(Math.round(1000 / this.lastElapsed) + " FPS", 630, 20);
 	ctx.restore();
-	
+
 };
 
 /**
@@ -4338,7 +4338,7 @@ proto.getData = function horde_Engine_proto_getData (key, callback, forceClay) {
 			callback({ data: horde.localData[key].value, usingVar: true });
 		}
 		else { // Data not stored locally, and can't fetch from Clay
-			callback({ data: window.localStorage.getItem(key), usingLocalStorage: true });			
+			callback({ data: window.localStorage.getItem(key), usingLocalStorage: true });
 			horde.localData[key] = window.localStorage.getItem(key); // save locally for future reference
 		}
 		return undefined;
@@ -4363,7 +4363,7 @@ proto.putData = function horde_Engine_proto_putData (key, value) {
 	// This is in place so we're not flooding Clay.io with data stores (there is a limit...)
 	if(!Clay.isReady)
 		return false;
-		
+
 	if(horde.localData[key] && horde.localData[key].timeout) {
 		clearTimeout(horde.localData[key].timeout);
 		var times = horde.localData[times] + 1; // log how many times the timeout is set, so every 10th, we'll store anyways
