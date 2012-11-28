@@ -1260,21 +1260,6 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 			case 5:
 				achievementId = "wave5";
 				break;
-			case 10:
-				achievementId = "wave10";
-				break;
-			case 20:
-				achievementId = "wave20";
-				break;
-			case 30:
-				achievementId = "wave30";
-				break;
-			case 40:
-				achievementId = "wave40";
-				break;
-			case 50:
-				achievementId = "wave50";
-				break;
 		}
 
 		if(achievementId && !horde.achievementsGranted[achievementId]) {
