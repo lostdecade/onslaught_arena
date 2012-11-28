@@ -22,7 +22,7 @@ function setup () {
 // Cleanup
 function cleanup () {
 	unlink(ROOT . 'horde.js');
-	unlink(ROOT . 'horde_demo.js');
+	//unlink(ROOT . 'horde_demo.js');
 }
 
 // Compile a bunch of JS files
@@ -63,6 +63,7 @@ function buildWeb ($version) {
 		file_get_contents(ROOT . 'template/ad_leaderboard.html'),
 		$tpl
 	);
+	/*
 	// DEMO
 	$demo_js = file_get_contents(ROOT . 'horde_demo.js');
 	$demo_tpl = file_get_contents(ROOT . 'template/web.template.html');
@@ -74,12 +75,13 @@ function buildWeb ($version) {
 		file_get_contents(ROOT . 'template/ad_leaderboard.html'),
 		$demo_tpl
 	);
+	*/
 	// SHARED
 	$web_root = ROOT . 'build/web/';
 	$htdocs = ROOT . 'htdocs';
 	exec("mkdir {$web_root}");
-	file_put_contents("{$web_root}full.html", $tpl);
-	file_put_contents("{$web_root}demo.html", $demo_tpl);
+	file_put_contents("{$web_root}index.html", $tpl);
+	//file_put_contents("{$web_root}demo.html", $demo_tpl);
 	exec("cp -r {$htdocs}/img {$web_root}");
 	exec("cp -r {$htdocs}/css {$web_root}");
 	exec("cp -r {$htdocs}/font {$web_root}");
@@ -143,19 +145,23 @@ $full_version[8] .= 'waves_full.js';
 echo "Compiling Full Version JavaScript...\n";
 compileJS($full_version, ROOT. 'horde.js', $version);
 
+/*
 $demo_version = $source_js;
 $demo_version[8] .= 'waves_demo.js';
 
 echo "Compiling Demo Version JavaScript...\n";
 compileJS($demo_version, ROOT. 'horde_demo.js', $version, true);
+*/
 
 setup();
 
 echo "Building web version...\n";
 buildWeb($version);
 
+/*
 echo "Building Chrome Web Store app...\n";
 buildChromeApp($version);
+*/
 
 cleanup();
 
