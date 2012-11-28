@@ -7,8 +7,8 @@ define('ROOT', dirname(__FILE__) . '/../');
 function getVersion () {
 	$version_file = ROOT . 'version.json';
 	$v = json_decode(file_get_contents($version_file));
-	$v->build++;
-	file_put_contents($version_file, json_encode($v));
+	//$v->build++;
+	//file_put_contents($version_file, json_encode($v));
 	return "{$v->major}.{$v->minor}.{$v->build}";
 }
 
