@@ -1253,15 +1253,6 @@ proto.updateWaves = function horde_Engine_proto_updateWaves (elapsed) {
 
 		// Clay.io: Achievements
 		var achievementId = false;
-		switch( this.currentWaveId + 1 ) {
-			case 1:
-				achievementId = "wave1";
-				break;
-			case 5:
-				achievementId = "wave5";
-				break;
-		}
-
 		if(achievementId && !horde.achievementsGranted[achievementId]) {
 			horde.achievementsGranted[achievementId] = true; // so we don't keep sending to Clay.io
 			(new Clay.Achievement({ id: achievementId })).award();
